@@ -46,11 +46,21 @@ def signup(request):
     return render(request, 'accounts/signup.html', context)
 
 
+def profile(request, user_pk):
+    User = get_user_model()
+    person = User.objects.get(pk=user_pk)
+    context = {
+        'person': person,
+    }
+    return render(request, 'accounts/profile.html', context)
+
+
 @login_required
 def delete(request, user_pk):
-    User = get_user_model
-    user = User.objects.get(pk=user_pk)
-    if request.user == user:
+    User = get_user_model()
+    person = User.objects.get(pk=user_pk)
+    if request.user == person:
         request.user.delete()
         auth_logout(request)
     return redirect('mountains:index')
+
