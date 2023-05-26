@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
-  <h1>회원가입</h1>
-  <form action="{% url 'accounts:signup' %}" method="POST">
+  <h1>프로필 수정</h1>
+  <form action="{% url 'accounts:update' user.pk %}" method="POST">
     {% csrf_token %}
     {{ form.as_p }}
     <input type="submit">
