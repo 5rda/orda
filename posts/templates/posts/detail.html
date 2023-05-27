@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div>
+    제목: {{ post.title }}
+  </div>
+  <div>
+    내용: {{ post.content }}
+  </div>
+  <a href="{% url 'posts:update' post.pk %}"><input type="submit" value='수정'></a>
+  <input type="submit" value="뒤로가기" onclick=window.history.back()>
+</body>
+</html>
