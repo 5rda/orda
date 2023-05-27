@@ -5,10 +5,18 @@
         <div class="d-flex flex-row justify-content-between" style="width: 45%;">
           <div class="header--logo">로고</div>
           <ul class="header__nav--list">
-            <li class="header__nav--item"><button id="탐색" class="active-button">탐색</button></li>
-            <li class="header__nav--item"><button id="마이코스">마이코스</button></li>
-            <li class="header__nav--item"><button id="등산로">등산로</button></li>
-            <li class="header__nav--item"><button id="인증샷">인증샷</button></li>
+            <li class="header__nav--item">
+              <button id="탐색" class="{% if active_button_id == '탐색' %}active-button{% endif %}">탐색</button>
+            </li>
+            <li class="header__nav--item">
+              <button id="마이코스" class="{% if active_button_id == '마이코스' %}active-button{% endif %}">마이코스</button>
+            </li>
+            <li class="header__nav--item">
+              <button id="등산로" class="{% if active_button_id == '등산로' %}active-button{% endif %}">등산로</button>
+            </li>
+            <li class="header__nav--item">
+              <button id="인증샷" class="{% if active_button_id == '인증샷' %}active-button{% endif %}">인증샷</button>
+            </li>
           </ul>
         </div>
         <div class="d-flex flex-row">
@@ -23,11 +31,22 @@
           </div>
           <div class="header__user--list">
             {% if user.is_authenticated %}
-              <div class="header__user--item"><button id="마이페이지">마이페이지</button></div>
-              <div class="header__user--item"><button id="로그아웃">로그아웃</button></div>
+              <div class="header__user--item">
+                <button id="마이페이지" class="{% if active_button_id == '마이페이지' %}active-button{% endif %}"><a href="{% url 'accounts:profile' %}">마이페이지</a></button>
+              </div>
+              <div class="header__user--item">
+                <form action="{% url 'accounts:logout' %}" method="POST">
+                  {% csrf_token %}
+                  <button id="로그아웃" type="submit">로그아웃</button>
+                </form>
+              </div>
             {% else %}
-              <div class="header__user--item"><button id="로그인">로그인</button></div>
-              <div class="header__user--item"><button id="회원가입">회원가입</button></div>
+              <div class="header__user--item">
+                <button id="로그인" class="{% if active_button_id == '로그인' %}active-button{% endif %}"><a href="{% url 'accounts:login' %}">로그인</a></button>
+              </div>
+              <div class="header__user--item">
+                <button id="회원가입" class="{% if active_button_id == '회원가입' %}active-button{% endif %}"><a href="{% url 'accounts:signup' %}">회원가입</a></button>
+              </div>
             {% endif %}
           </div>
         </div>
