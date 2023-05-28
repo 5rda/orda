@@ -111,11 +111,13 @@ def follow(request, user_pk):
 
 
 load_dotenv()
-CLIENT_ID = os.environ.get('CLIENT_ID')
+KAKAO_CLIENT_ID = os.environ.get('KAKAO_CLIENT_ID')
+NAVER_CLIENT_ID = os.environ.get('NAVER_CLIENT_ID')
+NAVER_CLIENT_SECRET = os.environ.get('NAVER_CLIENT_SECRET')
 
 
 def kakao_login(request):
-    client_id = CLIENT_ID
+    client_id = KAKAO_CLIENT_ID
     redirect_uri = 'http://localhost:8000/accounts/kakao/callback/'
     url = f'https://kauth.kakao.com/oauth/authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code'
     return redirect(url)
@@ -128,7 +130,7 @@ def kakao_callback(request):
         url = 'https://kauth.kakao.com/oauth/token'
         data = {
             'grant_type': 'authorization_code',
-            'client_id': CLIENT_ID,
+            'client_id': KAKAO_CLIENT_ID,
             'redirect_uri': 'http://localhost:8000/accounts/kakao/callback/',
             'code': code,
         }
@@ -161,4 +163,50 @@ def kakao_callback(request):
                 user.profile_img.save(f"{kakao_user_id}.png", File(response))
             auth_login(request, user)
             return redirect('mountains:index')
+    return redirect('accounts:login')
+
+
+def naver_login(request):
+    client_id = NAVER_CLIENT_ID
+    redirect_uri = 'http://localhost:8000/accounts/naver/callback/'
+    url = f'https://nid.naver.com/oauth2.0/authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code&state=STATE_STRING'
+    return redirect(url)
+
+
+def naver_callback(request):
+    User = get_user_model()
+    code = request.GET.get('code')
+    if code:
+        url = 'https://nid.naver.com/oauth2.0/token'
+        data = {
+            'grant_type': 'authorization_code',
+            'client_id': NAVER_CLIENT_ID,
+            'client_secret': NAVER_CLIENT_SECRET,
+            'redirect_uri': 'http://localhost:8000/accounts/naver/callback/',
+            'code': code,
+        }
+        response = requests.post(url, data=data)
+        token = response.json().get('access_token')
+        if token:
+            headers = {
+                'Authorization': f'Bearer {token}',
+            }
+            response = requests.get('https://openapi.naver.com/v1/nid/me', headers=headers)
+            user_info = response.json()
+            print(user_info)
+
+            naver_user_id = user_info['response']['id']
+            nickname = user_info['response']['nickname']
+            email = user_info['response']['email']
+            profile_img = user_info['response']['profile_image']
+
+            user, created = User.objects.get_or_create(naver_user_id=naver_user_id)
+
+            if created:
+                user.nickname = nickname
+                user.email = email
+                response = urlopen(profile_img)
+                user.profile_img.save(f"{naver_user_id}.png", File(response))
+            auth_login(request, user)
+            return redirect('accounts:profile', user.pk)
     return redirect('accounts:login')

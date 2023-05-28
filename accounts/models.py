@@ -12,3 +12,4 @@ class User(AbstractUser):
     followings = models.ManyToManyField('self', symmetrical=False, related_name='followers')
     message = models.CharField(max_length=200, blank=True)
     kakao_user_id = models.CharField(max_length=50, unique=True, blank=True, null=True)
+    naver_user_id = models.CharField(max_length=50, unique=True, blank=True, null=True)
