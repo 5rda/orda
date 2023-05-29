@@ -1,0 +1,417 @@
+.profile__container {
+  display: flex;
+  flex-direction: row;
+  width: 1280px;
+  padding: 30px 60px;
+  margin: auto;
+}
+
+/* user */
+
+.profile__userbox {
+  width: 270px;
+  border: solid 1px #DBDBDB;
+  border-radius: 5px;
+  padding: 30px 25px 20px;
+  margin-top: 20px;
+}
+
+.profile__user--imgbox {
+  position: relative;
+  width:120px;
+  margin: 0 auto 25px;
+}
+
+.profile__user--img {
+  object-fit: cover;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #DBDBDB;
+  border-radius: 100%;
+}
+
+.profile__user--stat {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+}
+
+.profile__user--name {
+  font-size: 25px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.profile__user--follow {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.profile__user--followtext {
+  margin-right: 5px;
+  font-size: 14px;
+  color: #777777;
+}
+
+.profile__user--followercount {
+  font-size: 14px;
+  font-weight: bold;
+  color: #777777;
+}
+
+.profile__user--followercount:hover {
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--main-color);
+}
+
+.profile__user--followingcount {
+  font-size: 14px;
+  font-weight: bold;
+  color: #777777;
+}
+
+.profile__user--followingcount:hover {
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--main-color);
+}
+
+.profile__user--edit {
+  display: flex;
+  justify-content: center;
+}
+
+.profile__user--editbtn {
+  width: 60px;
+  padding: 7px 15px;
+  font-size: 12px;
+  border: solid 1px #DBDBDB;
+  border-radius: 5px;
+}
+
+.profile__user--editbtn:hover {
+  opacity: 0.8;
+}
+
+.profile__user--followbtnbox {
+  display: flex;
+  justify-content: center;
+}
+
+.profile__user--followbtnbox > button:hover {
+  opacity: 0.8;
+}
+
+.profile__user--unfollowbtn{
+  display: flex;
+  justify-content: center;
+  width: 120px;
+  padding: 7px 15px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #777777;
+  border: solid 1px #DBDBDB;
+  border-radius: 5px;
+}
+
+.profile__user--followbtn {
+  width: 120px;
+  padding: 7px 15px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #FFFFFF;
+  background-color: var(--main-color) !important;
+  border: solid 1px var(--main-color);
+  border-radius: 5px;
+}
+
+.profile__user--messagebox {
+  margin: 24px 0;
+}
+
+.profile__user--message {
+  text-align: center;
+}
+
+.profile__user--info2 {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  border-top: solid 1px #DBDBDB;
+  padding: 24px 0 6px;
+}
+
+.profile__user--info2 > button:hover {
+  color: var(--main-color);
+}
+
+.profile__user--infoactivebtn {
+  color: var(--main-color) !important;
+}
+
+.profile__user--review {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 14px;
+  color: #777777;
+}
+
+.profile__user--info2cnt {
+  font-weight: bold;
+}
+
+.profile__user--bookmark {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 14px;
+  color: #777777;
+}
+
+.profile__user--like {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 14px;
+  color: #777777;
+}
+
+
+/* content */
+.profile__content--nonewrite {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  color: #777777;
+}
+
+.profile__contentbox {
+  width: 100%;
+  padding: 20px 10px 0 10px;
+  margin: 0px auto;
+}
+
+.profile__content1--review {
+  margin-bottom: 60px;
+}
+
+.profile__content1--reviewtext {
+  display: flex;
+  flex-direction: row;
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.profile__content1--reviewcontent {
+  height: 200px;
+  border: solid 1px #DBDBDB;
+  border-radius: 5px;
+}
+
+.profile__content1--mycourse {
+  margin-bottom: 60px;
+}
+
+.profile__content1--mycoursetext {
+  display: flex;
+  flex-direction: row;
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.profile__content1--mycoursecontent {
+  height: 200px;
+  border: solid 1px #DBDBDB;
+  border-radius: 5px;
+}
+
+.profile__content2--bookmark {
+  margin-bottom: 60px;
+}
+
+.profile__content2--bookmarktext {
+  display: flex;
+  flex-direction: row;
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.profile__content2--bookmarkcontent {
+  height: 200px;
+  border: solid 1px #DBDBDB;
+  border-radius: 5px;
+}
+
+.profile__content3--mountain {
+  margin-bottom: 60px;
+}
+
+.profile__content3--mountaintext {
+  display: flex;
+  flex-direction: row;
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.profile__content3--mountaincontent {
+  height: 200px;
+  border: solid 1px #DBDBDB;
+  border-radius: 5px;
+}
+
+.profile__content3--mycourse {
+  margin-bottom: 60px;
+}
+
+.profile__content3--mycoursetext {
+  display: flex;
+  flex-direction: row;
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.profile__content3--mycoursecontent {
+  height: 200px;
+  border: solid 1px #DBDBDB;
+  border-radius: 5px;
+}
+
+.profile__content4--follower {
+  margin-bottom: 60px;
+}
+
+.profile__content4--followertext {
+  display: flex;
+  flex-direction: row;
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.profile__content4--followercontent {
+  height: 200px;
+  border: solid 1px #DBDBDB;
+  border-radius: 5px;
+}
+
+.profile__content5--following {
+  margin-bottom: 60px;
+}
+
+.profile__content5--followingtext {
+  display: flex;
+  flex-direction: row;
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.profile__content5--followingcontent {
+  height: 200px;
+  border: solid 1px #DBDBDB;
+  border-radius: 5px;
+}
+
+
+/* follow */
+.profile__follows--list {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 30px;
+}
+
+.profile__follow--item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  height: 60px;
+  padding: 10px 0;
+}
+
+.profile__follow--item > a:hover {
+  opacity: 0.5;
+}
+
+.profile__follow--imgbox {
+  position: relative;
+  width:40px;
+}
+
+.profile__follow--img {
+  object-fit: cover;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #DBDBDB;
+  border-radius: 100%;
+}
+
+.profile__follow--info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: start;
+  margin-left: 15px;
+}
+
+.profile__follow--name {
+  font-size: 14px;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile__follow--message {
+  font-size: 12px;
+  font-weight: bold;
+  color: #777777;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile__follow--followbtnbox {
+  display: flex;
+  justify-content: center;
+}
+
+.profile__follow--followbtnbox > button:hover {
+  opacity: 0.8;
+}
+
+.profile__follow--unfollowbtn{
+  display: flex;
+  justify-content: center;
+  width: 60px;
+  padding: 5px 8px;
+  font-size: 13px;
+  font-weight: bold;
+  color: #777777;
+  border: solid 1px #DBDBDB;
+  border-radius: 5px;
+}
+
+.profile__follow--followbtn {
+  width: 60px;
+  padding: 5px 8px;
+  font-size: 13px;
+  font-weight: bold;
+  color: #FFFFFF;
+  background-color: var(--main-color) !important;
+  border: solid 1px var(--main-color);
+  border-radius: 5px;
+}

@@ -34,7 +34,7 @@
           <div class="header__user--list">
             {% if user.is_authenticated %}
               <div class="header__user--item">
-                <button id="마이페이지" class="{% if active_button_id == '마이페이지' %}active-button{% endif %}"><a href="{% url 'accounts:profile' %}">마이페이지</a></button>
+                <button id="마이페이지" class="{% if active_button_id == '마이페이지' %}active-button{% endif %}"><a href="{% url 'accounts:profile' user.pk %}">마이페이지</a></button>
               </div>
               <div class="header__user--item">
                 <form action="{% url 'accounts:logout' %}" method="POST">
