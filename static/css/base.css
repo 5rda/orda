@@ -5,6 +5,10 @@
   --green-btn: #47A945;
 }
 
+#wrapper{
+  height: auto;
+  min-height: calc(100vh - 295px);
+}
 
 /* nav */
 .header__navbox {
@@ -130,6 +134,8 @@
 
 
 /* footer */
+
+
 .footer--wrap {
   text-align: center;
   padding: 40px 0 40px 0;
