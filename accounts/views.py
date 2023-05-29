@@ -33,7 +33,7 @@ def signup(request):
     if request.user.is_authenticated:
         return redirect('mountains:index')
     if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save()
             auth_login(request, user)
