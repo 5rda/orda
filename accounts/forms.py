@@ -1,6 +1,31 @@
 from django import forms
 from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm, AuthenticationForm
+
+
+class CustomUserAuthenticationForm(AuthenticationForm):
+    username = forms.CharField(
+    label="아이디",
+    widget=forms.TextInput(
+        attrs={
+            'class': 'appearance-none bg-transparent border-none text-gray-700  py-1 px-2 leading-tight focus:outline-none',
+            'style': 'width: 96%',
+            'placeholder': '아이디를 입력하세요',
+            'id': "아이디",
+            }          
+        )
+    )
+    password = forms.CharField(
+        label="비밀번호",
+        widget=forms.PasswordInput(
+            attrs={
+                'class': '"appearance-none bg-transparent border-none text-gray-700  py-1 px-2 leading-tight focus:outline-none',
+                'style': 'width: 96%',
+                'placeholder': '비밀번호를 입력하세요',
+                'id': "비밀번호",
+            }
+        )
+    )
 
 
 class CustomUserCreationForm(UserCreationForm):
