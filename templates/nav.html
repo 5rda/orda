@@ -1,0 +1,58 @@
+{% load static %}
+
+<header style="position: sticky; top: 0;">
+  <div style="height: 100%; box-shadow: 0px 3px 5px var(--main-color); background-color: #FFFFFF;">
+    <div class="container">
+      <div class="header__nav--warp">
+        <div class="header__logo"><a href="{% url 'index' %}"><img class='header__logo--img' src="{% static 'img/nav_logo.png' %}" alt="ordalogo"></a></div>
+        <div class="header__navbox1">
+          <ul class="header__nav--list">
+            <li class="header__nav--item">
+              <button id="탐색" class="{% if active_button_id == '탐색' %}active-button{% endif %}">탐색</button>
+            </li>
+            <li class="header__nav--item">
+              <button id="마이코스" class="{% if active_button_id == '마이코스' %}active-button{% endif %}">마이코스</button>
+            </li>
+            <li class="header__nav--item">
+              <button id="등산로" class="{% if active_button_id == '등산로' %}active-button{% endif %}">등산로</button>
+            </li>
+            <li class="header__nav--item">
+              <button id="인증샷" class="{% if active_button_id == '인증샷' %}active-button{% endif %}">인증샷</button>
+            </li>
+          </ul>
+        </div>
+        <div class="header__navbox2">
+          <div class="header__search">
+            <div class="header__search--list">
+              <svg id="i-search" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="18" height="18" fill="none" stroke="#B2B2B2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                <circle cx="14" cy="14" r="12" />
+                <path d="M23 23 L30 30"  />
+              </svg>
+              <span class="header__search--text">무엇을 찾으시나요?</span>
+            </div>
+          </div>
+          <div class="header__user--list">
+            {% if user.is_authenticated %}
+              <div class="header__user--item">
+                <button id="마이페이지" class="{% if active_button_id == '마이페이지' %}active-button{% endif %}"><a href="{% url 'accounts:profile' %}">마이페이지</a></button>
+              </div>
+              <div class="header__user--item">
+                <form action="{% url 'accounts:logout' %}" method="POST">
+                  {% csrf_token %}
+                  <button id="로그아웃" type="submit">로그아웃</button>
+                </form>
+              </div>
+            {% else %}
+              <div class="header__user--item">
+                <button id="로그인" class="{% if active_button_id == '로그인' %}active-button{% endif %}"><a href="{% url 'accounts:login' %}">로그인</a></button>
+              </div>
+              <div class="header__user--item">
+                <button id="회원가입" class="{% if active_button_id == '회원가입' %}active-button{% endif %}"><a href="{% url 'accounts:signup' %}">회원가입</a></button>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
