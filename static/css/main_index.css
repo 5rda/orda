@@ -1,0 +1,131 @@
+.header__wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  background-color: #DDF0D6;
+  border-bottom: solid 5px var(--sub-color);
+  position: relative;
+  min-height: 400px;
+}
+
+.header__box {
+  width: 35%;
+  text-align:center;
+  min-width: 300px;
+}
+
+.header__box__p {
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+.header__box__p--size {
+  font-weight: bold;
+  font-size: 2em;
+}
+
+.header__box1__img {
+  justify-content: end;
+  min-height: 400px;
+}
+
+.header__div__img{
+  width: 200px;
+}
+
+.nav__box {
+  position: fixed;
+  top: -100px; /* 초기에 숨김 */
+  width: 100%;
+  transition: top 0.3s ease;
+  box-shadow: 0px 3px 5px var(--main-color);
+}
+
+.article__divbox {
+  padding: 150px 0px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.article__divbox--color {
+  background-color: var(--background-color);
+  padding: 105px 0px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.article__p {
+  margin: 5px 0px;
+  font-size: 18px;
+}
+
+.article__p--strong {
+  margin: 5px 0px;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.article__icon {
+  width: 150px;
+  margin: 30px 0px;
+}
+
+.article__btn {
+  background-color: var(--background-color);
+  padding: 10px 75px;
+  margin: 30px 0px;
+}
+
+.article__btn2 {
+  background-color: var(--green-btn);
+  padding: 10px 75px;
+  margin: 30px 0px;
+}
+
+.article__btn:hover,
+.article__btn2:hover {
+  background-color: var(--main-color);
+  color: white;
+}
+
+
+@media (max-width:1080px) {
+  .header__wrap {
+    flex-direction: column;
+  }
+
+  .header__box {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+  }
+
+  .header__box__p {
+    color: white;
+  }
+
+  .header__box__p--size {
+    color: white;
+  }
+
+  .header__box1 {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    filter: brightness(0.7)
+  }
+
+  .header__box1__img {
+    max-width: 100%;
+    height: auto;
+    min-width: 700px;
+  }
+}
