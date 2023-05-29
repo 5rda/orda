@@ -19,4 +19,4 @@ class PostComment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='like_postcomments')
-    
+    dislike_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='dislike_postcomments')
