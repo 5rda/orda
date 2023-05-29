@@ -87,6 +87,12 @@
   margin: 30px 0px;
 }
 
+.article__btn:hover,
+.article__btn2:hover {
+  background-color: var(--main-color);
+  color: white;
+}
+
 
 @media (max-width:1080px) {
   .header__wrap {
