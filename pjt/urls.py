@@ -27,8 +27,8 @@ urlpatterns = [
     path('', views.index, name="index"),
     path('accounts/', include('accounts.urls', 'allauth.urls')),
     path('posts/', include('posts.urls')),
+    path('mountains/', include('mountains.urls')),
     path('ckeditor/', include('ckeditor_uploader.urls')),
     re_path(r'^upload/$', login_required(views_ckeditor.upload), name='ckeditor_upload'),
     re_path(r'^browse/$', never_cache(login_required(views_ckeditor.browse)), name='ckeditor_browse'),
-    path('mountains/', include('mountains.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

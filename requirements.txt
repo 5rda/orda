@@ -1,6 +1,8 @@
 aiohttp==3.8.4
 aiosignal==1.3.1
 asgiref==3.6.0
+certifi==2023.5.7
+charset-normalizer==3.1.0
 asttokens==2.2.1
 async-timeout==4.0.2
 attrs==23.1.0
@@ -21,6 +23,9 @@ django-classy-tags==4.0.0
 django-dotenv==1.4.2
 django-extensions==3.2.1
 django-imagekit==4.1.0
+psycopg2==2.9.6
+pytz==2023.3
+requests==2.31.0
 django-js-asset==2.0.0
 django-scheduler==0.10.1
 django-taggit==4.0.0
@@ -60,6 +65,8 @@ requests-oauthlib==1.3.1
 six==1.16.0
 soupsieve==2.4.1
 sqlparse==0.4.4
+urllib3==2.0.2
+xmltodict==0.13.0
 stack-data==0.6.2
 traitlets==5.9.0
 typing_extensions==4.5.0
