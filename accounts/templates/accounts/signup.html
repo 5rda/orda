@@ -1,9 +1,41 @@
 {% extends 'base.html' %}
+{% load static %}
+{% block style %}
+<style>
+</style>
+<link rel="stylesheet" href="{% static 'css/accounts_signup.css' %}">
+{% endblock style %}
 {% block content %}
-  <h1>회원가입</h1>
-  <form action="{% url 'accounts:signup' %}" method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit">
-  </form>
-{% endblock content %}
+  <div class="select__box--wrap">
+    <div class="rounded-t-lg select__box1"><a href="{% url 'accounts:login' %}">로그인</a></div>
+    <div class="rounded-t-lg select__box"><a href="{% url 'accounts:signup' %}">회원가입</a></div>
+  </div>
+
+  <div class='title__box rounded-tr-lg'>
+    <h1 class="title">회원가입</h1>
+  </div>
+
+  <div class="form__box rounded-b-lg">
+    <form action="{% url 'accounts:signup' %}" method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      {% for field in form %}
+        {% comment %} 이미지 따로 빼기 {% endcomment %}
+        {% if field.name == 'profile' %}
+        <p class="">
+          <img id="profile-preview" src="#" alt="프로필 이미지" class="form__field__img">
+          {{ field }}
+        </p>
+          <label for="{{ field.label }}" class="form__field__imgbtn rounded-full">{{ field.label }}</label>
+        {% else %}
+          <label for="{{ field.label }}">{{ field.label }}</label>
+          <p class="form__field">{{ field }}</p>
+        {% endif %}
+    {% endfor %}
+    <hr>
+    <input type="submit" class="form__submitbtn rounded-2" value="회원가입">
+    </form>
+  {% endblock content %}
+  {% block javascript %}
+    <script src={% static 'js/accounts_input_image.js' %}></script>
+    <script src={% static 'js/accounts_input_delete.js' %}></script>
+  {% endblock javascript %}

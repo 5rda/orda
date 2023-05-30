@@ -1,4 +1,266 @@
 {% extends 'base.html' %}
+
+{% load static %}
+
+{% block style %}
+  <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{% endblock style %}
+
 {% block content %}
-  <h1>{{ person.nickname }}의 프로필</h1>
+<section>
+  <div class="profile__container">
+    <article style="width: 26%;">
+      <div class="profile__userbox">
+        <div class="profile__user--info">
+          <div class="profile__user--imgbox">
+            {% if person.profile %}
+              <img class="profile__user--img" src="{{ person.profile }}" alt="">
+            {% else %}
+              <img class="profile__user--img" src="{% static 'img/profile_no_img.png' %}" alt="">
+            {% endif %}
+          </div>
+          <div class="profile__user--stat">
+            <div class="profile__user--name">{{ person.nickname }}</div>
+            <div class="profile__user--follow">
+              <p class="profile__user--followtext">팔로워</p><button class="profile__user--followercount">{{ person.followers.all|length }}</button>
+              <p style="font-size: 12px; line-height: 20px; margin: 0 5px;">|</p>
+              <p class="profile__user--followtext">팔로잉</p><button class="profile__user--followingcount">{{ person.followings.all|length }}</button>
+            </div>
+            {% if request.user == person %}
+              <div class="profile__user--edit">
+                <form action="{% url 'accounts:update' %}" method="POST">
+                  {% csrf_token %}
+                  <button class="profile__user--editbtn" type="submit">설정</button>
+                </form>
+              </div>
+            {% else %}
+              <form action="{% url 'accounts:follow' person.pk %}" method="POST">
+                {% csrf_token %}
+                {% if request.user in person.followers.all %}
+                  <div class="profile__user--followbtnbox">
+                    <button class="profile__user--unfollowbtn" type="submit">
+                      <svg id="i-checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="18" height="18" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                        <path d="M2 20 L12 28 30 4" />
+                      </svg>
+                      <p style="margin-left: 5px;">팔로잉</p>
+                    </button>
+                  </div>
+                {% else %}
+                  <div class="profile__user--followbtnbox">
+                    <button class="profile__user--followbtn" type="submit">
+                      <p>팔로우</p>
+                    </button>
+                  </div>
+                {% endif %}
+              </form>
+            {% endif %}
+          </div>
+          <div class="profile__user--messagebox">
+            <p class="profile__user--message">{{ person.message }}</p>
+          </div>
+        </div>
+        <div class="profile__user--info2">
+          <button class="profile__user--review profile__user--infoactivebtn">
+            <svg id="i-edit" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+              <path d="M30 7 L25 2 5 22 3 29 10 27 Z M21 6 L26 11 Z M5 22 L10 27 Z" />
+            </svg>
+            <p>나의글</p>
+            <div class="d-flex flex-row profile__user--info2cnt">
+              <span>0</span>
+              <span style="margin: 0 3px; font-size: 12px; line-height: 20px;">|</span>
+              <span>0</span>
+            </div>
+          </button>
+          <button class="profile__user--bookmark">
+            <svg id="i-bookmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+              <path d="M6 2 L26 2 26 30 16 20 6 30 Z" />
+            </svg>
+            <p>북마크</p>
+            <div class="d-flex flex-row profile__user--info2cnt">
+              <span>0</span>
+            </div>
+          </button>
+          <button class="profile__user--like">
+            <svg id="i-heart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+              <path d="M4 16 C1 12 2 6 7 4 12 2 15 6 16 8 17 6 21 2 26 4 31 6 31 12 28 16 25 20 16 28 16 28 16 28 7 20 4 16 Z" />
+            </svg>
+            <p>좋아요</p>
+            <div class="d-flex flex-row profile__user--info2cnt">
+              <span>0</span>
+              <span style="margin: 0 3px; font-size: 12px; line-height: 20px;">|</span>
+              <span>0</span>
+            </div>
+          </button>
+        </div>
+      </div>
+    </article>
+    <div style="width: 8%; padding: 0 10px;"></div>
+    <article style="width: 66%;">
+      <div class="profile__contentbox">
+        <div class="profile__content1" style="display: block;">
+          <div class="profile__content1--review">
+            <div class="profile__content1--reviewtext">
+              <p>내가 쓴 리뷰</p>
+              <span style="margin-left: 5px; color: var(--main-color);">0</span>
+            </div>
+            <div class="profile__content1--reviewcontent">
+              <p class="profile__content--nonewrite">등록된 글이 없습니다.</p>
+            </div>
+          </div>
+          <div class="profile__content1--mycourse">
+            <div class="profile__content1--mycoursetext">
+              <p>마이코스</p>
+              <span style="margin-left: 5px; color: var(--main-color);">0</span>
+            </div>
+            <div class="profile__content1--mycoursecontent">
+              <p class="profile__content--nonewrite">등록된 글이 없습니다.</p>
+            </div>
+          </div>
+        </div>
+        <div class="profile__content2" style="display: none;">
+          <div class="profile__content2--bookmark">
+            <div class="profile__content2--bookmarktext">
+              <p>북마크</p>
+              <span style="margin-left: 5px; color: var(--main-color);">0</span>
+            </div>
+            <div class="profile__content2--bookmarkcontent">
+              <p class="profile__content--nonewrite">북마크한 글이 없습니다.</p>
+            </div>
+          </div>
+        </div>
+        <div class="profile__content3" style="display: none;">
+          <div class="profile__content3--mountain">
+            <div class="profile__content3--mountaintext">
+              <p>산</p>
+              <span style="margin-left: 5px; color: var(--main-color);">0</span>
+            </div>
+            <div class="profile__content3--mountaincontent">
+              <p class="profile__content--nonewrite">좋아요한 글이 없습니다.</p>
+            </div>
+          </div>
+          <div class="profile__content3--mycourse">
+            <div class="profile__content3--mycoursetext">
+              <p>마이코스</p>
+              <span style="margin-left: 5px; color: var(--main-color);">0</span>
+            </div>
+            <div class="profile__content3--mycoursecontent">
+              <p class="profile__content--nonewrite">좋아요한 글이 없습니다.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile__content4" style="display: none;">
+          <div class="profile__content4--follower">
+            <div class="profile__content4--followertext">
+              <p>팔로워</p>
+            </div>
+            <div class="profile__content4--followercontent">
+              {% if person.followers.all %}
+                <div class="profile__follows--list">
+                  {% for follower in person.followers.all %}
+                    <div class="profile__follow--item">
+                      <a class="d-flex flex-row" href="{% url 'accounts:profile' follower.pk %}">
+                        <div class="profile__follow--imgbox">
+                          {% if follower.profile %}
+                            <img class="profile__follow--img" src="{{ follower.profile }}" alt="">
+                          {% else %}
+                            <img class="profile__follow--img" src="{% static 'img/profile_no_img.png' %}" alt="">
+                          {% endif %}
+                        </div>
+                        <div class="profile__follow--info">
+                          <div class="profile__follow--name">{{ follower.nickname }}</div>
+                          {% if follower.message %}
+                            <div class="profile__follow--message">{{ follower.message }}</div>
+                          {% endif %}
+                        </div>
+                      </a>
+                      {% if request.user != follower %}
+                        <form action="{% url 'accounts:follow' follower.pk %}" method="POST">
+                          {% csrf_token %}
+                          {% if request.user in follower.followers.all %}
+                            <div class="profile__follow--followbtnbox">
+                              <button class="profile__follow--unfollowbtn" type="submit">
+                                <p>팔로잉</p>
+                              </button>
+                            </div>
+                          {% else %}
+                            <div class="profile__follow--followbtnbox">
+                              <button class="profile__follow--followbtn" type="submit">
+                                <p>팔로우</p>
+                              </button>
+                            </div>
+                          {% endif %}
+                        </form>
+                      {% endif %}
+                    </div>
+                  {% endfor %}
+                </div>
+              {% else %}
+               <p class="profile__content--nonewrite">팔로워가 없습니다.</p>
+              {% endif %}  
+            </div>
+          </div>
+        </div>
+
+        <div class="profile__content5" style="display: none;">
+          <div class="profile__content5--following">
+            <div class="profile__content5--followingtext">
+              <p>팔로워</p>
+            </div>
+            <div class="profile__content5--followingcontent">
+              {% if person.followings.all %}
+                <div class="profile__follows--list">
+                  {% for following in person.followings.all %}
+                    <div class="profile__follow--item">
+                      <a class="d-flex flex-row" href="{% url 'accounts:profile' following.pk %}">
+                        <div class="profile__follow--imgbox">
+                          {% if following.profile %}
+                            <img class="profile__follow--img" src="{{ following.profile }}" alt="">
+                          {% else %}
+                            <img class="profile__follow--img" src="{% static 'img/profile_no_img.png' %}" alt="">
+                          {% endif %}
+                        </div>
+                        <div class="profile__follow--info">
+                          <div class="profile__follow--name">{{ following.nickname }}</div>
+                          {% if following.message %}
+                            <div class="profile__follow--message">{{ following.message }}</div>
+                          {% endif %}
+                        </div>
+                      </a>
+                      {% if request.user != following %}
+                        <form action="{% url 'accounts:follow' following.pk %}" method="POST">
+                          {% csrf_token %}
+                          {% if following in person.followings.all %}
+                            <div class="profile__follow--followbtnbox">
+                              <button class="profile__follow--unfollowbtn" type="submit">
+                                <p>팔로잉</p>
+                              </button>
+                            </div>
+                          {% else %}
+                            <div class="profile__follow--followbtnbox">
+                              <button class="profile__follow--followbtn" type="submit">
+                                <p>팔로우</p>
+                              </button>
+                            </div>
+                          {% endif %}
+                        </form>
+                      {% endif %}
+                    </div>
+                  {% endfor %}
+                </div>
+              {% else %}
+               <p class="profile__content--nonewrite">팔로윙이 없습니다.</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </article>
+  </div>
+</section>
 {% endblock content %}
+
+{% block javascript %}
+<script type="text/javascript" src="{% static 'js/profile.js' %}"></script>
+{% endblock javascript %}

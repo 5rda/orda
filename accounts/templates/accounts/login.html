@@ -1,11 +1,48 @@
 {% extends 'base.html' %}
+{% load static %}
+{% block style %}
+<style>
+</style>
+<link rel="stylesheet" href="{% static 'css/accounts_login.css' %}">
+{% endblock style %}
 {% block content %}
-  <h1>로그인</h1>
-  <form action="{% url 'accounts:login' %}" method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit">
-  </form>
-  <a href="{% url 'accounts:kakao_login' %}">카카오로 로그인</a>
-  <a href="{% url 'accounts:naver_login' %}">네이버로 로그인</a>
+  <div class="select__box--wrap">
+    <div class="rounded-t-lg select__box"><a href="{% url 'accounts:login' %}">로그인</a></div>
+    <div class="rounded-t-lg select__box1"><a href="{% url 'accounts:signup' %}">회원가입</a></div>
+  </div>
+  <div class='title__box rounded-tr-lg'>
+    <h1 class="title">로그인</h1>
+  </div>
+  <div class="form__box rounded-b-lg">
+    <form action="{% url 'accounts:login' %}" method="POST">
+      {% csrf_token %}
+      {% for field in form %}
+        <label for="{{ field.label }}">{{ field.label }}</label>
+        <p class="form__field">{{ field }}</p>  
+      {% endfor %}
+      <hr>
+      <input type="submit" class="form__submitbtn rounded-2" value="로그인">
+
+      {% comment %} 소셜로그인 {% endcomment %}
+      <a href="#">
+        <div  class="login__btn--kakao rounded">
+          <img src="{% static 'img/icon/kakao_logo.png' %}" style="height: 70%;" alt="">
+          <p class="login__btn--kakaotext">카카오 로그인</p>
+        </div>
+      </a>
+      
+      <a href="#">
+        <div  class="login__btn--naver rounded">
+          <img src="{% static 'img/icon/naver_logo.png' %}" style="height: 70%;" alt="">
+          <p class="login__btn--navertext">네이버 로그인</p>
+        </div>
+      </a>
+      
+    </form>
+  </div>
 {% endblock content %}
+
+{% block javascript %}
+  <script src={% static 'js/accounts_input_delete.js' %}></script>
+{% endblock javascript %}
+
