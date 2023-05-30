@@ -25,7 +25,7 @@ from . import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name="index"),
-    path('accounts/', include('accounts.urls')),
+    path('accounts/', include('accounts.urls', 'allauth.urls')),
     path('posts/', include('posts.urls')),
     path('ckeditor/', include('ckeditor_uploader.urls')),
     re_path(r'^upload/$', login_required(views_ckeditor.upload), name='ckeditor_upload'),

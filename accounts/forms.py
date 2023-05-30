@@ -73,7 +73,6 @@ class CustomUserCreationForm(UserCreationForm):
             }
         )
     )
-
     email = forms.EmailField(
         label="이메일", 
         required=False,
@@ -84,8 +83,9 @@ class CustomUserCreationForm(UserCreationForm):
                 'placeholder': '이메일을 입력하세요',
                 'id': "이메일",
             }
-        ))
-    profile = forms.ImageField(
+        )
+    )
+    profile_img = forms.ImageField(
         label="프로필 이미지", 
         required=False,
         widget=forms.ClearableFileInput(
@@ -94,19 +94,17 @@ class CustomUserCreationForm(UserCreationForm):
                 'id': "프로필 이미지",
             }
         )
-        )
+    )
     class Meta:
         model = get_user_model()
-        fields = ("username", "password1", "password2", "nickname", "email", "profile")
-
-
+        fields = ("username", "password1", "password2", "nickname", "email", "profile_img")
 
 
 class CustomUserChangeForm(UserChangeForm):
     nickname = forms.CharField(label="닉네임")
     email = forms.EmailField(label="이메일", required=False)
-    profile = forms.ImageField(label="프로필 이미지", required=False)
+    profile_img = forms.ImageField(label="프로필 이미지", required=False)
     message = forms.CharField(label="상태메시지", required=False)
     class Meta:
         model = get_user_model()
-        fields = ("nickname", "email", "profile", "message")
+        fields = ("nickname", "email", "profile_img", "message")
