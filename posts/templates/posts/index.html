@@ -1,16 +1,91 @@
 <!DOCTYPE html>
+{% load custom_filters %}
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+  <style>
+    .post-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-gap: 20px;
+    }
+
+    .post-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    #loadMoreBtn {
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
-  {% for post in posts %}
-    <a href="{% url 'posts:detail' post.pk %}">
-      <div>{{ post.title }}</div>
-    </a>
-  {% endfor %}
+  <h1>마이코스: {{ posts|length }}개</h1>
+
+  <form id="filterForm" method="GET" action="{% if category %}{% url 'posts:category' category %}{% else %}{% url 'posts:index' %}{% endif %}">
+    <input type="hidden" name="sortKind" value="{{ sortKind }}">
+    <select class="selectpicker" id="sortKind" name="sortKind" onchange="document.getElementById('filterForm').submit()">
+      <option value="최신순" {% if sortKind == '최신순' %}selected{% endif %}>최신순</option>
+      <option value="인기순" {% if sortKind == '인기순' %}selected{% endif %}>인기순</option>
+    </select>
+  </form>
+
+
+  <div class="post-grid" id="postGrid">
+    {% for post in posts %}
+      <div>
+        <a href="{% url 'posts:detail' post.pk %}">{{ post.title }}</a>
+        좋아요: {{ post.like_users.count }}
+        작성: {{ post.created_at|date:"y.m.d H:i" }}
+        {% with first_image_url=post.content|get_first_image_from_content %}
+          {% if first_image_url %}
+            <img src="{{ first_image_url }}" alt="썸네일">
+          {% else %}
+            <p>이미지 없음</p>
+          {% endif %}
+        {% endwith %}
+      </div>
+    {% endfor %}
+  </div>
+  <button id="loadMoreBtn">더 보기</button>
+  <script>
+    var postGrid = document.getElementById('postGrid');
+    var loadMoreBtn = document.getElementById('loadMoreBtn');
+    var page = 1;
+    var perPage = 16; 
+
+    function showMorePosts() {
+      var hiddenPosts = postGrid.querySelectorAll('.post-item.hidden');
+      var i = 0;
+
+      while (i < perPage && hiddenPosts[i]) {
+        hiddenPosts[i].classList.remove('hidden');
+        i++;
+      }
+
+      if (hiddenPosts.length <= perPage) {
+        loadMoreBtn.style.display = 'none';
+      }
+    }
+
+    loadMoreBtn.addEventListener('click', showMorePosts);
+
+    var allPosts = postGrid.querySelectorAll('.post-item');
+    allPosts.forEach(function(post, index) {
+      if (index >= perPage) {
+        post.classList.add('hidden');
+      }
+    });
+
+    if (allPosts.length <= perPage) {
+      loadMoreBtn.style.display = 'none';
+    }
+  </script>
 </body>
 </html>
