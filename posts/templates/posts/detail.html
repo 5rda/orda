@@ -5,94 +5,15 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/ckeditor.js"></script>
-  <script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/translations/ko.js"></script>
 </head>
 <body>
   <div>
     제목: {{ post.title }}
   </div>
   <div>
-    내용: {{ post.content|safe }}
+    내용: {{ post.content }}
   </div>
-
-  <form action="{% url 'posts:likes' post.pk %}" method="POST">
-    {% csrf_token %} 
-    {% if request.user in post.like_users.all %}
-    <button type="submit">좋아요 취소</button>
-    {% else %}
-    <button type="submit">좋아요</button>
-    {% endif %}
-    <div>좋아요: {{ post.like_users.count }}</div>
-  </form>
-  
-  {% if request.user == post.user %}
-    <a href="{% url 'posts:update' post.pk %}"><button>수정</button></a>
-    <form method="POST" action="{% url 'posts:delete' post.pk %}">
-      {% csrf_token %}
-      <button type="submit">삭제</button> 
-    </form>
-  {% endif %}
-  <a href="javascript:history.back()"><button>뒤로 가기</button></a>
-
-    <div>
-      댓글 목록
-      <div>댓글 개수: {{ post.postcomment_set.count }}</div>
-      <div>
-        <form action="{% url 'posts:comment_create' post.pk %}" method="POST">
-          {% csrf_token %} 
-          {{ postcomment_form.content }}
-          <button type="submit">작성</button>
-        </form>
-      </div>
-    </div>
-    {% for postcomment in postcomments %}
-    <li style="list-style: none">
-      <div>
-        {{ postcomment.user.username }}: {{ postcomment.content }}
-        <form action="{% url 'posts:comment_likes' post.pk postcomment.pk %}" method="POST">
-        {% csrf_token %} 
-        {% if request.user in postcomment.like_users.all %}
-          <button type="submit">좋아요 취소</button>
-        {% else %}
-          <button type="submit">좋아요</button>
-        {% endif %}
-        댓글 좋아요: {{postcomment.like_users.count}}
-        </form>
-
-        <form action="{% url 'posts:comment_dislikes' post.pk postcomment.pk %}" method="POST">
-        {% csrf_token %} 
-        {% if request.user in postcomment.dislike_users.all %}
-          <button type="submit">싫어요 취소</button>
-        {% else %}
-          <button type="submit">싫어요</button>
-        {% endif %}
-        댓글 싫어요: {{postcomment.dislike_users.count}}
-        </form>
-    
-        {% if request.user.is_authenticated and request.user == postcomment.user %}
-        <form action="{% url 'posts:comment_delete' post.pk postcomment.pk %}"method="POST">
-          {% csrf_token %}
-          <button type="submit">삭제</button>
-        </form>
-        {% endif %}
-      </div>
-    </li>
-    {% endfor %}
+  <a href="{% url 'posts:update' post.pk %}"><input type="submit" value='수정'></a>
+  <input type="submit" value="뒤로가기" onclick=window.history.back()>
 </body>
-<script>
-  ClassicEditor
-    .create(document.querySelector('#content'), {
-      language: 'ko',
-    })
-    .then(editor => {
-      editor.model.document.on('change:data', () => {
-        document.querySelector('#content').value = editor.getData();
-      });
-    })
-    .catch(error => {
-      console.error(error);
-    });
-</script>
 </html>
