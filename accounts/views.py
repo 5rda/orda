@@ -10,6 +10,7 @@ from posts.models import Post
 import requests
 import os
 from dotenv import load_dotenv
+from django.http import JsonResponse
 
 
 def login(request):
@@ -21,7 +22,6 @@ def login(request):
             auth_login(request, form.get_user())
             # return redirect('mountains:index', request.user.pk )
             return redirect('accounts:profile', request.user.pk )
-
     else:
         form = CustomUserAuthenticationForm()
     context = {
@@ -143,13 +143,24 @@ def password_change(request):
 @login_required
 def follow(request, user_pk):
     User = get_user_model()
-    person = User.objects.get(pk=user_pk)
-    if request.user != person:
-        if request.user in person.followers.all():
-            person.followers.remove(request.user)
+    person  = User.objects.get(pk=user_pk)
+    me = request.user
+
+    if person != me:
+        if me in person.followers.all():
+            person.followers.remove(me)
+            is_followed = False
         else:
-            person.followers.add(request.user)
-    return redirect('accounts:profile', person.pk)
+            person.followers.add(me)
+            is_followed = True
+        context = {
+            'is_followed':is_followed,
+            'followings_count':person.followings.count(),
+            'followers_count':person.followers.count(),
+            'followers': [{'username': f.username,'pk': f.pk} for f in person.followers.all()]
+        }
+        return JsonResponse(context)
+    return redirect('accounts:profile', person.username)
 
 
 load_dotenv()
