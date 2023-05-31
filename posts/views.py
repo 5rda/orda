@@ -2,25 +2,41 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .models import Post, PostComment
 from .forms import PostForm, PostCommentForm
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.conf import settings
+from bs4 import BeautifulSoup
 import os
 
 # Create your views here.
 
 
 def index(request):
-    posts = Post.objects.all()
+    author_pk = request.GET.get('author')
+    sort_option = request.GET.get('sortKind', '최신순')
+
+    if author_pk:
+        if sort_option == '인기순':
+            posts = Post.objects.filter(user__pk=author_pk).annotate(like_count=Count('like_users')).order_by('-like_count')
+        else:
+            posts = Post.objects.filter(user__pk=author_pk).order_by('-created_at')
+    else:
+        if sort_option == '인기순':
+            posts = Post.objects.annotate(like_count=Count('like_users')).order_by('-like_count')
+        else:
+            posts = Post.objects.order_by('-created_at')
+
     context = {
-        'posts': posts
+        'posts': posts,
+        'sortKind': sort_option
     }
     return render(request, 'posts/index.html', context)
+
 
 
 def detail(request, post_pk):
     post = Post.objects.get(pk=post_pk)
     postcomment_form = PostCommentForm()
-    postcomments = post.PostComment_set.all()
+    postcomments = post.postcomment_set.all()
     context = {
         'post': post,
         'postcomment_form': postcomment_form,
@@ -75,10 +91,6 @@ def update(request, post_pk):
 def delete(request, post_pk):
     post = Post.objects.get(pk=post_pk)
     if request.user == post.user:
-        if post.image:
-            image_path = os.path.join(settings.MEDIA_ROOT, str(post.image1))
-            if os.path.isfile(image_path):
-                os.remove(image_path)
   
         post.delete()
     return redirect('posts:index')
@@ -112,7 +124,7 @@ def comment_create(request, post_pk):
     return render(request, 'posts/detail.html', context)
 
 
-def comments_update(request, post_pk, postcomment_pk):
+def comment_update(request, post_pk, postcomment_pk):
     postcomment = PostComment.objects.get(pk=postcomment_pk)
     
     if request.method == 'POST':
@@ -131,11 +143,29 @@ def comments_update(request, post_pk, postcomment_pk):
     return render(request, 'posts/detail.html', context)
 
 
-def comments_delete(request, post_pk, postcomment_pk):
-    postcomment = PostComment.objects.get(pk=postcomment_pk)
+def comment_delete(request, post_pk, comment_pk):
+    postcomment = PostComment.objects.get(pk=comment_pk)
     if request.user == postcomment.user:
         postcomment.delete()
         
+    return redirect('posts:detail', post_pk)
+
+
+def comment_likes(request, post_pk, comment_pk):
+    comment = PostComment.objects.get(pk=comment_pk)
+    if comment.like_users.filter(pk=request.user.pk).exists():
+        comment.like_users.remove(request.user)
+    else:
+        comment.like_users.add(request.user)
+    return redirect('posts:detail', post_pk)
+
+
+def comment_dislikes(request, post_pk, comment_pk):
+    comment = PostComment.objects.get(pk=comment_pk)
+    if comment.dislike_users.filter(pk=request.user.pk).exists():
+        comment.dislike_users.remove(request.user)
+    else:
+        comment.dislike_users.add(request.user)
     return redirect('posts:detail', post_pk)
 
 
@@ -146,3 +176,12 @@ def search(request):
         'posts': posts
     }
     return render(request, 'posts/search.html', context)
+
+
+def get_first_image_from_content(content):
+    soup = BeautifulSoup(content, 'html.parser')
+    img_tag = soup.find('img')
+    if img_tag:
+        return img_tag['src']
+    else:
+        return None
