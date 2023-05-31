@@ -61,7 +61,7 @@ def profile(request, user_pk):
 
     if score < 200:
         level = 1
-        rest = score % 200
+        rest = score
         max_score = 200
     elif score < 300:
         level = 2
@@ -77,6 +77,12 @@ def profile(request, user_pk):
         max_score = 500
     else:
         level = 5
+        rest = score-500
+        if rest < 600:
+            rest = score-500
+        else:
+            rest = 600
+        max_score = 600
 
     level_dict = {1:'등산새싹', 2:'등산샛별', 3:'등산인', 4:'등산고수', 5:'등산왕'}
     context = {
