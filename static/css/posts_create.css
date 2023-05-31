@@ -1,0 +1,36 @@
+.create__wrap {
+  margin: 0px 200px;
+  display: flex;
+  justify-content: center;
+  padding: 50px 20px;
+}
+
+.btn__wrap{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;;
+}
+
+.btn--back{
+  border: 1px solid var(--sub-color);
+  background-color: var(--sub-color) !important;
+  width: 150px;
+  font-weight: bold;
+  padding: 10px 30px;
+  margin: 15px 0px;
+}
+
+.btn--submit{
+  border: 1px solid var(--main-color);
+  background-color: var(--main-color) !important;
+  color: white;
+  width: 150px;
+  font-weight: bold;
+  padding: 10px 30px;
+  margin: 15px 0px;
+}
+
+.btn--back:hover,
+.btn--submit:hover{
+  filter: brightness(0.9);
+}

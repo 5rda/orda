@@ -19,7 +19,6 @@ def login(request):
         form = CustomUserAuthenticationForm(request, request.POST)
         if form.is_valid():
             auth_login(request, form.get_user())
-
             # return redirect('mountains:index', request.user.pk )
             return redirect('accounts:profile', request.user.pk )
 
@@ -45,7 +44,8 @@ def signup(request):
         if form.is_valid():
             user = form.save()
             auth_login(request, user)
-            return redirect('mountains:index')
+            return redirect('accounts:profile', request.user.pk )
+            # return redirect('mountains:index')
     else:
         form = CustomUserCreationForm()
     context = {
