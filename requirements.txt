@@ -1,12 +1,12 @@
 aiohttp==3.8.4
 aiosignal==1.3.1
 asgiref==3.6.0
-certifi==2023.5.7
 asttokens==2.2.1
 async-timeout==4.0.2
 attrs==23.1.0
 backcall==0.2.0
 beautifulsoup4==4.12.2
+certifi==2023.5.7
 cffi==1.15.1
 charset-normalizer==3.1.0
 colorama==0.4.6
@@ -21,7 +21,6 @@ django-classy-tags==4.0.0
 django-dotenv==1.4.2
 django-extensions==3.2.1
 django-imagekit==4.1.0
-requests==2.31.0
 django-js-asset==2.0.0
 django-scheduler==0.10.1
 django-taggit==4.0.0
@@ -32,6 +31,7 @@ djangorestframework==3.14.0
 et-xmlfile==1.1.0
 executing==1.2.0
 frozenlist==1.3.3
+GDAL @ file:///C:/Users/Limseongjoo/Desktop/Github/5rda/GDAL-3.6.4-cp39-cp39-win_amd64.whl
 geographiclib==2.0
 geopy==2.3.0
 icalendar==5.0.5
@@ -47,6 +47,7 @@ pickleshare==0.7.5
 pilkit==2.0
 Pillow==9.5.0
 prompt-toolkit==3.0.38
+protobuf==3.20.3
 psycopg2==2.9.6
 pure-eval==0.2.2
 pycparser==2.21
@@ -56,15 +57,16 @@ python-dateutil==2.8.2
 python-dotenv==1.0.0
 python3-openid==3.2.0
 pytz==2023.3
+requests==2.31.0
 requests-oauthlib==1.3.1
 six==1.16.0
 soupsieve==2.4.1
 sqlparse==0.4.4
-urllib3==2.0.2
-xmltodict==0.13.0
 stack-data==0.6.2
 traitlets==5.9.0
 typing_extensions==4.5.0
 tzdata==2023.3
+urllib3==2.0.2
 wcwidth==0.2.6
+xmltodict==0.13.0
 yarl==1.9.2

@@ -7,6 +7,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.decorators import login_required
 from django.core.files import File
 from urllib.request import urlopen
+from posts.models import Post
 import requests
 import os
 from dotenv import load_dotenv
@@ -14,12 +15,12 @@ from dotenv import load_dotenv
 
 def login(request):
     if request.user.is_authenticated:
-        return redirect('mountains:index', request.user.pk)
+        return redirect('accounts:profile', request.user.pk)
     if request.method == 'POST':
         form = CustomUserAuthenticationForm(request, request.POST)
         if form.is_valid():
             auth_login(request, form.get_user())
-            return redirect('mountains:index', request.user.pk )
+            return redirect('accounts:profile', request.user.pk)
     else:
         form = CustomUserAuthenticationForm()
     context = {
@@ -54,11 +55,15 @@ def signup(request):
 def profile(request, user_pk):
     User = get_user_model()
     person = User.objects.get(pk=user_pk)
+    posts = Post.objects.filter(user=person)
+    liked_posts = Post.objects.filter(like_users=request.user)
+
     context = {
         'person': person,
+        'posts': posts,
+        'liked_posts': liked_posts,
     }
     return render(request, 'accounts/profile.html', context)
-
 
 @login_required
 def update(request):
