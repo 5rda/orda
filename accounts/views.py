@@ -6,6 +6,7 @@ from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.core.files import File
 from urllib.request import urlopen
+from posts.models import Post
 import requests
 import os
 from dotenv import load_dotenv
@@ -13,13 +14,15 @@ from dotenv import load_dotenv
 
 def login(request):
     if request.user.is_authenticated:
-        return redirect('mountains:index', request.user.pk)
+        return redirect('accounts:profile', request.user.pk)
     if request.method == 'POST':
         form = CustomUserAuthenticationForm(request, request.POST)
         if form.is_valid():
             auth_login(request, form.get_user())
+
             # return redirect('mountains:index', request.user.pk )
             return redirect('accounts:profile', request.user.pk )
+
     else:
         form = CustomUserAuthenticationForm()
     context = {
@@ -54,7 +57,9 @@ def signup(request):
 def profile(request, user_pk):
     User = get_user_model()
     person = User.objects.get(pk=user_pk)
+    post = Post.objects.filter(user=person)
     posts = person.post_set.all().order_by('-created_at')
+    liked_posts = Post.objects.filter(like_users=request.user)
     posts_comments = person.postcomment_set.all().count()
     mountains_comments = person.comment_set.all().count()
     score = posts.count() * 40 + mountains_comments * 30 + posts_comments * 5
@@ -87,14 +92,15 @@ def profile(request, user_pk):
     level_dict = {1:'등산새싹', 2:'등산샛별', 3:'등산인', 4:'등산고수', 5:'등산왕'}
     context = {
         'person': person,
+        'post': post,
         'posts': posts,
         'level': level,
         'level_name': level_dict[level],
         'rest': rest,
         'max_score': max_score,
+        'liked_posts': liked_posts,
     }
     return render(request, 'accounts/profile.html', context)
-
 
 @login_required
 def update(request):
