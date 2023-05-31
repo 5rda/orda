@@ -6,6 +6,19 @@
   margin: auto;
 }
 
+.profile__article1 {
+  width: 26%;
+}
+
+.profile__article2 {
+  width: 8%;
+  padding: 0 10px;
+}
+
+.profile__article3 {
+  width: 66%;
+}
+
 /* user */
 
 .profile__userbox {
@@ -396,7 +409,9 @@
 .profile__follow--unfollowbtn{
   display: flex;
   justify-content: center;
+  align-items: center;
   width: 60px;
+  height: 34px;
   padding: 5px 8px;
   font-size: 13px;
   font-weight: bold;
@@ -406,7 +421,11 @@
 }
 
 .profile__follow--followbtn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 60px;
+  height: 34px;
   padding: 5px 8px;
   font-size: 13px;
   font-weight: bold;
@@ -414,4 +433,39 @@
   background-color: var(--main-color) !important;
   border: solid 1px var(--main-color);
   border-radius: 5px;
+}
+
+
+@media (max-width:1080px) {
+  .profile__container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 30px 60px;
+    margin: auto;
+  }
+
+  .profile__article1 {
+    width: 100%;
+  }
+  
+  .profile__article2 {
+    width: 100%;
+    height: 8%;
+    padding: 20px 0;
+  }
+  
+  .profile__article3 {
+    width: 100%;
+  }
+
+  .profile__userbox {
+    width: 100%;
+    border: solid 1px #DBDBDB;
+    border-radius: 5px;
+    padding: 30px 25px 20px;
+    margin-top: 20px;
+  }
+
 }

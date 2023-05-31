@@ -9,7 +9,7 @@
 {% block content %}
 <section>
   <div class="profile__container">
-    <article style="width: 26%;">
+    <article class="profile__article1">
       <div class="profile__userbox">
         <div class="profile__user--info">
           <div class="profile__user--imgbox">
@@ -22,9 +22,9 @@
           <div class="profile__user--stat">
             <div class="profile__user--name">{{ person.nickname }}</div>
             <div class="profile__user--follow">
-              <p class="profile__user--followtext">팔로워</p><button class="profile__user--followercount">{{ person.followers.all|length }}</button>
+              <p class="profile__user--followtext">팔로워</p><button id="followers-count" class="profile__user--followercount">{{ person.followers.all|length }}</button>
               <p style="font-size: 12px; line-height: 20px; margin: 0 5px;">|</p>
-              <p class="profile__user--followtext">팔로잉</p><button class="profile__user--followingcount">{{ person.followings.all|length }}</button>
+              <p class="profile__user--followtext">팔로잉</p><button id="followings-count" class="profile__user--followingcount">{{ person.followings.all|length }}</button>
             </div>
             {% if request.user == person %}
               <div class="profile__user--edit">
@@ -34,28 +34,16 @@
                 </form>
               </div>
             {% else %}
-              {% comment %} <form action="{% url 'accounts:follow' person.pk %}" method="POST">
-                {% csrf_token %}
-                {% if request.user in person.followers.all %}
-                  <div class="profile__user--followbtnbox">
-                    <button class="profile__user--unfollowbtn" type="submit">
-                      <svg id="i-checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="18" height="18" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                        <path d="M2 20 L12 28 30 4" />
-                      </svg>
-                      <p style="margin-left: 5px;">팔로잉</p>
-                    </button>
-                  </div>
-                {% else %}
-                  <div class="profile__user--followbtnbox">
-                    <button class="profile__user--followbtn" type="submit">
-                      <p>팔로우</p>
-                    </button>
-                  </div>
-                {% endif %}
-              </form> {% endcomment %}
               <div class="profile__user--followbtnbox">
-                <button id="followBtn" class="profile__user--followbtn" data-person="{{ person.pk }}">
-                  <p>팔로우</p>
+                <button id="followBtn" class="{% if request.user in person.followers.all %}profile__user--unfollowbtn{% else %}profile__user--followbtn{% endif %}" data-person="{{ person.pk }}">
+                  {% if request.user in person.followers.all %}
+                    <svg id="i-checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="18" height="18" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                      <path d="M2 20 L12 28 30 4" />
+                    </svg>
+                    <p style="margin-left: 5px;">팔로잉</p>
+                  {% else %}
+                    <p>팔로우</p>
+                  {% endif %}
                 </button>
               </div>
             {% endif %}
@@ -99,8 +87,8 @@
         </div>
       </div>
     </article>
-    <div style="width: 8%; padding: 0 10px;"></div>
-    <article style="width: 66%;">
+    <article class="profile__article2"></article>
+    <article class="profile__article3">
       <div class="profile__contentbox">
         <div class="profile__content1" style="display: block;">
           <div class="profile__content1--review">
@@ -202,22 +190,16 @@
                         </div>
                       </a>
                       {% if request.user != follower %}
-                        <form action="{% url 'accounts:follow' follower.pk %}" method="POST">
-                          {% csrf_token %}
-                          {% if request.user in follower.followers.all %}
-                            <div class="profile__follow--followbtnbox">
-                              <button class="profile__follow--unfollowbtn" type="submit">
-                                <p>팔로잉</p>
-                              </button>
-                            </div>
-                          {% else %}
-                            <div class="profile__follow--followbtnbox">
-                              <button class="profile__follow--followbtn" type="submit">
-                                <p>팔로우</p>
-                              </button>
-                            </div>
-                          {% endif %}
-                        </form>
+                      
+                        <div class="profile__follow--followbtnbox">
+                          <button id="followBtn2" class="{% if request.user in follower.followers.all %}profile__follow--unfollowbtn {% else %}profile__follow--followbtn{% endif %}" type="submit" data-person="{{ follower.pk }}">
+                            {% if request.user in follower.followers.all %}
+                              <p>팔로잉</p>
+                            {% else %}
+                              <p>팔로우</p>
+                            {% endif %}
+                          </button>
+                        </div>
                       {% endif %}
                     </div>
                   {% endfor %}
@@ -255,22 +237,11 @@
                         </div>
                       </a>
                       {% if request.user != following %}
-                        <form action="{% url 'accounts:follow' following.pk %}" method="POST">
-                          {% csrf_token %}
-                          {% if following in person.followings.all %}
-                            <div class="profile__follow--followbtnbox">
-                              <button class="profile__follow--unfollowbtn" type="submit">
-                                <p>팔로잉</p>
-                              </button>
-                            </div>
-                          {% else %}
-                            <div class="profile__follow--followbtnbox">
-                              <button class="profile__follow--followbtn" type="submit">
-                                <p>팔로우</p>
-                              </button>
-                            </div>
-                          {% endif %}
-                        </form>
+                        <div class="profile__follow--followbtnbox">
+                          <button id="followBtn3" class="profile__follow--unfollowbtn" type="submit" data-person="{{ following.pk }}">
+                            <p>팔로잉</p>
+                          </button>
+                        </div>
                       {% endif %}
                     </div>
                   {% endfor %}
