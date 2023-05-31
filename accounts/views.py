@@ -10,18 +10,20 @@ from posts.models import Post
 import requests
 import os
 from dotenv import load_dotenv
-from django.http import JsonResponse
 
 
 def login(request):
     if request.user.is_authenticated:
         return redirect('accounts:profile', request.user.pk)
+        return redirect('accounts:profile', request.user.pk)
     if request.method == 'POST':
         form = CustomUserAuthenticationForm(request, request.POST)
         if form.is_valid():
             auth_login(request, form.get_user())
+
             # return redirect('mountains:index', request.user.pk )
             return redirect('accounts:profile', request.user.pk )
+
     else:
         form = CustomUserAuthenticationForm()
     context = {
@@ -44,8 +46,7 @@ def signup(request):
         if form.is_valid():
             user = form.save()
             auth_login(request, user)
-            return redirect('accounts:profile', request.user.pk )
-            # return redirect('mountains:index')
+            return redirect('mountains:index')
     else:
         form = CustomUserCreationForm()
     context = {
@@ -57,11 +58,11 @@ def signup(request):
 def profile(request, user_pk):
     User = get_user_model()
     person = User.objects.get(pk=user_pk)
-    post = Post.objects.filter(user=person)
-    posts = person.post_set.all().order_by('-created_at')
-    liked_posts = Post.objects.filter(like_users=request.user)
-    posts_comments = person.postcomment_set.all().count()
-    # mountains_comments = person.comment_set.all().count()
+    # post = Post.objects.filter(user=person)
+    # posts = person.post_set.all().order_by('-created_at')
+    # liked_posts = Post.objects.filter(like_users=request.user)
+    # posts_comments = person.postcomment_set.all().count()
+    
     # score = posts.count() * 40 + mountains_comments * 30 + posts_comments * 5
 
     # if score < 200:
@@ -92,13 +93,13 @@ def profile(request, user_pk):
     # level_dict = {1:'등산새싹', 2:'등산샛별', 3:'등산인', 4:'등산고수', 5:'등산왕'}
     context = {
         'person': person,
-        'post': post,
-        'posts': posts,
+        # 'post': post,
+        # 'posts': posts,
         # 'level': level,
         # 'level_name': level_dict[level],
         # 'rest': rest,
         # 'max_score': max_score,
-        'liked_posts': liked_posts,
+        # 'liked_posts': liked_posts,
     }
     return render(request, 'accounts/profile.html', context)
 
@@ -143,24 +144,13 @@ def password_change(request):
 @login_required
 def follow(request, user_pk):
     User = get_user_model()
-    person  = User.objects.get(pk=user_pk)
-    me = request.user
-
-    if person != me:
-        if me in person.followers.all():
-            person.followers.remove(me)
-            is_followed = False
+    person = User.objects.get(pk=user_pk)
+    if request.user != person:
+        if request.user in person.followers.all():
+            person.followers.remove(request.user)
         else:
-            person.followers.add(me)
-            is_followed = True
-        context = {
-            'is_followed':is_followed,
-            'followings_count':person.followings.count(),
-            'followers_count':person.followers.count(),
-            'followers': [{'username': f.username,'pk': f.pk} for f in person.followers.all()]
-        }
-        return JsonResponse(context)
-    return redirect('accounts:profile', person.username)
+            person.followers.add(request.user)
+    return redirect('accounts:profile', person.pk)
 
 
 load_dotenv()
