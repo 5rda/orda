@@ -468,4 +468,94 @@
     margin-top: 20px;
   }
 
+  .profile__user--info {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center
+  }
+
+  .profile__user--imgbox {
+    position: relative;
+    flex-basis: 20%;
+    width:120px;
+    margin: 0 auto 25px;
+  }
+
+  .profile__user--stat {
+    display: flex;
+    flex-basis: 80%;
+    flex-direction: column;
+    text-align: start;
+    justify-content: flex-end;
+    padding-left: 30px;
+    margin-bottom: auto;
+  }
+
+  .profile__user--edit {
+    display: flex;
+    justify-content: start;
+  }
+  
+  .profile__user--name {
+    font-size: 25px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .profile__user--follow {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    margin-bottom: 10px;
+  }
+
+  .profile__user--followbtnbox {
+    display: flex;
+    justify-content: start;
+  }
+
+  .profile__user--messagebox {
+    width: 80%;
+    margin: 0 0 24px auto;
+    padding-left: 30px;
+  }
+  
+  .profile__user--message {
+    text-align: start;
+  }
+
+  .profile__user--info2 {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    border-top: solid 1px #DBDBDB;
+    padding: 24px 0 6px;
+  }
+
+  .profile__user--review {
+    width: 33.3%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 16px;
+    color: #777777;
+  }
+
+  .profile__user--bookmark {
+    width: 33.4%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 16px;
+    color: #777777;
+  }
+
+  .profile__user--like {
+    width: 33.3%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 16px;
+    color: #777777;
+  }
 }
