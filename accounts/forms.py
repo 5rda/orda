@@ -8,7 +8,7 @@ class CustomUserAuthenticationForm(AuthenticationForm):
     label="아이디",
     widget=forms.TextInput(
         attrs={
-            'class': 'appearance-none bg-transparent border-none text-gray-700  py-1 px-2 leading-tight focus:outline-none',
+            'class': 'appearance-none bg-transparent border-none text-gray-700  py-1 px-2 leading-tight focus:outline-none ',
             'style': 'width: 96%',
             'placeholder': '아이디를 입력하세요',
             'id': "아이디",
