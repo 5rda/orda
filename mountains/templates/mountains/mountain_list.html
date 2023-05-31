@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+  {% for mountain in mountains %}
+    <ul>
+      <li>{{ mountain.pk }}</li>
+      <li>{{ mountain.name }}</li>
+      <li>{{ mountain.region }}</li>
+      <li>{{ mountain.height }}</li>
+    </ul>
+
+  {% endfor %}
+{% endblock content %}

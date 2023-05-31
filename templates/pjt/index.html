@@ -54,8 +54,7 @@
       <P class='article__p'>정상을 갔다면?</P>
      <img class='article__icon' src="{% static 'img/icon/summit.png' %}" alt="">
       <P class='article__p--strong'>내가 다녀온 후기는 공유해보세요</P>
-      {% comment %} {% url 'posts:index' %} {% endcomment %}
-      <a href="#"><button class='rounded-full article__btn'>공유</button></a>
+      <a href="{% url 'posts:index' %}"><button class='rounded-full article__btn'>공유</button></a>
     </div>
   
     <div class='article__divbox--color'>

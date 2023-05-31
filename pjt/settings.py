@@ -99,7 +99,7 @@ WSGI_APPLICATION = 'pjt.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'orda_db',
+        'NAME': 'postgres',
         'USER': os.environ['DB_USERNAME'],
         'PASSWORD': os.environ['DB_PASSWORD'],
         'HOST': 'localhost',
@@ -147,7 +147,7 @@ USE_TZ = False
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_URL = '/static/'
 
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 # Default primary key field type
@@ -178,4 +178,4 @@ CKEDITOR_CONFIGS = {
     }}
 
 CKEDITOR_UPLOAD_PATH = 'uploads/'
-CKEDITOR_IMAGE_BACKEND = "pillow" 
+CKEDITOR_IMAGE_BACKEND = 'pillow'

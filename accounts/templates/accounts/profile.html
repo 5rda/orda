@@ -115,10 +115,22 @@
           <div class="profile__content1--mycourse">
             <div class="profile__content1--mycoursetext">
               <p>마이코스</p>
-              <span style="margin-left: 5px; color: var(--main-color);">0</span>
+              <span style="margin-left: 5px; color: var(--main-color);">{{ posts|length }}</span>
             </div>
             <div class="profile__content1--mycoursecontent">
-              <p class="profile__content--nonewrite">등록된 글이 없습니다.</p>
+              {% if posts %}
+                {% for post in posts %}
+                  {% if post.user == person %}
+                    <div>
+                      <a href="{% url 'posts:detail' post.pk %}">{{ post.title }}</a>
+                      좋아요: {{ post.like_users.count }}
+                      작성: {{ post.created_at|date:"y.m.d H:i" }}
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              {% else %}
+                <p class="profile__content--nonewrite">등록된 글이 없습니다.</p>
+              {% endif %}
             </div>
           </div>
         </div>
@@ -145,13 +157,23 @@
           </div>
           <div class="profile__content3--mycourse">
             <div class="profile__content3--mycoursetext">
-              <p>마이코스</p>
-              <span style="margin-left: 5px; color: var(--main-color);">0</span>
+                <p>마이코스</p>
+                <span style="margin-left: 5px; color: var(--main-color);">{{ liked_posts|length }}</span>
             </div>
             <div class="profile__content3--mycoursecontent">
-              <p class="profile__content--nonewrite">좋아요한 글이 없습니다.</p>
+                {% if liked_posts %}
+                    {% for post in liked_posts %}
+                        <div>
+                            <a href="{% url 'posts:detail' post.pk %}">{{ post.title }}</a>
+                            좋아요: {{ post.like_users.count }}
+                            작성: {{ post.created_at|date:"y.m.d H:i" }}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="profile__content--nonewrite">좋아요한 글이 없습니다.</p>
+                {% endif %}
             </div>
-          </div>
+        </div>
         </div>
 
         <div class="profile__content4" style="display: none;">
