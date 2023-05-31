@@ -126,3 +126,34 @@ followingButton.addEventListener('click', () => {
   // 팔로윙 count 요소의 색상을 변경합니다.
   followingButton.classList.add('profile__user--infoactivebtn')
 });
+
+
+const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+console.log(csrftoken)
+
+// 팔로우 버튼 클릭 이벤트 리스너
+const followBtn = document.getElementById('followBtn');
+followBtn.addEventListener('click', () => {
+  const personId = followBtn.getAttribute('data-person');
+  console.log(followBtn)
+  axios.defaults.headers.common['X-CSRFToken'] = csrftoken;  // CSRF 토큰 설정
+  axios.post(`/accounts/profile/${personId}/follow`)
+    .then(response => {
+      // 서버로부터의 응답을 처리
+      if (response.data.following) {
+        // 팔로우 성공 시 동작
+        followBtn.innerHTML = '<p>팔로잉</p>';
+        followBtn.classList.remove('profile__user--followbtn')
+        followBtn.classList.add('profile__user--unfollowbtn')
+      } else {
+        // 언팔로우 성공 시 동작
+        followBtn.innerHTML = '<p>팔로우</p>';
+        followBtn.classList.remove('profile__user--unfollowbtn')
+        followBtn.classList.add('profile__user--followbtn')
+      }
+    })
+    .catch(error => {
+      // 에러 처리
+      console.error(error);
+    });
+});

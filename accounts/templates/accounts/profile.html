@@ -34,7 +34,7 @@
                 </form>
               </div>
             {% else %}
-              <form action="{% url 'accounts:follow' person.pk %}" method="POST">
+              {% comment %} <form action="{% url 'accounts:follow' person.pk %}" method="POST">
                 {% csrf_token %}
                 {% if request.user in person.followers.all %}
                   <div class="profile__user--followbtnbox">
@@ -52,7 +52,12 @@
                     </button>
                   </div>
                 {% endif %}
-              </form>
+              </form> {% endcomment %}
+              <div class="profile__user--followbtnbox">
+                <button id="followBtn" class="profile__user--followbtn" data-person="{{ person.pk }}">
+                  <p>팔로우</p>
+                </button>
+              </div>
             {% endif %}
           </div>
           <div class="profile__user--messagebox">
@@ -262,5 +267,6 @@
 {% endblock content %}
 
 {% block javascript %}
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script type="text/javascript" src="{% static 'js/profile.js' %}"></script>
 {% endblock javascript %}
