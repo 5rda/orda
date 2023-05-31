@@ -1,9 +1,8 @@
 from django.shortcuts import render, redirect
-from .forms import CustomUserCreationForm, CustomUserChangeForm, CustomUserAuthenticationForm
+from .forms import CustomUserCreationForm, CustomUserChangeForm, CustomUserAuthenticationForm, CustomUserPasswordChangeForm
 from django.contrib.auth import get_user_model, update_session_auth_hash
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
-from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.decorators import login_required
 from django.core.files import File
 from urllib.request import urlopen
@@ -20,7 +19,10 @@ def login(request):
         form = CustomUserAuthenticationForm(request, request.POST)
         if form.is_valid():
             auth_login(request, form.get_user())
-            return redirect('accounts:profile', request.user.pk)
+
+            # return redirect('mountains:index', request.user.pk )
+            return redirect('accounts:profile', request.user.pk )
+
     else:
         form = CustomUserAuthenticationForm()
     context = {
@@ -55,12 +57,47 @@ def signup(request):
 def profile(request, user_pk):
     User = get_user_model()
     person = User.objects.get(pk=user_pk)
-    posts = Post.objects.filter(user=person)
+    post = Post.objects.filter(user=person)
+    posts = person.post_set.all().order_by('-created_at')
     liked_posts = Post.objects.filter(like_users=request.user)
+    posts_comments = person.postcomment_set.all().count()
+    mountains_comments = person.comment_set.all().count()
+    score = posts.count() * 40 + mountains_comments * 30 + posts_comments * 5
 
+    if score < 200:
+        level = 1
+        rest = score
+        max_score = 200
+    elif score < 300:
+        level = 2
+        rest = score-200
+        max_score = 300
+    elif score < 400:
+        level = 3
+        rest = score-300
+        max_score = 400
+    elif score < 500:
+        level = 4
+        rest = score-400
+        max_score = 500
+    else:
+        level = 5
+        rest = score-500
+        if rest < 600:
+            rest = score-500
+        else:
+            rest = 600
+        max_score = 600
+
+    level_dict = {1:'등산새싹', 2:'등산샛별', 3:'등산인', 4:'등산고수', 5:'등산왕'}
     context = {
         'person': person,
+        'post': post,
         'posts': posts,
+        'level': level,
+        'level_name': level_dict[level],
+        'rest': rest,
+        'max_score': max_score,
         'liked_posts': liked_posts,
     }
     return render(request, 'accounts/profile.html', context)
@@ -90,13 +127,13 @@ def delete(request):
 @login_required
 def password_change(request):
     if request.method == 'POST':
-        form = PasswordChangeForm(request.user, request.POST)
+        form = CustomUserPasswordChangeForm(request.user, request.POST)
         if form.is_valid():
             user = form.save()
             update_session_auth_hash(request, user)
             return redirect('mountains:index')
     else:
-        form = PasswordChangeForm(request.user)
+        form = CustomUserPasswordChangeForm(request.user)
     context = {
         'form': form,
     }

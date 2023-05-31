@@ -5,28 +5,22 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/ckeditor.js"></script>
   <script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/translations/ko.js"></script>
 </head>
 <body>
   <form action="{% url 'posts:update' post.pk %}" method="POST" enctype="multipart/form-data">
     {% csrf_token %} 
-    {{ form.media }}  
-    {{ form.as_p }}
+    {{ form.title }}
+    <textarea id="content"></textarea><br>
     <input type="submit" value='수정'>
     <input type="submit" value="뒤로가기" onclick=window.history.back()>
   </form> 
 </body>
 <script>
   ClassicEditor
-    .create(document.querySelector('#content'), {
+    .update(document.querySelector('#content'), {
       language: 'ko',
-    })
-    .then(editor => {
-      editor.model.document.on('change:data', () => {
-        document.querySelector('#content').value = editor.getData();
-      });
     })
     .catch(error => {
       console.error(error);
