@@ -23,32 +23,32 @@ class Mountain(models.Model):
 class Course(models.Model):
     id = models.AutoField(primary_key=True)
     mntn_name = models.ForeignKey(Mountain, on_delete=models.CASCADE, to_field="name", db_column="mntn_name")
-    crs_name = models.CharField(max_length=30)
+    crs_name = models.CharField(max_length=100, unique=True)
+    distance = models.IntegerField(db_column='total_distance_int')
+    duration = models.DurationField(db_column='total_duration_int')
+
+    class Meta:
+        managed = False
+        db_table = 'course'
+
+    def __str__(self):
+        return self.crs_name
+
+
+class CourseDetail(models.Model):
+    id = models.AutoField(primary_key=True)
+    crs_name = models.ForeignKey(Course, on_delete=models.CASCADE, to_field="crs_name", db_column="crs_name")
     is_waypoint = models.BooleanField(default=False)
     waypoint_name = models.CharField(max_length=50)
     geom = models.GeometryField()
 
     class Meta:
         managed = False
-        db_table = 'test_course'
+        db_table = 'course_detail'
 
     def __str__(self):
-        return self.crs_name
+        return str(self.crs_name)
     
-    # @property
-    # def total_distance(self):
-    #     total_distance = Course.objects.filter(crs_name=self.crs_name).annotate(distance=Length(Transform('geom', 3857))).aggregate(distance=Sum('distance'))['distance']
-    #     return total_distance
 
-    # @property
-    # def total_duration(self):
-    #     distance = self.total_distance
-    #     speed = 1.4  # m/s
-    #     total_seconds = distance / speed if distance else None
-    #     hours = int(total_seconds // 3600)
-    #     minutes = int((total_seconds % 3600) // 60)
-    #     total_duration = "{:02d}시간 {:02d}분".format(hours, minutes)
-    #     return total_duration
-    
 class Comment(models.Model):
     pass

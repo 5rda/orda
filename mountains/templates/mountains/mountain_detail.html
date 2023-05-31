@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block content %}
+  <ul>
+    <li>{{ mountain.pk }}</li>
+    <li>{{ mountain.name }}</li>
+    <div id="map" style="width:500px;height:400px;"></div>
+    <li>{{ mountain.region }}</li>
+    <li>{{ mountain.height }}</li>
+    <li id="latitude">{{ mountain.geom.y }}</li>
+    <li id="longitude">{{ mountain.geom.x }}</li>
+  </ul>
+  <h2>course</h2>
+  <ul>
+    {% for course in courses %}
+        <li>{{ course.crs_name }}</li>
+    {% empty %}
+        <li>No courses available.</li>
+    {% endfor %}
+  </ul>
+
+  <script>
+    function loadKakaoMaps() {
+      var script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.src = 'https://dapi.kakao.com/v2/maps/sdk.js?appkey=d39fcd60ffdc96ae99454337f5e45a16&libraries=services&autoload=false';
+      script.onload = function() {
+        kakao.maps.load(function() {
+          var mapContainer = document.getElementById('map');
+          var mapOption = {
+            center: new kakao.maps.LatLng(33.450701, 126.570667),
+            level: 10
+          };
+    
+          var map = new kakao.maps.Map(mapContainer, mapOption);
+    
+          var latitude = parseFloat(document.getElementById('latitude').textContent);
+          var longitude = parseFloat(document.getElementById('longitude').textContent);
+    
+          var geomPosition = new kakao.maps.LatLng(latitude, longitude);
+    
+          var marker = new kakao.maps.Marker({
+            position: geomPosition
+          });
+    
+          marker.setMap(map);
+    
+          // 지도 중심을 마커의 위치로 이동합니다
+          map.setCenter(geomPosition);
+    
+          // 부드럽게 마커가 위치한 곳으로 이동합니다
+          map.panTo(geomPosition);
+        });
+      };
+      document.head.appendChild(script);
+    }
+    
+    loadKakaoMaps();
+  </script>
+{% endblock content %}
