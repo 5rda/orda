@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm, AuthenticationForm
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm, AuthenticationForm, PasswordChangeForm
 
 
 class CustomUserAuthenticationForm(AuthenticationForm):
@@ -108,3 +108,39 @@ class CustomUserChangeForm(UserChangeForm):
     class Meta:
         model = get_user_model()
         fields = ("nickname", "email", "profile_img", "message")
+
+
+class CustomUserPasswordChangeForm(PasswordChangeForm):
+    old_password = forms.CharField(
+        label="기존 비밀번호 입력",
+        widget=forms.PasswordInput(
+            attrs={
+                'class': '"appearance-none bg-transparent border-none text-gray-700  py-1 px-2 leading-tight focus:outline-none',
+                'style': 'width: 96%',
+                'placeholder': '기존 비밀번호를 입력하세요',
+                'id': "기존 비밀번호 입력",
+            }
+        )
+    )
+    new_password1 = forms.CharField(
+        label="새 비밀번호 입력",
+        widget=forms.PasswordInput(
+            attrs={
+                'class': '"appearance-none bg-transparent border-none text-gray-700  py-1 px-2 leading-tight focus:outline-none',
+                'style': 'width: 96%',
+                'placeholder': '새 비밀번호를 입력하세요',
+                'id': "새 비밀번호 입력",
+            }
+        )
+    )
+    new_password2 = forms.CharField(
+        label="새 비밀번호 확인",
+        widget=forms.PasswordInput(
+            attrs={
+                'class': '"appearance-none bg-transparent border-none text-gray-700  py-1 px-2 leading-tight focus:outline-none',
+                'style': 'width: 96%',
+                'placeholder': '새 비밀번호를 확인하세요',
+                'id': "새 비밀번호 확인",
+            }
+        )
+    )
