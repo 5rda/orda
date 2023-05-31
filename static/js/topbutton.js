@@ -1,11 +1,11 @@
 $(window).scroll(function(){
   if ($(this).scrollTop() > 300){
-    $('.btn_gotop').show();
+    $('.btn__gotop').show();
   } else{
-    $('.btn_gotop').hide();
+    $('.btn__gotop').hide();
   }
 });
-$('.btn_gotop').click(function(){
+$('.btn__gotop').click(function(){
   $('html, body').animate({scrollTop:0},400);
   return false;
 });

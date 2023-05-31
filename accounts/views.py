@@ -1,9 +1,8 @@
 from django.shortcuts import render, redirect
-from .forms import CustomUserCreationForm, CustomUserChangeForm, CustomUserAuthenticationForm
+from .forms import CustomUserCreationForm, CustomUserChangeForm, CustomUserAuthenticationForm, CustomUserPasswordChangeForm
 from django.contrib.auth import get_user_model, update_session_auth_hash
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
-from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.decorators import login_required
 from django.core.files import File
 from urllib.request import urlopen
@@ -19,6 +18,7 @@ def login(request):
         form = CustomUserAuthenticationForm(request, request.POST)
         if form.is_valid():
             auth_login(request, form.get_user())
+            # return redirect('mountains:index', request.user.pk )
             return redirect('accounts:profile', request.user.pk )
     else:
         form = CustomUserAuthenticationForm()
@@ -121,13 +121,13 @@ def delete(request):
 @login_required
 def password_change(request):
     if request.method == 'POST':
-        form = PasswordChangeForm(request.user, request.POST)
+        form = CustomUserPasswordChangeForm(request.user, request.POST)
         if form.is_valid():
             user = form.save()
             update_session_auth_hash(request, user)
             return redirect('mountains:index')
     else:
-        form = PasswordChangeForm(request.user)
+        form = CustomUserPasswordChangeForm(request.user)
     context = {
         'form': form,
     }
