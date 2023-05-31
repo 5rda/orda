@@ -15,7 +15,7 @@
     {% csrf_token %}
     {% for field in form %}
       {% comment %} 이미지 따로 빼기 {% endcomment %}
-      {% if field.name == 'profile' %}
+      {% if field.name == 'profile_img' %}
       <p class="">
         <img id="profile-preview" src="#" alt="프로필 이미지" class="form__field__img">
         {{ field }}
