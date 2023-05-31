@@ -19,7 +19,7 @@ def login(request):
         form = CustomUserAuthenticationForm(request, request.POST)
         if form.is_valid():
             auth_login(request, form.get_user())
-            return redirect('mountains:index', request.user.pk )
+            return redirect('accounts:profile', request.user.pk )
     else:
         form = CustomUserAuthenticationForm()
     context = {
@@ -54,8 +54,38 @@ def signup(request):
 def profile(request, user_pk):
     User = get_user_model()
     person = User.objects.get(pk=user_pk)
+    posts = person.post_set.all().order_by('-created_at')
+    posts_comments = person.postcomment_set.all().count()
+    mountains_comments = person.comment_set.all().count()
+    score = posts.count() * 40 + mountains_comments * 30 + posts_comments * 5
+
+    if score < 200:
+        level = 1
+        rest = score % 200
+        max_score = 200
+    elif score < 300:
+        level = 2
+        rest = score-200
+        max_score = 300
+    elif score < 400:
+        level = 3
+        rest = score-300
+        max_score = 400
+    elif score < 500:
+        level = 4
+        rest = score-400
+        max_score = 500
+    else:
+        level = 5
+
+    level_dict = {1:'등산새싹', 2:'등산샛별', 3:'등산인', 4:'등산고수', 5:'등산왕'}
     context = {
         'person': person,
+        'posts': posts,
+        'level': level,
+        'level_name': level_dict[level],
+        'rest': rest,
+        'max_score': max_score,
     }
     return render(request, 'accounts/profile.html', context)
 
