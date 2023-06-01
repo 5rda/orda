@@ -10,6 +10,7 @@ from posts.models import Post
 import requests
 import os
 from dotenv import load_dotenv
+from django.http import JsonResponse
 
 
 def login(request):
@@ -19,10 +20,7 @@ def login(request):
         form = CustomUserAuthenticationForm(request, request.POST)
         if form.is_valid():
             auth_login(request, form.get_user())
-
-            # return redirect('mountains:index', request.user.pk )
             return redirect('accounts:profile', request.user.pk )
-
     else:
         form = CustomUserAuthenticationForm()
     context = {
@@ -61,43 +59,43 @@ def profile(request, user_pk):
     posts = person.post_set.all().order_by('-created_at')
     liked_posts = Post.objects.filter(like_users=request.user)
     posts_comments = person.postcomment_set.all().count()
-    mountains_comments = person.comment_set.all().count()
-    score = posts.count() * 40 + mountains_comments * 30 + posts_comments * 5
+    # mountains_comments = person.comment_set.all().count()
+    # score = posts.count() * 40 + mountains_comments * 30 + posts_comments * 5
 
-    if score < 200:
-        level = 1
-        rest = score
-        max_score = 200
-    elif score < 300:
-        level = 2
-        rest = score-200
-        max_score = 300
-    elif score < 400:
-        level = 3
-        rest = score-300
-        max_score = 400
-    elif score < 500:
-        level = 4
-        rest = score-400
-        max_score = 500
-    else:
-        level = 5
-        rest = score-500
-        if rest < 600:
-            rest = score-500
-        else:
-            rest = 600
-        max_score = 600
+    # if score < 200:
+    #     level = 1
+    #     rest = score
+    #     max_score = 200
+    # elif score < 300:
+    #     level = 2
+    #     rest = score-200
+    #     max_score = 300
+    # elif score < 400:
+    #     level = 3
+    #     rest = score-300
+    #     max_score = 400
+    # elif score < 500:
+    #     level = 4
+    #     rest = score-400
+    #     max_score = 500
+    # else:
+    #     level = 5
+    #     rest = score-500
+    #     if rest < 600:
+    #         rest = score-500
+    #     else:
+    #         rest = 600
+    #     max_score = 600
 
-    level_dict = {1:'등산새싹', 2:'등산샛별', 3:'등산인', 4:'등산고수', 5:'등산왕'}
+    # level_dict = {1:'등산새싹', 2:'등산샛별', 3:'등산인', 4:'등산고수', 5:'등산왕'}
     context = {
         'person': person,
         'post': post,
         'posts': posts,
-        'level': level,
-        'level_name': level_dict[level],
-        'rest': rest,
-        'max_score': max_score,
+        # 'level': level,
+        # 'level_name': level_dict[level],
+        # 'rest': rest,
+        # 'max_score': max_score,
         'liked_posts': liked_posts,
     }
     return render(request, 'accounts/profile.html', context)
@@ -143,13 +141,24 @@ def password_change(request):
 @login_required
 def follow(request, user_pk):
     User = get_user_model()
-    person = User.objects.get(pk=user_pk)
-    if request.user != person:
-        if request.user in person.followers.all():
-            person.followers.remove(request.user)
+    person  = User.objects.get(pk=user_pk)
+    me = request.user
+
+    if person != me:
+        if me in person.followers.all():
+            person.followers.remove(me)
+            is_followed = False
         else:
-            person.followers.add(request.user)
-    return redirect('accounts:profile', person.pk)
+            person.followers.add(me)
+            is_followed = True
+        context = {
+            'is_followed':is_followed,
+            'followings_count':person.followings.count(),
+            'followers_count':person.followers.count(),
+            'followers': [{'username': f.username,'pk': f.pk} for f in person.followers.all()]
+        }
+        return JsonResponse(context)
+    return redirect('accounts:profile', person.username)
 
 
 load_dotenv()

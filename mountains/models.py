@@ -57,6 +57,7 @@ class CourseDetail(models.Model):
 
     def __str__(self):
         return str(self.crs_name)
+
     
     # def as_dict(self):
     #     return {
@@ -67,8 +68,6 @@ class CourseDetail(models.Model):
     #     }
     
 
-class Comment(models.Model):
-    pass
 
 
 # class CourseBookmark(models.Model):
@@ -77,3 +76,17 @@ class Comment(models.Model):
 
 #     class Meta:
 #         db_table = 'mountains_course_bookmarks'
+
+
+
+class Review(models.Model):
+    mountain = models.ForeignKey(Mountain, on_delete=models.CASCADE)
+    content = models.TextField()
+    image = models.ImageField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    tags = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.content
+

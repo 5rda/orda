@@ -6,6 +6,19 @@
   margin: auto;
 }
 
+.profile__article1 {
+  width: 26%;
+}
+
+.profile__article2 {
+  width: 8%;
+  padding: 0 10px;
+}
+
+.profile__article3 {
+  width: 66%;
+}
+
 /* user */
 
 .profile__userbox {
@@ -396,7 +409,9 @@
 .profile__follow--unfollowbtn{
   display: flex;
   justify-content: center;
+  align-items: center;
   width: 60px;
+  height: 34px;
   padding: 5px 8px;
   font-size: 13px;
   font-weight: bold;
@@ -406,7 +421,11 @@
 }
 
 .profile__follow--followbtn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 60px;
+  height: 34px;
   padding: 5px 8px;
   font-size: 13px;
   font-weight: bold;
@@ -414,4 +433,129 @@
   background-color: var(--main-color) !important;
   border: solid 1px var(--main-color);
   border-radius: 5px;
+}
+
+
+@media (max-width:1080px) {
+  .profile__container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 30px 60px;
+    margin: auto;
+  }
+
+  .profile__article1 {
+    width: 100%;
+  }
+  
+  .profile__article2 {
+    width: 100%;
+    height: 8%;
+    padding: 20px 0;
+  }
+  
+  .profile__article3 {
+    width: 100%;
+  }
+
+  .profile__userbox {
+    width: 100%;
+    border: solid 1px #DBDBDB;
+    border-radius: 5px;
+    padding: 30px 25px 20px;
+    margin-top: 20px;
+  }
+
+  .profile__user--info {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center
+  }
+
+  .profile__user--imgbox {
+    position: relative;
+    flex-basis: 20%;
+    width:120px;
+    margin: 0 auto 25px;
+  }
+
+  .profile__user--stat {
+    display: flex;
+    flex-basis: 80%;
+    flex-direction: column;
+    text-align: start;
+    justify-content: flex-end;
+    padding-left: 30px;
+    margin-bottom: auto;
+  }
+
+  .profile__user--edit {
+    display: flex;
+    justify-content: start;
+  }
+  
+  .profile__user--name {
+    font-size: 25px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .profile__user--follow {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    margin-bottom: 10px;
+  }
+
+  .profile__user--followbtnbox {
+    display: flex;
+    justify-content: start;
+  }
+
+  .profile__user--messagebox {
+    width: 80%;
+    margin: 0 0 24px auto;
+    padding-left: 30px;
+  }
+  
+  .profile__user--message {
+    text-align: start;
+  }
+
+  .profile__user--info2 {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    border-top: solid 1px #DBDBDB;
+    padding: 24px 0 6px;
+  }
+
+  .profile__user--review {
+    width: 33.3%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 16px;
+    color: #777777;
+  }
+
+  .profile__user--bookmark {
+    width: 33.4%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 16px;
+    color: #777777;
+  }
+
+  .profile__user--like {
+    width: 33.3%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 16px;
+    color: #777777;
+  }
 }
