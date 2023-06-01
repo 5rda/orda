@@ -1,7 +1,11 @@
 from django.shortcuts import render
-from django.views.generic.list import ListView
-from django.views.generic import DetailView
+from django.views.generic import DetailView, ListView
+from django.contrib.gis.serializers.geojson import Serializer
+from django.shortcuts import get_object_or_404
 from .models import *
+import json, os
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
 # Create your views here.
 
 def index(request):
@@ -22,32 +26,20 @@ class MountainDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         mountain = self.get_object()
-        context['courses'] = mountain.course_set.order_by('crs_name')
+        serializer = Serializer()
+        courses = mountain.course_set.all()
+        course_details = {}
+        for course in courses:
+            geojson_data = serializer.serialize(CourseDetail.objects.filter(crs_name=course), fields=('geom', 'is_waypoint', 'waypoint_name'))
+            course_details[course.pk] =geojson_data
+        # print(course_details)
+        context = {
+            'mountain': mountain,
+            'courses': courses,
+            'course_details': course_details
+        }
+        # json_data = json.dumps(course_details, indent=4, sort_keys=True, ensure_ascii=False)
+        # file_path = os.path.join(settings.STATICFILES_DIRS[0], 'course_details.json')
+        # with open(file_path, 'w', encoding='utf-8') as file:
+        #     file.write(json_data)
         return context
-    
-
-class CourseListView(ListView):
-    template_name = 'mountains/course_list.html'
-    context_object_name = 'courses'
-    model = Course
-
-    def get_queryset(self):
-        mountain_pk = self.kwargs['mountain_pk']
-        return super().get_queryset().filter(mntn_name__id=mountain_pk)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        courses = context['courses']
-        course_details_list = []
-        if isinstance(courses, Course):
-            # courses가 단일 Course 객체인 경우
-            course_details = CourseDetail.objects.filter(crs_name=courses)
-            course_details_list.extend(course_details)
-        else:
-            # courses가 QuerySet인 경우
-            for course in courses:
-                course_details = CourseDetail.objects.filter(crs_name=course)
-                course_details_list.extend(course_details)
-        context['course_details'] = course_details_list
-        return context
-
