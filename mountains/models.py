@@ -48,7 +48,15 @@ class CourseDetail(models.Model):
 
     def __str__(self):
         return str(self.crs_name)
-    
 
-class Comment(models.Model):
-    pass
+
+class Review(models.Model):
+    mountain = models.ForeignKey(Mountain, on_delete=models.CASCADE)
+    content = models.TextField()
+    image = models.ImageField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    tags = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.content
