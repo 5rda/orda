@@ -8,6 +8,13 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/ckeditor.js"></script>
   <script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/translations/ko.js"></script>
+  <style>
+    img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+  </style>
 </head>
 <body>
   <div>
@@ -16,6 +23,8 @@
   <div>
     내용: {{ post.content|safe }}
   </div>
+
+  <hr>
 
   <form action="{% url 'posts:likes' post.pk %}" method="POST">
     {% csrf_token %} 
@@ -34,53 +43,114 @@
       <button type="submit">삭제</button> 
     </form>
   {% endif %}
-  <a href="javascript:history.back()"><button>뒤로 가기</button></a>
+  <a href="{% if 'profile' in request.META.HTTP_REFERER %}{% url 'accounts:profile' person.pk %}{% else %}{% url 'posts:index' %}{% endif %}"><button>뒤로 가기</button></a>
+  
+  <hr>
 
+  <div>
+    댓글 목록
+    <div>댓글 개수: {{ post.postcomment_set.count }}</div>
     <div>
-      댓글 목록
-      <div>댓글 개수: {{ post.postcomment_set.count }}</div>
-      <div>
-        <form action="{% url 'posts:comment_create' post.pk %}" method="POST">
-          {% csrf_token %} 
-          {{ postcomment_form.content }}
-          <button type="submit">작성</button>
-        </form>
-      </div>
+      <form action="{% url 'posts:comment_create' post.pk %}" method="POST">
+        {% csrf_token %} 
+        {{ postcomment_form.content }}
+        <button type="submit">작성</button>
+      </form>
     </div>
-    {% for postcomment in postcomments %}
-    <li style="list-style: none">
-      <div>
-        {{ postcomment.user.username }}: {{ postcomment.content }}
-        <form action="{% url 'posts:comment_likes' post.pk postcomment.pk %}" method="POST">
-        {% csrf_token %} 
-        {% if request.user in postcomment.like_users.all %}
-          <button type="submit">좋아요 취소</button>
-        {% else %}
-          <button type="submit">좋아요</button>
-        {% endif %}
-        댓글 좋아요: {{postcomment.like_users.count}}
-        </form>
+  </div>
 
-        <form action="{% url 'posts:comment_dislikes' post.pk postcomment.pk %}" method="POST">
-        {% csrf_token %} 
-        {% if request.user in postcomment.dislike_users.all %}
-          <button type="submit">싫어요 취소</button>
-        {% else %}
-          <button type="submit">싫어요</button>
-        {% endif %}
-        댓글 싫어요: {{postcomment.dislike_users.count}}
-        </form>
-    
+  <hr>
+
+  {% for postcomment in postcomments %}
+    <li style="list-style: none">
+      <div id="comment-{{ postcomment.pk }}">
+        {{ postcomment.user.username }}: <span class="comment-content">{{ postcomment.content }}</span>
         {% if request.user.is_authenticated and request.user == postcomment.user %}
-        <form action="{% url 'posts:comment_delete' post.pk postcomment.pk %}"method="POST">
+        <div id="comment-edit-form-{{ postcomment.pk }}" class="comment-update-form" style="display: none;">
+          <form class="edit-comment-form" action="{% url 'posts:comment_update' post.pk postcomment.pk %}" method="POST" data-comment-id="{{ postcomment.pk }}">
+            {% csrf_token %}
+            <input type="text" name="content" value="{{ postcomment.content }}">
+            <button type="submit">수정</button>
+          </form>
+        </div>
+        <button class="edit-comment-button" data-comment-id="{{ postcomment.pk }}">댓글수정</button>
+
+        <form action="{% url 'posts:comment_delete' post.pk postcomment.pk %}" method="POST">
           {% csrf_token %}
           <button type="submit">삭제</button>
         </form>
         {% endif %}
+
+        <form action="{% url 'posts:comment_likes' post.pk postcomment.pk %}" method="POST">
+          {% csrf_token %} 
+          {% if request.user in postcomment.like_users.all %}
+            <button type="submit">좋아요 취소</button>
+          {% else %}
+            <button type="submit">좋아요</button>
+          {% endif %}
+          댓글 좋아요: {{ postcomment.like_users.count }}
+        </form>
+
+        <form action="{% url 'posts:comment_dislikes' post.pk postcomment.pk %}" method="POST">
+          {% csrf_token %} 
+          {% if request.user in postcomment.dislike_users.all %}
+            <button type="submit">싫어요 취소</button>
+          {% else %}
+            <button type="submit">싫어요</button>
+          {% endif %}
+          댓글 싫어요: {{ postcomment.dislike_users.count }}
+        </form>
       </div>
     </li>
-    {% endfor %}
+    <hr>
+  {% endfor %}
+    
+  <!-- 이전 게시물 링크 -->
+  {% if previous_post %}
+  <a href="{% url 'posts:detail' previous_post.pk %}"><button>이전</button></a>
+  {% endif %}
+
+  <!-- 다음 게시물 링크 -->
+  {% if next_post %}
+  <a href="{% url 'posts:detail' next_post.pk %}"><button>다음</button></a>
+  {% endif %}
+    
 </body>
+<script>
+  $(document).ready(function() {
+    $('.edit-comment-button').click(function() {
+      var commentId = $(this).data('comment-id');
+      $('#comment-edit-form-' + commentId).toggle();
+      $('#comment-' + commentId + ' .comment-content').toggle();
+      $(this).toggle(); // Add this line to hide the edit button
+    });
+
+    $('.edit-comment-form').submit(function(event) {
+      event.preventDefault();
+      var commentId = $(this).data('comment-id');
+      var content = $(this).find('input[name=content]').val();
+      var form = $(this);
+
+      $.ajax({
+        type: 'POST',
+        url: form.attr('action'),
+        data: form.serialize(),
+        success: function(response) {
+          // Update the comment content
+          $('#comment-' + commentId + ' .comment-content').text(content);
+          // Show the edit button again
+          $('.edit-comment-button[data-comment-id=' + commentId + ']').toggle();
+          // Hide the edit form
+          $('#comment-edit-form-' + commentId).toggle();
+          $('#comment-' + commentId + ' .comment-content').toggle();
+        },
+        error: function(xhr, status, error) {
+          console.error(xhr.responseText);
+        }
+      });
+    });
+  });
+</script>
 <script>
   ClassicEditor
     .create(document.querySelector('#content'), {

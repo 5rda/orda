@@ -9,7 +9,7 @@
   <style>
     .post-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(4, 400px);
       grid-gap: 20px;
     }
 
@@ -22,6 +22,11 @@
 
     #loadMoreBtn {
       margin-top: 20px;
+    }
+
+    .thumbnail-image {
+      max-width: 400px;
+      height: 300px; /* 원하는 높이로 조정하세요 */
     }
   </style>
 </head>
@@ -44,7 +49,7 @@
         작성: {{ post.created_at|date:"y.m.d H:i" }}
         {% with first_image_url=post.content|get_first_image_from_content %}
           {% if first_image_url %}
-            <img src="{{ first_image_url }}" alt="썸네일">
+            <img src="{{ first_image_url }}" alt="썸네일" class="thumbnail-image">
           {% else %}
             <p>이미지 없음</p>
           {% endif %}
