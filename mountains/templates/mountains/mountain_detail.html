@@ -4,9 +4,16 @@
     <li>{{ mountain.pk }}</li>
     <li>{{ mountain.name }}</li>
     <li>{{ mountain.subname }}</li>
+    <li>조회수: {{ mountain.views }}</li>
     <div id="mountain-map" style="width:500px;height:400px;"></div>
     <li>{{ mountain.region }}</li>
     <li>{{ mountain.height }}</li>
+    <form>
+      {% csrf_token %}
+      <button id="mountain-likes-btn" type="submit" data-mountain-pk-2="{{ mountain.pk }}">
+        <p>좋아요 추가</p>
+      </button>  
+    </form>  
     <li id="latitude">{{ mountain.geom.y }}</li>
     <li id="longitude">{{ mountain.geom.x }}</li>
   </ul>
@@ -155,7 +162,7 @@ function showMountainMarker(latitude, longitude) {
 <script>
   function bookmark(courseId) {
     const bookmarkBtn = document.getElementById('bookmark-btn-' + courseId);
-    const mountainCsrftokenBookmark = document.querySelector("[name=csrfmiddlewaretoken]").value;
+    const mountainCsrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
 
     if (bookmarkBtn) {
       bookmarkBtn.addEventListener('click', () => {
@@ -166,7 +173,7 @@ function showMountainMarker(latitude, longitude) {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': mountainCsrftokenBookmark
+            'X-CSRFToken': mountainCsrftoken
           },
           body: JSON.stringify({})
         })
@@ -195,6 +202,41 @@ function showMountainMarker(latitude, longitude) {
   {% for course in courses %}
     bookmark({{ course.pk }});
   {% endfor %}
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const mountainLikesBtn = document.getElementById('mountain-likes-btn');
+    if (mountainLikesBtn) {
+      mountainLikesBtn.addEventListener('click', (event) => {
+        event.preventDefault();
+        const mountainPk2 = mountainLikesBtn.getAttribute('data-mountain-pk-2');
+        const csrfToken = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+        axios.post(`/mountains/${mountainPk2}/likes/`, null, {
+          headers: {
+            'X-CSRFToken': csrfToken,
+          },
+        })
+          .then((response) => {
+            const isLiked = response.data.is_liked;
+            // 서버로부터의 응답을 처리
+            if (isLiked === true) {
+              // 팔로우 성공 시 동작
+              mountainLikesBtn.innerHTML = '<p>좋아요 제거</p>';
+              alert('좋아요가 추가되었습니다.');
+            } else {
+              // 언팔로우 성공 시 동작
+              mountainLikesBtn.innerHTML = '<p>좋아요 추가</p>';
+              alert('좋아요가 제거되었습니다.');
+            }
+          })
+          .catch((error) => {
+            // 에러 처리
+            console.error(error);
+          });
+      });
+    }
+  });
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>

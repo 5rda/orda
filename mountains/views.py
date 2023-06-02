@@ -4,14 +4,11 @@ from django.contrib.gis.serializers.geojson import Serializer
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 from .models import *
-import json, os
+from django.db.models import F, Count
 from django.conf import settings
 from .forms import ReviewCreationForm
 from django.contrib.auth.decorators import login_required
 # Create your views here.
-
-def index(request):
-    return render(request, 'mountains/index.html')
 
 
 class MountainListView(ListView):
@@ -37,11 +34,21 @@ class MountainListView(ListView):
 
         return queryset
 
+
 class MountainDetailView(DetailView):
     template_name = 'mountains/mountain_detail.html'
     context_object_name = 'mountain'
     model = Mountain
 
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        # Increase the views count
+        Mountain.objects.filter(pk=self.object.pk).update(views=F('views') + 1)
+
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         mountain = self.get_object()
@@ -61,6 +68,35 @@ class MountainDetailView(DetailView):
         # with open(file_path, 'w', encoding='utf-8') as file:
         #     file.write(json_data)
         return context
+
+
+class CourseListView(ListView):
+    template_name = 'mountains/course_list.html'
+    context_object_name = 'courses'
+    model = Course
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        sort_option = self.request.GET.get('sort', '')  # 기본값으로 전체
+
+        if sort_option == 'bookmarks':
+            queryset = queryset.annotate(bookmarks_count=Count('bookmarks'))
+            queryset = queryset.order_by('-bookmarks_count')
+
+        return queryset
+
+
+def mountain_likes(request, mountain_pk):
+    mountain = get_object_or_404(Mountain, pk=mountain_pk)
+    user = request.user
+    if request.user in mountain.likes.all():
+        mountain.likes.remove(request.user)
+        is_liked = False
+    else:
+        mountain.likes.add(request.user)
+        is_liked = True
+
+    return JsonResponse({'is_liked': is_liked})    
 
 
 def bookmark(request, mountain_pk, course_pk):

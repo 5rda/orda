@@ -1,8 +1,6 @@
 # from django.db import models
 from django.contrib.gis.db import models
 from django.conf import settings
-from django.core.serializers.json import DjangoJSONEncoder
-import json
 
 # Create your models here.
 class Mountain(models.Model):
