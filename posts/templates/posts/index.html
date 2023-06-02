@@ -13,74 +13,50 @@
 <div style="padding: 30px 60px;">
   {% comment %} 조회순 {% endcomment %}
   <section style="margin-bottom: 120px;">
-    <h1 class="postindex__Content--title">조회수가 많은 마이코스</h1>
-    <div id="inquiryRank" class="carousel slide" data-bs-ride="true" style="padding: 0 60px;">
-      <div class="carousel-inner">
-        <div class="carousel-item active">
-          <div class="postindex__Rankbox">
-            <div class="card postindex__Rank--item" style="width: 20%;">
-              <img src="{% static 'img/nav_logo.png' %}" class="card-img-top" alt="...">
-              <div class="card-body">
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+    <h1 class="postindex__Content--title">조회수가 높은 마이코스</h1>
+    <div class="owl-carousel" style="margin-bottom: 120px; padding: 0 100px;">
+      {% for post in view_posts %}
+        <div class="item">
+          <a href="{% url 'posts:detail' post.pk %}">
+            <div class="postindex__post">
+              <div class="postindex__post--imgbox">
+                {% with first_image_url=post.content|get_first_image_from_content %}
+                  {% if first_image_url %}
+                    <img class="postindex__post--img" src="{{ first_image_url }}" alt="썸네일">
+                  {% else %}
+                    <img class="postindex__post--img" src="{% static 'img/nav_logo.png' %}" alt="대체이미지">
+                  {% endif %}
+                {% endwith %}
+                <button class="postindex__post--like" data-post={{ post.pk }}>
+                  <svg id="i-heart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="{% if request.user in post.like_users.all %}#FFB6C1{% else %}#DBDBDB{% endif %}" stroke="#FFB6C1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                    <path d="M4 16 C1 12 2 6 7 4 12 2 15 6 16 8 17 6 21 2 26 4 31 6 31 12 28 16 25 20 16 28 16 28 16 28 7 20 4 16 Z" />
+                  </svg>
+                </button>
+              </div>
+              <div>
+                <p class="postindex__post--title">{{ post.title }}</p>
+                <div class="postindex__post--user">
+                  <div class="postindex__post--userimgbox">
+                    {% if post.user.profile %}
+                      <img class="postindex__post--userimg" src="{{ post.user.profile }}" alt="유저프로필">
+                    {% else %}
+                      <img class="postindex__post--userimg" src="{% static 'img/profile_no_img.png' %}" alt="대체프로필">
+                    {% endif %}
+                  </div>
+                  <p class="postindex__post--username">{{ post.user.username }}</p>
+                </div>
+                <div class="postindex__post--stat">
+                  <div>
+                    <span class="postindex__post--likecount" data-like={{ post.pk }}>좋아요 {{ post.like_users.count }}</span>
+                    <span>조회수 {{ post.view_count }}</span>
+                  </div>
+                  <p>{{ post.created_at|date:"y. m. d" }}</p>
+                </div>
               </div>
             </div>
-            <div class="card postindex__Rank--item" style="width: 20%;">
-              <img src="{% static 'img/nav_logo.png' %}" class="card-img-top" alt="...">
-              <div class="card-body">
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-              </div>
-            </div>
-            <div class="card postindex__Rank--item" style="width: 20%;">
-              <img src="{% static 'img/nav_logo.png' %}" class="card-img-top" alt="...">
-              <div class="card-body">
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-              </div>
-            </div>
-            <div class="card postindex__Rank--item" style="width: 20%;">
-              <img src="{% static 'img/nav_logo.png' %}" class="card-img-top" alt="...">
-              <div class="card-body">
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-              </div>
-            </div>
-          </div>
+          </a>
         </div>
-        <div class="carousel-item">
-          <div class="postindex__Rankbox">
-            <div class="card postindex__Rank--item" style="width: 20%;">
-              <img src="{% static 'img/nav_logo.png' %}" class="card-img-top" alt="...">
-              <div class="card-body">
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-              </div>
-            </div>
-            <div class="card postindex__Rank--item" style="width: 20%;">
-              <img src="{% static 'img/nav_logo.png' %}" class="card-img-top" alt="...">
-              <div class="card-body">
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-              </div>
-            </div>
-            <div class="card postindex__Rank--item" style="width: 20%;">
-              <img src="{% static 'img/nav_logo.png' %}" class="card-img-top" alt="...">
-              <div class="card-body">
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-              </div>
-            </div>
-            <div class="card postindex__Rank--item" style="width: 20%;">
-              <img src="{% static 'img/nav_logo.png' %}" class="card-img-top" alt="...">
-              <div class="card-body">
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <button class="carousel-control-prev" type="button" data-bs-target="#inquiryRank" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Previous</span>
-      </button>
-      <button class="carousel-control-next" type="button" data-bs-target="#inquiryRank" data-bs-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Next</span>
-      </button>
+      {% endfor %}
     </div>
   </section>
 
@@ -121,7 +97,7 @@
                 <div class="postindex__post--stat">
                   <div>
                     <span class="postindex__post--likecount" data-like={{ post.pk }}>좋아요 {{ post.like_users.count }}</span>
-                    <span>조회수 0</span>
+                    <span>조회수 {{ post.view_count }}</span>
                   </div>
                   <p>{{ post.created_at|date:"y. m. d" }}</p>
                 </div>
@@ -168,7 +144,7 @@
               <div class="postindex__post--stat">
                 <div>
                   <span class="postindex__post--likecount" data-like={{ post.pk }}>좋아요 {{ post.like_users.count }}</span>
-                  <span>조회수 0</span>
+                  <span>조회수 {{ post.view_count }}</span>
                 </div>
                 <p>{{ post.created_at|date:"y. m. d" }}</p>
               </div>
