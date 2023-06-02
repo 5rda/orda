@@ -5,3 +5,9 @@ class MountainForm(forms.ModelForm):
     class Meta:
         model = Mountain
         fields = '__all__'
+
+
+class ReviewCreationForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = ['content', 'image', 'tags']

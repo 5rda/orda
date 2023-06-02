@@ -3,7 +3,7 @@
   {% for mountain in mountains %}
     <ul>
       <li>{{ mountain.pk }}</li>
-      <li>{{ mountain.name }}</li>
+      <li><a href="{% url 'mountains:mountain_detail' mountain.pk %}">{{ mountain.name }}</a></li>
       <li>{{ mountain.region }}</li>
       <li>{{ mountain.height }}</li>
     </ul>

@@ -7,6 +7,7 @@ from django.conf import settings
 from bs4 import BeautifulSoup
 from django.http import JsonResponse
 import os
+from django.http import JsonResponse
 
 # Create your views here.
 
@@ -30,20 +31,26 @@ def index(request):
     context = {
         'posts': posts,
         'sortKind': sort_option,
-        'like_posts': like_posts
+        'like_posts': like_posts,
     }
     return render(request, 'posts/index.html', context)
-
 
 
 def detail(request, post_pk):
     post = Post.objects.get(pk=post_pk)
     postcomment_form = PostCommentForm()
     postcomments = post.postcomment_set.all()
+
+    # 이전, 다음 게시물 가져오기
+    previous_post = Post.objects.filter(created_at__lt=post.created_at).order_by('-created_at').first()
+    next_post = Post.objects.filter(created_at__gt=post.created_at).order_by('created_at').first()
+
     context = {
         'post': post,
         'postcomment_form': postcomment_form,
         'postcomments': postcomments,
+        'previous_post': previous_post,
+        'next_post': next_post,
     }
     return render(request, 'posts/detail.html', context)
 
@@ -137,9 +144,9 @@ def comment_create(request, post_pk):
     return render(request, 'posts/detail.html', context)
 
 
-def comment_update(request, post_pk, postcomment_pk):
-    postcomment = PostComment.objects.get(pk=postcomment_pk)
-    
+def comment_update(request, post_pk, comment_pk):
+    postcomment = PostComment.objects.get(pk=comment_pk)
+
     if request.method == 'POST':
         form = PostCommentForm(request.POST, instance=postcomment)
         if form.is_valid():
@@ -147,13 +154,13 @@ def comment_update(request, post_pk, postcomment_pk):
             return redirect('posts:detail', post_pk)
     else:
         form = PostCommentForm(instance=postcomment)
-    
+
     context = {
         'form': form,
         'post_pk': post_pk,
-        'postcomment_pk': postcomment_pk
+        'comment_pk': comment_pk
     }
-    return render(request, 'posts/detail.html', context)
+    return render(request, 'posts/comment_update.html', context)
 
 
 def comment_delete(request, post_pk, comment_pk):
@@ -198,3 +205,4 @@ def get_first_image_from_content(content):
         return img_tag['src']
     else:
         return None
+    
