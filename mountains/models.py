@@ -80,13 +80,18 @@ class CourseDetail(models.Model):
 
 
 class Review(models.Model):
+    def image_path(instance, filename):
+        return f'reviews/{instance.mountain.name}/{filename}'
     mountain = models.ForeignKey(Mountain, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     content = models.TextField()
-    image = models.ImageField(blank=True)
+    image = models.ImageField(blank=True, upload_to=image_path)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     tags = models.CharField(max_length=200)
 
+
     def __str__(self):
         return self.content
+
 
