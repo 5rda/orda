@@ -5,6 +5,7 @@ from .forms import PostForm, PostCommentForm
 from django.db.models import Q, Count
 from django.conf import settings
 from bs4 import BeautifulSoup
+from django.http import JsonResponse
 import os
 
 # Create your views here.
@@ -13,6 +14,7 @@ import os
 def index(request):
     author_pk = request.GET.get('author')
     sort_option = request.GET.get('sortKind', '최신순')
+    like_posts = Post.objects.annotate(like_count=Count('like_users')).order_by('-like_count')
 
     if author_pk:
         if sort_option == '인기순':
@@ -27,7 +29,8 @@ def index(request):
 
     context = {
         'posts': posts,
-        'sortKind': sort_option
+        'sortKind': sort_option,
+        'like_posts': like_posts
     }
     return render(request, 'posts/index.html', context)
 
@@ -96,13 +99,23 @@ def delete(request, post_pk):
     return redirect('posts:index')
 
 
+@login_required
 def likes(request, post_pk):
     post = Post.objects.get(pk=post_pk)
-    if post.like_users.filter(pk=request.user.pk).exists():
-        post.like_users.remove(request.user)
+    me = request.user
+
+    if me in post.like_users.all():
+        post.like_users.remove(me)
+        is_liked = False
     else:
-        post.like_users.add(request.user)
-    return redirect('posts:detail', post.pk)
+        post.like_users.add(me)
+        is_liked = True
+
+    context = {
+        'is_liked':is_liked,
+        'likes_count':post.like_users.count(),
+    }
+    return JsonResponse(context)
 
 
 def comment_create(request, post_pk):
