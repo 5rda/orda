@@ -7,6 +7,7 @@ import json, os
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from .forms import ReviewCreationForm
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 def index(request):
@@ -46,6 +47,7 @@ class MountainDetailView(DetailView):
         return context
 
 
+@login_required
 def create_review(request, pk):
     mountain = Mountain.objects.get(pk=pk)
     TAG_LIST = [
@@ -95,3 +97,13 @@ def create_review(request, pk):
         'mountain': mountain,
     }
     return render(request, 'mountains/create_review.html', context)
+
+
+@login_required
+def review_likes(request, pk, review_pk):
+    review = Review.objects.get(pk=review_pk)
+    if request.user in review.like_users.all():
+        review.like_users.remove(request.user)
+    else:
+        review.like_users.add(request.user)
+    return redirect('mountains:mountain_detail', pk)
