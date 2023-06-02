@@ -13,25 +13,15 @@ from django.http import JsonResponse
 
 
 def index(request):
-    author_pk = request.GET.get('author')
-    sort_option = request.GET.get('sortKind', '최신순')
+    view_posts = Post.objects.order_by('-view_count')
     like_posts = Post.objects.annotate(like_count=Count('like_users')).order_by('-like_count')
-
-    if author_pk:
-        if sort_option == '인기순':
-            posts = Post.objects.filter(user__pk=author_pk).annotate(like_count=Count('like_users')).order_by('-like_count')
-        else:
-            posts = Post.objects.filter(user__pk=author_pk).order_by('-created_at')
-    else:
-        if sort_option == '인기순':
-            posts = Post.objects.annotate(like_count=Count('like_users')).order_by('-like_count')
-        else:
-            posts = Post.objects.order_by('-created_at')
-
+    posts = Post.objects.order_by('-created_at')
+    
     context = {
-        'posts': posts,
-        'sortKind': sort_option,
+        'view_posts': view_posts,
         'like_posts': like_posts,
+        'posts': posts,
+   
     }
     return render(request, 'posts/index.html', context)
 
@@ -45,6 +35,12 @@ def detail(request, post_pk):
     previous_post = Post.objects.filter(created_at__lt=post.created_at).order_by('-created_at').first()
     next_post = Post.objects.filter(created_at__gt=post.created_at).order_by('created_at').first()
 
+    session_key = f'post_viewed_{post_pk}'  # 게시물 고유 세션 키 생성
+    if not request.session.get(session_key):
+        post.view_count += 1  # 조회수 증가
+        post.save()  # 변경된 조회수 저장
+        request.session[session_key] = True  # 세션에 조회 여부 기록
+        
     context = {
         'post': post,
         'postcomment_form': postcomment_form,
