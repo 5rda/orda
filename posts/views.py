@@ -6,6 +6,7 @@ from django.db.models import Q, Count
 from django.conf import settings
 from bs4 import BeautifulSoup
 import os
+from django.http import JsonResponse
 
 # Create your views here.
 
@@ -37,10 +38,14 @@ def detail(request, post_pk):
     post = Post.objects.get(pk=post_pk)
     postcomment_form = PostCommentForm()
     postcomments = post.postcomment_set.all()
+    prev_posts = Post.objects.filter(pk__lt=post_pk).order_by('-pk')[:2]
+    next_posts = Post.objects.filter(pk__gt=post_pk).order_by('pk')[:2]
+    posts = list(prev_posts) + [post] + list(next_posts)
     context = {
         'post': post,
         'postcomment_form': postcomment_form,
         'postcomments': postcomments,
+        'posts': posts,
     }
     return render(request, 'posts/detail.html', context)
 
@@ -100,9 +105,16 @@ def likes(request, post_pk):
     post = Post.objects.get(pk=post_pk)
     if post.like_users.filter(pk=request.user.pk).exists():
         post.like_users.remove(request.user)
+        is_liked = False
     else:
         post.like_users.add(request.user)
-    return redirect('posts:detail', post.pk)
+        is_liked = True
+    context = {
+        'is_liked':is_liked,
+        'like_count':post.like_users.count()
+    }
+    return JsonResponse(context)
+    # return redirect('posts:detail', post.pk)
 
 
 def comment_create(request, post_pk):
@@ -114,14 +126,16 @@ def comment_create(request, post_pk):
         postcomment.post = post
         postcomment.user = request.user
         postcomment.save()
-        return redirect('posts:detail', post.pk)
+        # return redirect('posts:detail', post.pk)
+        return JsonResponse({'success': True})
     else:
-        postcomment_form = PostCommentForm()
-    context = {
-        'post': post,
-        'postcomment_form': postcomment_form,
-    }
-    return render(request, 'posts/detail.html', context)
+        return JsonResponse({'success': False, 'errors': postcomment_form.errors})
+    #     postcomment_form = PostCommentForm()
+    # context = {
+    #     'post': post,
+    #     'postcomment_form': postcomment_form,
+    # }
+    # return render(request, 'posts/detail.html', context)
 
 
 def comment_update(request, post_pk, postcomment_pk):
@@ -147,26 +161,45 @@ def comment_delete(request, post_pk, comment_pk):
     postcomment = PostComment.objects.get(pk=comment_pk)
     if request.user == postcomment.user:
         postcomment.delete()
-        
-    return redirect('posts:detail', post_pk)
+        post_comments = PostComment.objects.filter(post=post_pk).count()
+        return JsonResponse({'status': 'ok','post_comments': post_comments})
+    else:
+        return JsonResponse({'status': 'error', 'message': '권한이 없습니다.'})
+    # return redirect('posts:detail', post_pk)
 
 
 def comment_likes(request, post_pk, comment_pk):
     comment = PostComment.objects.get(pk=comment_pk)
     if comment.like_users.filter(pk=request.user.pk).exists():
         comment.like_users.remove(request.user)
+        cl_is_liked = False
     else:
         comment.like_users.add(request.user)
-    return redirect('posts:detail', post_pk)
+        cl_is_liked = True
+    cl_likes_count = comment.like_users.all().count()
+    context = {
+        'cl_is_liked' : cl_is_liked,
+        'cl_likes_count' : cl_likes_count,
+    }
+    return JsonResponse(context)
+    # return redirect('posts:detail', post_pk)
 
 
 def comment_dislikes(request, post_pk, comment_pk):
     comment = PostComment.objects.get(pk=comment_pk)
     if comment.dislike_users.filter(pk=request.user.pk).exists():
         comment.dislike_users.remove(request.user)
+        cd_is_liked = False
     else:
         comment.dislike_users.add(request.user)
-    return redirect('posts:detail', post_pk)
+        cd_is_liked = True
+    cd_likes_count = comment.dislike_users.all().count()
+    context = {
+        'cd_is_liked' : cd_is_liked,
+        'cd_likes_count' : cd_likes_count,
+    }
+    return JsonResponse(context)
+    # return redirect('posts:detail', post_pk)
 
 
 def search(request):
