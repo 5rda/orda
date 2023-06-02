@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<form>
+  <label for="sort-select">정렬:</label>
+  <select name="sort" id="sort-select">
+      <option value="likes" {% if request.GET.sort == "" %}selected{% endif %}>전체</option>
+      <option value="reviews" {% if request.GET.sort == "bookmarks" %}selected{% endif %}>북마크순</option>
+  </select>
+  <input type="submit" value="정렬 적용">
+</form>
+
+  {% for course in courses %}
+    <ul>
+      <li>{{ course.pk }}</li>
+      <li><a href="{% url 'mountains:mountain_detail' course.mntn_name.pk %}">{{ course.crs_name }}</a></li>
+      <li>{{ course.bookmarks|length }}</li>
+      <li>{{ course.mntn_name }}</li>
+      <li>{{ course.distance }}</li>
+      <li>{{ course.duration }}</li>
+    </ul>
+
+  {% endfor %}
+{% endblock content %}
