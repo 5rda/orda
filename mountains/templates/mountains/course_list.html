@@ -4,8 +4,8 @@
 <form>
   <label for="sort-select">정렬:</label>
   <select name="sort" id="sort-select">
-      <option value="likes" {% if request.GET.sort == "" %}selected{% endif %}>전체</option>
-      <option value="reviews" {% if request.GET.sort == "bookmarks" %}selected{% endif %}>북마크순</option>
+      <option value="" {% if request.GET.sort == "" %}selected{% endif %}>전체</option>
+      <option value="bookmarks" {% if request.GET.sort == "bookmarks" %}selected{% endif %}>북마크순</option>
   </select>
   <input type="submit" value="정렬 적용">
 </form>
