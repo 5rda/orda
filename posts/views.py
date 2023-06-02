@@ -5,6 +5,7 @@ from .forms import PostForm, PostCommentForm
 from django.db.models import Q, Count
 from django.conf import settings
 from bs4 import BeautifulSoup
+from django.http import JsonResponse
 import os
 from django.http import JsonResponse
 
@@ -105,13 +106,23 @@ def delete(request, post_pk):
     return redirect('posts:index')
 
 
+@login_required
 def likes(request, post_pk):
     post = Post.objects.get(pk=post_pk)
-    if post.like_users.filter(pk=request.user.pk).exists():
-        post.like_users.remove(request.user)
+    me = request.user
+
+    if me in post.like_users.all():
+        post.like_users.remove(me)
+        is_liked = False
     else:
-        post.like_users.add(request.user)
-    return redirect('posts:detail', post.pk)
+        post.like_users.add(me)
+        is_liked = True
+
+    context = {
+        'is_liked':is_liked,
+        'likes_count':post.like_users.count(),
+    }
+    return JsonResponse(context)
 
 
 def comment_create(request, post_pk):
