@@ -174,3 +174,10 @@ def review_likes(request, pk, review_pk):
         review.like_users.add(request.user)
     return redirect('mountains:mountain_detail', pk)
 
+
+@login_required
+def review_delete(request, pk, review_pk):
+    review = Review.objects.get(pk=review_pk)
+    if review.user == request.user:
+        review.delete()
+        return redirect('mountains:mountain_detail', pk)
