@@ -34,16 +34,11 @@ def detail(request, post_pk):
     prev_posts = Post.objects.filter(pk__lt=post_pk).order_by('-pk')[:2]
     next_posts = Post.objects.filter(pk__gt=post_pk).order_by('pk')[:2]
     posts = list(prev_posts) + [post] + list(next_posts)
-
-
-
-
     session_key = f'post_viewed_{post_pk}'  # 게시물 고유 세션 키 생성
     if not request.session.get(session_key):
         post.view_count += 1  # 조회수 증가
         post.save()  # 변경된 조회수 저장
         request.session[session_key] = True  # 세션에 조회 여부 기록
-        
 
     context = {
         'post': post,

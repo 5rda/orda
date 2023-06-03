@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load custom_filters %}
 {% block style %}
   {% comment %} <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/ckeditor.js"></script>
@@ -7,6 +8,7 @@
 <style>
 </style>
 <link rel="stylesheet" href="{% static 'css/posts_detail.css' %}">
+<link rel="stylesheet" href="{% static 'css/posts_index.css' %}">
 {% comment %} <link rel="stylesheet" href="{% static 'css/posts_create.css' %}"> {% endcomment %}
 {% endblock style %}
 {% block content %}
@@ -21,15 +23,15 @@
     <div class="post__userdata--box">
       <div>
         <a href="{% url 'accounts:profile' post.user.pk %}">
-          {% if person.profile_img %}
-          <img class="user__img" src="{% static 'img/profile_no_img.png' %}" alt="">
+          {% if post.user.profile_img %}
+            <img class="user__img" src="{{ post.user.profile_img.url }}" alt="{{ post.user }}프로필">
           {% else %}
-          <img class="user__img" src="{{ post.user.profile_img.url }}" alt="{{ post.user }}프로필">
+            <img class="user__img" src="{% static 'img/profile_no_img.png' %}" alt="no">
           {% endif %}
       </div>
       <div class="post__user--box">
         <p style="font-weight: bold;">{{ post.user }}</p>
-      </a>
+        </a>
       <div class="post__data--box">
         <p> {{ post.updated_at|date:'Y. m. d. h. i'}} |&nbsp;</p>          
         {% if request.user == post.user %}
@@ -95,7 +97,14 @@
         <li id="comment-{{ postcomment.pk }}" class="container mb-2" style="list-style: none;">
           <div class="flex--d-row">
             <div class="col-1">
-              <img src="{{ postcomment.user.profile_img.url }}" class="user__img" alt="{{ postcomment.user }}의 프로필">
+              {% comment %} 프로필 이미지 {% endcomment %}
+              <a href="{% url 'accounts:profile' postcomment.user.pk %}">
+                {% if postcomment.user.profile_img %}
+                <img class="user__img" src="{{ postcomment.user.profile_img.url }}" alt="{{ post.user }}프로필">
+                {% else %}
+                <img class="user__img" src="{% static 'img/profile_no_img.png' %}" alt="no">
+                {% endif %}
+              </a>
             </div>
             <div class="flex--d-col col-11">
               <div class="flex--d-row flex--between">
@@ -112,7 +121,17 @@
                           <button type="submit" class="dropdown-item delete-comment-btn" data-comment-id="{{ postcomment.pk }}"  data-post-id="{{post.pk}}">삭제</button>
                         </form>
                       </li>
-                      <li><a class="dropdown-item" href="#">Another action</a></li>
+                      <li>
+                        {% comment %} 댓글 수정부분 원하시는 데 갖다 놓으세요 {% endcomment %}
+                        <div id="comment-edit-form-{{ postcomment.pk }}" class="comment-update-form" style="display: none;">
+                        <form class="edit-comment-form" action="{% url 'posts:comment_update' post.pk postcomment.pk %}" method="POST" data-comment-id="{{ postcomment.pk }}">
+                          {% csrf_token %}
+                          <input type="text" name="content" value="{{ postcomment.content }}">
+                          <button type="submit">수정</button>
+                        </form>
+                        </div>
+                        <button class="edit-comment-button" data-comment-id="{{ postcomment.pk }}">댓글수정</button> 
+                      </li>
                     </ul>
                   </div>
                 {% endif %} 
@@ -165,7 +184,46 @@
       <div class="row">
         {% for post in posts %}
         <div class="col-6 col-md-3">
-          {{post.title}}
+          <div class="item">
+            <a href="{% url 'posts:detail' post.pk %}">
+              <div class="postindex__post">
+                <div class="postindex__post--imgbox">
+                  {% with first_image_url=post.content|get_first_image_from_content %}
+                    {% if first_image_url %}
+                      <img class="postindex__post--img" src="{{ first_image_url }}" alt="썸네일">
+                    {% else %}
+                      <img class="postindex__post--img" src="{% static 'img/nav_logo.png' %}" alt="대체이미지">
+                    {% endif %}
+                  {% endwith %}
+                  <button class="postindex__post--like" data-post={{ post.pk }}>
+                    <svg id="i-heart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="{% if request.user in post.like_users.all %}#FFB6C1{% else %}#DBDBDB{% endif %}" stroke="#FFB6C1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                      <path d="M4 16 C1 12 2 6 7 4 12 2 15 6 16 8 17 6 21 2 26 4 31 6 31 12 28 16 25 20 16 28 16 28 16 28 7 20 4 16 Z" />
+                    </svg>
+                  </button>
+                </div>
+                <div>
+                  <p class="postindex__post--title">{{ post.title }}</p>
+                  <div class="postindex__post--user">
+                    <div class="postindex__post--userimgbox">
+                      {% if post.user.profile %}
+                        <img class="postindex__post--userimg" src="{{ post.user.profile }}" alt="유저프로필">
+                      {% else %}
+                        <img class="postindex__post--userimg" src="{% static 'img/profile_no_img.png' %}" alt="대체프로필">
+                      {% endif %}
+                    </div>
+                    <p class="postindex__post--username">{{ post.user.username }}</p>
+                  </div>
+                  <div class="postindex__post--stat">
+                    <div>
+                      <span class="postindex__post--likecount" data-like={{ post.pk }}>좋아요 {{ post.like_users.count }}</span>
+                      <span>조회수 {{ post.view_count }}</span>
+                    </div>
+                    <p>{{ post.created_at|date:"y. m. d" }}</p>
+                  </div>
+                </div>
+              </div>
+            </a>
+          </div>
         </div>
         {% endfor %}
       </div>
@@ -175,14 +233,9 @@
 </div>
 
       {% if request.user.is_authenticated and request.user == postcomment.user %}
-      <div id="comment-edit-form-{{ postcomment.pk }}" class="comment-update-form" style="display: none;">
-        <form class="edit-comment-form" action="{% url 'posts:comment_update' post.pk postcomment.pk %}" method="POST" data-comment-id="{{ postcomment.pk }}">
-          {% csrf_token %}
-          <input type="text" name="content" value="{{ postcomment.content }}">
-          <button type="submit">수정</button>
-        </form>
-      </div>
-      <button class="edit-comment-button" data-comment-id="{{ postcomment.pk }}">댓글수정</button>
+      e;">
+
+      {% endif %}
 {% endblock content %}
 
 {% block ect %}
@@ -242,8 +295,7 @@
       });
     });
   });
-</script>
-<script>
+
   ClassicEditor
     .create(document.querySelector('#content'), {
       language: 'ko',
