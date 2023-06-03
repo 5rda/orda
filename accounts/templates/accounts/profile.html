@@ -13,8 +13,8 @@
       <div class="profile__userbox">
         <div class="profile__user--info">
           <div class="profile__user--imgbox">
-            {% if person.profile %}
-              <img class="profile__user--img" src="{{ person.profile }}" alt="">
+            {% if person.profile_img %}
+              <img class="profile__user--img" src="{{ person.profile_img.url }}" alt="">
             {% else %}
               <img class="profile__user--img" src="{% static 'img/profile_no_img.png' %}" alt="">
             {% endif %}

@@ -31,9 +31,12 @@ def detail(request, post_pk):
     postcomment_form = PostCommentForm()
     postcomments = post.postcomment_set.all()
 
-    # 이전, 다음 게시물 가져오기
-    previous_post = Post.objects.filter(created_at__lt=post.created_at).order_by('-created_at').first()
-    next_post = Post.objects.filter(created_at__gt=post.created_at).order_by('created_at').first()
+    prev_posts = Post.objects.filter(pk__lt=post_pk).order_by('-pk')[:2]
+    next_posts = Post.objects.filter(pk__gt=post_pk).order_by('pk')[:2]
+    posts = list(prev_posts) + [post] + list(next_posts)
+
+
+
 
     session_key = f'post_viewed_{post_pk}'  # 게시물 고유 세션 키 생성
     if not request.session.get(session_key):
@@ -41,12 +44,12 @@ def detail(request, post_pk):
         post.save()  # 변경된 조회수 저장
         request.session[session_key] = True  # 세션에 조회 여부 기록
         
+
     context = {
         'post': post,
         'postcomment_form': postcomment_form,
         'postcomments': postcomments,
-        'previous_post': previous_post,
-        'next_post': next_post,
+        'posts': posts,
     }
     return render(request, 'posts/detail.html', context)
 
@@ -105,20 +108,18 @@ def delete(request, post_pk):
 @login_required
 def likes(request, post_pk):
     post = Post.objects.get(pk=post_pk)
-    me = request.user
-
-    if me in post.like_users.all():
-        post.like_users.remove(me)
+    if post.like_users.filter(pk=request.user.pk).exists():
+        post.like_users.remove(request.user)
         is_liked = False
     else:
-        post.like_users.add(me)
+        post.like_users.add(request.user)
         is_liked = True
-
     context = {
         'is_liked':is_liked,
-        'likes_count':post.like_users.count(),
+        'like_count':post.like_users.count()
     }
     return JsonResponse(context)
+    # return redirect('posts:detail', post.pk)
 
 
 def comment_create(request, post_pk):
@@ -130,14 +131,16 @@ def comment_create(request, post_pk):
         postcomment.post = post
         postcomment.user = request.user
         postcomment.save()
-        return redirect('posts:detail', post.pk)
+        # return redirect('posts:detail', post.pk)
+        return JsonResponse({'success': True})
     else:
-        postcomment_form = PostCommentForm()
-    context = {
-        'post': post,
-        'postcomment_form': postcomment_form,
-    }
-    return render(request, 'posts/detail.html', context)
+        return JsonResponse({'success': False, 'errors': postcomment_form.errors})
+    #     postcomment_form = PostCommentForm()
+    # context = {
+    #     'post': post,
+    #     'postcomment_form': postcomment_form,
+    # }
+    # return render(request, 'posts/detail.html', context)
 
 
 def comment_update(request, post_pk, comment_pk):
@@ -163,26 +166,45 @@ def comment_delete(request, post_pk, comment_pk):
     postcomment = PostComment.objects.get(pk=comment_pk)
     if request.user == postcomment.user:
         postcomment.delete()
-        
-    return redirect('posts:detail', post_pk)
+        post_comments = PostComment.objects.filter(post=post_pk).count()
+        return JsonResponse({'status': 'ok','post_comments': post_comments})
+    else:
+        return JsonResponse({'status': 'error', 'message': '권한이 없습니다.'})
+    # return redirect('posts:detail', post_pk)
 
 
 def comment_likes(request, post_pk, comment_pk):
     comment = PostComment.objects.get(pk=comment_pk)
     if comment.like_users.filter(pk=request.user.pk).exists():
         comment.like_users.remove(request.user)
+        cl_is_liked = False
     else:
         comment.like_users.add(request.user)
-    return redirect('posts:detail', post_pk)
+        cl_is_liked = True
+    cl_likes_count = comment.like_users.all().count()
+    context = {
+        'cl_is_liked' : cl_is_liked,
+        'cl_likes_count' : cl_likes_count,
+    }
+    return JsonResponse(context)
+    # return redirect('posts:detail', post_pk)
 
 
 def comment_dislikes(request, post_pk, comment_pk):
     comment = PostComment.objects.get(pk=comment_pk)
     if comment.dislike_users.filter(pk=request.user.pk).exists():
         comment.dislike_users.remove(request.user)
+        cd_is_liked = False
     else:
         comment.dislike_users.add(request.user)
-    return redirect('posts:detail', post_pk)
+        cd_is_liked = True
+    cd_likes_count = comment.dislike_users.all().count()
+    context = {
+        'cd_is_liked' : cd_is_liked,
+        'cd_likes_count' : cd_likes_count,
+    }
+    return JsonResponse(context)
+    # return redirect('posts:detail', post_pk)
 
 
 def search(request):
