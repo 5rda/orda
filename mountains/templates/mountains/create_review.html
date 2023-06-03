@@ -1,23 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
   <form action="{% url 'mountains:create_review' mountain.pk %}" method="post" enctype="multipart/form-data">
-    {% csrf_token %}      
-    <div class="form-group">
-      <label for="{{ form.content.id_for_label }}">내용:</label>
-      {{ form.content }}
-      {{ form.content.errors }}
-    </div>
-    <div class="form-group">
-      <label for="{{ form.image.id_for_label }}">사진:</label>
-      {{ form.image }}
-      {{ form.image.errors }}
-    </div>
-    <div class="form-group">
-      <label>태그:</label><br>
-      {% for tag in tag_list %}
-        <input type="checkbox" name="tags" value="{{ tag.1 }}"> {{ tag.0 }}<br>
-      {% endfor %}
-    </div>
-    <input type="submit">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="리뷰 작성">
   </form>
 {% endblock content %}
