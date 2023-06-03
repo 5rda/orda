@@ -1,7 +1,7 @@
 from django import forms
 from .models import *
 
-class MountainForm(forms.ModelForm):
+class ReviewCreationForm(forms.ModelForm):
     class Meta:
-        model = Mountain
-        fields = '__all__'
+        model = Review
+        fields = ['content', 'image', 'tags']

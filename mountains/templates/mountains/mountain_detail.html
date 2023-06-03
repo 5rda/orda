@@ -3,57 +3,241 @@
   <ul>
     <li>{{ mountain.pk }}</li>
     <li>{{ mountain.name }}</li>
-    <div id="map" style="width:500px;height:400px;"></div>
+    <li>{{ mountain.subname }}</li>
+    <li>조회수: {{ mountain.views }}</li>
+    <div id="mountain-map" style="width:500px;height:400px;"></div>
     <li>{{ mountain.region }}</li>
     <li>{{ mountain.height }}</li>
+    <form>
+      {% csrf_token %}
+      <button id="mountain-likes-btn" type="submit" data-mountain-pk-2="{{ mountain.pk }}">
+        <p>좋아요 추가</p>
+      </button>  
+    </form>  
     <li id="latitude">{{ mountain.geom.y }}</li>
     <li id="longitude">{{ mountain.geom.x }}</li>
   </ul>
+  <br>
+  <hr>
   <h2>course</h2>
   <ul>
     {% for course in courses %}
-        <li>{{ course.crs_name }}</li>
+        <li>코스명: {{ course.crs_name }}</li>
+        <div id="map-{{ course.pk }}" style="width: 100%; height: 300px;"></div>
+        <li>총거리: {{ course.distance }}m</li>
+        <li>소요시간: {{ course.duration }}</li>
+        <form>
+          {% csrf_token %}
+          <button id="bookmark-btn-{{ course.pk }}" type="submit" data-mountain-pk="{{ mountain.pk }}" data-course-pk="{{ course.pk }}">
+            <p>북마크 추가</p>
+          </button>
+        </form>
+        <br>
+        <hr>
     {% empty %}
         <li>No courses available.</li>
     {% endfor %}
   </ul>
-
+  {% endblock content %}
+  {% block javascript %}
+  <!-- 카카오맵 API 로드 -->
   <script>
-    function loadKakaoMaps() {
-      var script = document.createElement('script');
-      script.type = 'text/javascript';
-      script.src = 'https://dapi.kakao.com/v2/maps/sdk.js?appkey=d39fcd60ffdc96ae99454337f5e45a16&libraries=services&autoload=false';
-      script.onload = function() {
-        kakao.maps.load(function() {
-          var mapContainer = document.getElementById('map');
-          var mapOption = {
-            center: new kakao.maps.LatLng(33.450701, 126.570667),
-            level: 10
-          };
     
-          var map = new kakao.maps.Map(mapContainer, mapOption);
-    
-          var latitude = parseFloat(document.getElementById('latitude').textContent);
-          var longitude = parseFloat(document.getElementById('longitude').textContent);
-    
-          var geomPosition = new kakao.maps.LatLng(latitude, longitude);
-    
-          var marker = new kakao.maps.Marker({
-            position: geomPosition
-          });
-    
-          marker.setMap(map);
-    
-          // 지도 중심을 마커의 위치로 이동합니다
-          map.setCenter(geomPosition);
-    
-          // 부드럽게 마커가 위치한 곳으로 이동합니다
-          map.panTo(geomPosition);
-        });
-      };
-      document.head.appendChild(script);
+    function loadKakaoMapScript(callback) {
+        if (window.kakao) {
+            // 이미 카카오맵 API가 로드되어 있는 경우
+            callback();
+        } else {
+            // 카카오맵 API 로드
+            var script = document.createElement("script");
+            script.type = "text/javascript";
+            script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=d39fcd60ffdc96ae99454337f5e45a16&libraries=services&autoload=false";
+            document.head.appendChild(script);
+            
+            script.onload = function () {
+                kakao.maps.load(function () {
+                    callback();
+                });
+            };
+        }
     }
+    // 카카오맵 초기화 함수
+    function initMap(courseId, courseDetail) {
+      var container = document.getElementById('map-' + courseId);
+      var options = {
+        center: new kakao.maps.LatLng(37.5665, 126.9780), 
+        level: 6
+      };
+      var map = new kakao.maps.Map(container, options);
     
-    loadKakaoMaps();
-  </script>
-{% endblock content %}
+      var linePath = [];
+      var waypointPositions = [];
+      var waypointNames = [];
+      // 해당 코스의 CourseDetail들에 대해 위치 표시 및 linePath에 좌표 추가
+      courseDetail.features.forEach(function(feature) {
+        var coordinates = feature.geometry.coordinates;
+        var x = coordinates[0];
+        var y = coordinates[1];
+        var excludedNames = ['국가지점', '쉼터', '자연경관', '갈림길', '이정표', '표시', '벤치', '화장실', '주의', '현위치', '조망점', '계곡', '비석'];
+        if (!feature.properties.is_waypoint) {
+          linePath.push(new kakao.maps.LatLng(y, x));
+        } else if (!excludedNames.some(name => feature.properties.waypoint_name.includes(name))) {
+          waypointPositions.push(new kakao.maps.LatLng(y, x));
+          waypointNames.push(feature.properties.waypoint_name)
+          // 마커를 표시합니다
+          
+          waypointPositions.forEach(function (position, index) {
+            
+            var marker = new kakao.maps.Marker({
+              position: position,
+              map: map,
+              title: waypointNames[index]
+            });
+          });
+        
+        }
+      });
+    
+      // 중간 인덱스 계산
+      var middleIndex = Math.floor(linePath.length / 2);
+      var center = linePath[middleIndex];
+    
+      // Polyline을 이용하여 선 그리기
+      var polyline = new kakao.maps.Polyline({
+        path: linePath, // linePath에 저장된 좌표들로 설정
+        strokeWeight: 3,
+        strokeColor: '#FF0000',
+        strokeOpacity: 0.7,
+        strokeStyle: 'solid'
+      });
+      polyline.setMap(map);
+    
+      // 부드럽게 마커가 위치한 곳으로 이동합니다
+      map.panTo(center);
+    }
+
+
+// 산 좌표를 찍는 카카오 MAP
+function showMountainMarker(latitude, longitude) {
+  var container = document.getElementById('mountain-map');
+  var options = {
+    center: new kakao.maps.LatLng(latitude, longitude),
+    level: 10
+  };
+  var map = new kakao.maps.Map(container, options);
+
+  var markerPosition = new kakao.maps.LatLng(latitude, longitude);
+
+  var marker = new kakao.maps.Marker({
+    position: markerPosition
+  });
+
+  marker.setMap(map);
+
+  // 지도 중심을 마커의 위치로 이동합니다
+  map.setCenter(markerPosition);
+
+  // 부드럽게 마커가 위치한 곳으로 이동합니다
+  map.panTo(markerPosition);
+}
+
+  // 카카오맵 API 로드 후 초기화 함수 호출
+  loadKakaoMapScript(function () {
+    {% for course in courses %}
+      var courseId = {{ course.pk }};
+      var courseDetails = {{ course_details|safe }};
+      var courseDetail = JSON.parse(courseDetails[courseId]);
+      initMap(courseId, courseDetail);
+    {% endfor %}
+
+    // 산의 위치에 마커 표시
+    var mountainLatitude = parseFloat(document.getElementById('latitude').textContent);
+    var mountainLongitude = parseFloat(document.getElementById('longitude').textContent);
+    showMountainMarker(mountainLatitude, mountainLongitude);
+
+  });
+
+</script>
+
+<script>
+  function bookmark(courseId) {
+    const bookmarkBtn = document.getElementById('bookmark-btn-' + courseId);
+    const mountainCsrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+
+    if (bookmarkBtn) {
+      bookmarkBtn.addEventListener('click', () => {
+        event.preventDefault(); // 폼의 기본 동작 중지
+        const mountainPk = bookmarkBtn.getAttribute('data-mountain-pk');
+        const coursePk = bookmarkBtn.getAttribute('data-course-pk');
+        fetch(`/mountains/${mountainPk}/course/${coursePk}/bookmark/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': mountainCsrftoken
+          },
+          body: JSON.stringify({})
+        })
+          .then(response => response.json())
+          .then(data => {
+            const isBookmarked = data.is_bookmarked;
+            // 서버로부터의 응답을 처리
+            if (isBookmarked) {
+              // 북마크 추가 시 동작
+              bookmarkBtn.innerText = '북마크 제거';
+              alert('북마크가 추가되었습니다.');
+            } else {
+              // 북마크 제거 시 동작
+              bookmarkBtn.innerText = '북마크 추가';
+              alert('북마크가 제거되었습니다.');
+            }
+          })
+          .catch(error => {
+            // 에러 처리
+            console.error(error);
+          });
+      });
+    }
+  }
+
+  {% for course in courses %}
+    bookmark({{ course.pk }});
+  {% endfor %}
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const mountainLikesBtn = document.getElementById('mountain-likes-btn');
+    if (mountainLikesBtn) {
+      mountainLikesBtn.addEventListener('click', (event) => {
+        event.preventDefault();
+        const mountainPk2 = mountainLikesBtn.getAttribute('data-mountain-pk-2');
+        const csrfToken = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+        axios.post(`/mountains/${mountainPk2}/likes/`, null, {
+          headers: {
+            'X-CSRFToken': csrfToken,
+          },
+        })
+          .then((response) => {
+            const isLiked = response.data.is_liked;
+            // 서버로부터의 응답을 처리
+            if (isLiked === true) {
+              // 팔로우 성공 시 동작
+              mountainLikesBtn.innerHTML = '<p>좋아요 제거</p>';
+              alert('좋아요가 추가되었습니다.');
+            } else {
+              // 언팔로우 성공 시 동작
+              mountainLikesBtn.innerHTML = '<p>좋아요 추가</p>';
+              alert('좋아요가 제거되었습니다.');
+            }
+          })
+          .catch((error) => {
+            // 에러 처리
+            console.error(error);
+          });
+      });
+    }
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+{% endblock javascript %}

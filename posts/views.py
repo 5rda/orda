@@ -5,6 +5,7 @@ from .forms import PostForm, PostCommentForm
 from django.db.models import Q, Count
 from django.conf import settings
 from bs4 import BeautifulSoup
+from django.http import JsonResponse
 import os
 from django.http import JsonResponse
 
@@ -12,35 +13,38 @@ from django.http import JsonResponse
 
 
 def index(request):
-    author_pk = request.GET.get('author')
-    sort_option = request.GET.get('sortKind', '최신순')
-
-    if author_pk:
-        if sort_option == '인기순':
-            posts = Post.objects.filter(user__pk=author_pk).annotate(like_count=Count('like_users')).order_by('-like_count')
-        else:
-            posts = Post.objects.filter(user__pk=author_pk).order_by('-created_at')
-    else:
-        if sort_option == '인기순':
-            posts = Post.objects.annotate(like_count=Count('like_users')).order_by('-like_count')
-        else:
-            posts = Post.objects.order_by('-created_at')
-
+    view_posts = Post.objects.order_by('-view_count')
+    like_posts = Post.objects.annotate(like_count=Count('like_users')).order_by('-like_count')
+    posts = Post.objects.order_by('-created_at')
+    
     context = {
+        'view_posts': view_posts,
+        'like_posts': like_posts,
         'posts': posts,
-        'sortKind': sort_option
+   
     }
     return render(request, 'posts/index.html', context)
-
 
 
 def detail(request, post_pk):
     post = Post.objects.get(pk=post_pk)
     postcomment_form = PostCommentForm()
     postcomments = post.postcomment_set.all()
+
     prev_posts = Post.objects.filter(pk__lt=post_pk).order_by('-pk')[:2]
     next_posts = Post.objects.filter(pk__gt=post_pk).order_by('pk')[:2]
     posts = list(prev_posts) + [post] + list(next_posts)
+
+
+
+
+    session_key = f'post_viewed_{post_pk}'  # 게시물 고유 세션 키 생성
+    if not request.session.get(session_key):
+        post.view_count += 1  # 조회수 증가
+        post.save()  # 변경된 조회수 저장
+        request.session[session_key] = True  # 세션에 조회 여부 기록
+        
+
     context = {
         'post': post,
         'postcomment_form': postcomment_form,
@@ -101,6 +105,7 @@ def delete(request, post_pk):
     return redirect('posts:index')
 
 
+@login_required
 def likes(request, post_pk):
     post = Post.objects.get(pk=post_pk)
     if post.like_users.filter(pk=request.user.pk).exists():
@@ -138,9 +143,9 @@ def comment_create(request, post_pk):
     # return render(request, 'posts/detail.html', context)
 
 
-def comment_update(request, post_pk, postcomment_pk):
-    postcomment = PostComment.objects.get(pk=postcomment_pk)
-    
+def comment_update(request, post_pk, comment_pk):
+    postcomment = PostComment.objects.get(pk=comment_pk)
+
     if request.method == 'POST':
         form = PostCommentForm(request.POST, instance=postcomment)
         if form.is_valid():
@@ -148,13 +153,13 @@ def comment_update(request, post_pk, postcomment_pk):
             return redirect('posts:detail', post_pk)
     else:
         form = PostCommentForm(instance=postcomment)
-    
+
     context = {
         'form': form,
         'post_pk': post_pk,
-        'postcomment_pk': postcomment_pk
+        'comment_pk': comment_pk
     }
-    return render(request, 'posts/detail.html', context)
+    return render(request, 'posts/comment_update.html', context)
 
 
 def comment_delete(request, post_pk, comment_pk):
@@ -218,3 +223,4 @@ def get_first_image_from_content(content):
         return img_tag['src']
     else:
         return None
+    

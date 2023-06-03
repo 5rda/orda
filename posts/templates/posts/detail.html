@@ -5,7 +5,6 @@
   <script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/ckeditor.js"></script>
   <script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/translations/ko.js"></script> {% endcomment %}
 <style>
-
 </style>
 <link rel="stylesheet" href="{% static 'css/posts_detail.css' %}">
 {% comment %} <link rel="stylesheet" href="{% static 'css/posts_create.css' %}"> {% endcomment %}
@@ -49,6 +48,7 @@
       {% if request.user != post.user %}
         {% comment %} <form action="{% url 'accounts:follow' post.user.pk %}" method="POST"> {% endcomment %}
         <form id="follow-form" data-user-id="{{ post.user.pk }}">
+
           {% csrf_token %}
           {% if request.user in post.user.followers.all %}
             <input type="submit" class="follw__btn rounded btn__hover" value="팔로잉">
@@ -174,7 +174,15 @@
 </div>
 </div>
 
-
+      {% if request.user.is_authenticated and request.user == postcomment.user %}
+      <div id="comment-edit-form-{{ postcomment.pk }}" class="comment-update-form" style="display: none;">
+        <form class="edit-comment-form" action="{% url 'posts:comment_update' post.pk postcomment.pk %}" method="POST" data-comment-id="{{ postcomment.pk }}">
+          {% csrf_token %}
+          <input type="text" name="content" value="{{ postcomment.content }}">
+          <button type="submit">수정</button>
+        </form>
+      </div>
+      <button class="edit-comment-button" data-comment-id="{{ postcomment.pk }}">댓글수정</button>
 {% endblock content %}
 
 {% block ect %}
@@ -201,8 +209,53 @@
 {% block javascript %}
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
+  $(document).ready(function() {
+    $('.edit-comment-button').click(function() {
+      var commentId = $(this).data('comment-id');
+      $('#comment-edit-form-' + commentId).toggle();
+      $('#comment-' + commentId + ' .comment-content').toggle();
+      $(this).toggle(); // Add this line to hide the edit button
+    });
 
-  
+    $('.edit-comment-form').submit(function(event) {
+      event.preventDefault();
+      var commentId = $(this).data('comment-id');
+      var content = $(this).find('input[name=content]').val();
+      var form = $(this);
+
+      $.ajax({
+        type: 'POST',
+        url: form.attr('action'),
+        data: form.serialize(),
+        success: function(response) {
+          // Update the comment content
+          $('#comment-' + commentId + ' .comment-content').text(content);
+          // Show the edit button again
+          $('.edit-comment-button[data-comment-id=' + commentId + ']').toggle();
+          // Hide the edit form
+          $('#comment-edit-form-' + commentId).toggle();
+          $('#comment-' + commentId + ' .comment-content').toggle();
+        },
+        error: function(xhr, status, error) {
+          console.error(xhr.responseText);
+        }
+      });
+    });
+  });
+</script>
+<script>
+  ClassicEditor
+    .create(document.querySelector('#content'), {
+      language: 'ko',
+    })
+    .then(editor => {
+      editor.model.document.on('change:data', () => {
+        document.querySelector('#content').value = editor.getData();
+      });
+    })
+    .catch(error => {
+      console.error(error);
+    });
 </script>
 <script src="{% static 'js/post_detail.js' %}"></script>
 {% comment %} <script src="{% static 'js/ckeditor.js' %}"></script> {% endcomment %}

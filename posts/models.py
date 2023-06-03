@@ -12,6 +12,7 @@ class Post(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='like_posts')
+    view_count = models.PositiveIntegerField(default=0)
 
 class PostComment(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
