@@ -4,7 +4,8 @@ from django.contrib.gis.serializers.geojson import Serializer
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 from .models import *
-from django.db.models import F, Count
+import json, os
+from django.db.models import F, Count, When, Case
 from django.conf import settings
 from .forms import ReviewCreationForm
 from django.contrib.auth.decorators import login_required
@@ -56,7 +57,7 @@ class MountainDetailView(DetailView):
         courses = mountain.course_set.all()
         course_details = {}
         for course in courses:
-            geojson_data = serializer.serialize(CourseDetail.objects.filter(crs_name=course), fields=('geom', 'is_waypoint', 'waypoint_name'))
+            geojson_data = serializer.serialize(CourseDetail.objects.filter(crs_name_detail=course), fields=('geom', 'is_waypoint', 'waypoint_name', 'crs_name_detail'))
             course_details[course.pk] =geojson_data
         context = {
             'mountain': mountain,
@@ -69,9 +70,59 @@ class MountainDetailView(DetailView):
         #     file.write(json_data)
         return context
 
-
 class CourseListView(ListView):
     template_name = 'mountains/course_list.html'
+    context_object_name = 'courses'
+    model = Course    
+
+    def get_queryset(self):
+        mountain_pk = self.kwargs['mountain_pk']
+        mountain = Mountain.objects.get(pk=mountain_pk)
+        sort_option = self.request.GET.get('sort', '')  # 정렬 옵션 가져오기
+
+        queryset = Course.objects.filter(mntn_name=mountain)
+
+        if sort_option == 'bookmarks':
+            queryset = queryset.annotate(num_bookmarks=Count('bookmarks')).order_by('-num_bookmarks')
+        elif sort_option == 'distance':
+            queryset = queryset.order_by('distance')
+        elif sort_option == 'hidden_time':
+            queryset = queryset.order_by('hidden_time')
+        elif sort_option == 'diff':
+            # 난이도 정렬을 추가
+            queryset = queryset.annotate(
+                diff_order=Case(
+                    When(diff='하', then=1),
+                    When(diff='중', then=2),
+                    When(diff='상', then=3),
+                    default=4
+                )
+            ).order_by('diff_order')
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        mountain_pk = self.kwargs['mountain_pk']
+        courses = self.get_queryset()
+        mountain = Mountain.objects.get(pk=mountain_pk)
+        sort_option = self.request.GET.get('sort', '')  # 정렬 옵션 가져오기
+
+        serializer = Serializer()
+        course_details = {}
+        for course in courses:
+            geojson_data = serializer.serialize(CourseDetail.objects.filter(crs_name_detail=course), fields=('geom', 'is_waypoint', 'waypoint_name', 'crs_name_detail'))
+            course_details[course.pk] =geojson_data
+        context = {
+            'mountain': mountain,
+            'courses': courses,
+            'course_details': course_details
+        }        
+        return context        
+
+
+class CourseAllListView(ListView):
+    template_name = 'mountains/course_all_list.html'
     context_object_name = 'courses'
     model = Course
 
@@ -146,6 +197,12 @@ def review_likes(request, pk, review_pk):
     return redirect('mountains:review_detail', pk, review.pk)
 
 
+# class MountainTestView(ListView):
+#     model = Mountain
+#     template_name = 'mountains/mountain_test.html'
+#     context_object_name = 'mountains'
+    
+
 @login_required
 def review_delete(request, pk, review_pk):
     review = Review.objects.get(pk=review_pk)
@@ -162,3 +219,5 @@ def review_detail(request, pk, review_pk):
         'tags': tags,
     }
     return render(request, 'mountains/review_detail.html', context)
+
+  
