@@ -11,6 +11,7 @@ import requests
 import os
 from dotenv import load_dotenv
 from django.http import JsonResponse
+from bs4 import BeautifulSoup
 
 
 def login(request):
@@ -57,46 +58,56 @@ def profile(request, user_pk):
     person = User.objects.get(pk=user_pk)
     post = Post.objects.filter(user=person)
     posts = person.post_set.all().order_by('-created_at')
-    liked_posts = Post.objects.filter(like_users=request.user)
-    posts_comments = person.postcomment_set.all().count()
+    liked_posts = Post.objects.filter(like_users=person)
+    # posts_comments = person.postcomment_set.all().count()
     # mountains_comments = person.comment_set.all().count()
-    # score = posts.count() * 40 + mountains_comments * 30 + posts_comments * 5
+    score = posts.count() * 40
+    #  + mountains_comments * 30 + posts_comments * 5
 
-    # if score < 200:
-    #     level = 1
-    #     rest = score
-    #     max_score = 200
-    # elif score < 300:
-    #     level = 2
-    #     rest = score-200
-    #     max_score = 300
-    # elif score < 400:
-    #     level = 3
-    #     rest = score-300
-    #     max_score = 400
-    # elif score < 500:
-    #     level = 4
-    #     rest = score-400
-    #     max_score = 500
-    # else:
-    #     level = 5
-    #     rest = score-500
-    #     if rest < 600:
-    #         rest = score-500
-    #     else:
-    #         rest = 600
-    #     max_score = 600
+    if score < 200:
+        level = 1
+        rest = score
+        max_score = 200
+    elif score < 300:
+        level = 2
+        rest = score-200
+        max_score = 300
+    elif score < 400:
+        level = 3
+        rest = score-300
+        max_score = 400
+    elif score < 500:
+        level = 4
+        rest = score-400
+        max_score = 500
+    else:
+        level = 5
+        rest = score-500
+        if rest < 600:
+            rest = score-500
+        else:
+            rest = 600
+        max_score = 600
 
-    # level_dict = {1:'등산새싹', 2:'등산샛별', 3:'등산인', 4:'등산고수', 5:'등산왕'}
+    # 추가
+    expbar = (score / max_score) * 100
+    restexp = max_score - score
+
+    level_dict = {1:'등산새싹', 2:'등산샛별', 3:'등산인', 4:'등산고수', 5:'등산왕'}
     context = {
         'person': person,
         'post': post,
         'posts': posts,
-        # 'level': level,
-        # 'level_name': level_dict[level],
-        # 'rest': rest,
-        # 'max_score': max_score,
+        'level': level,
+        'level_name': level_dict[level],
+        'rest': rest,
+        'max_score': max_score,
         'liked_posts': liked_posts,
+
+        # 추가
+        'score': score,
+        'expbar': expbar,
+        'restexp': restexp,
     }
     return render(request, 'accounts/profile.html', context)
 
@@ -261,3 +272,13 @@ def naver_callback(request):
             auth_login(request, user)
             return redirect('accounts:profile', user.pk)
     return redirect('accounts:login')
+
+
+def get_first_image_from_content(content):
+    soup = BeautifulSoup(content, 'html.parser')
+    img_tag = soup.find('img')
+    print(img_tag)
+    if img_tag:
+        return img_tag['src']
+    else:
+        return None
