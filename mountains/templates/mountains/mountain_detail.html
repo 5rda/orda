@@ -21,11 +21,12 @@
   <hr>
   <h2>course</h2>
   <ul>
-    {% for course in courses %}
-        <li>코스명: {{ course.crs_name }}</li>
+    {% for course in courses|slice:":3" %}
+        <li>코스명: {{ course.crs_name_detail }}</li>
         <div id="map-{{ course.pk }}" style="width: 100%; height: 300px;"></div>
-        <li>총거리: {{ course.distance }}m</li>
+        <li>총거리: {{ course.distance }}km</li>
         <li>소요시간: {{ course.duration }}</li>
+        <li>난이도: {{ course.diff }}</li>
         <form>
           {% csrf_token %}
           <button id="bookmark-btn-{{ course.pk }}" type="submit" data-mountain-pk="{{ mountain.pk }}" data-course-pk="{{ course.pk }}">
@@ -38,8 +39,13 @@
         <li>No courses available.</li>
     {% endfor %}
   </ul>
-  {% endblock content %}
-  {% block javascript %}
+  {% if courses|length > 3 %}
+    <a href="{% url 'mountains:course_list' mountain.pk %}">더보기</a>
+  {% endif %}
+
+{% endblock content %}
+
+{% block javascript %}
   <!-- 카카오맵 API 로드 -->
   <script>
     
@@ -73,6 +79,7 @@
       var linePath = [];
       var waypointPositions = [];
       var waypointNames = [];
+      console.log(courseDetail)
       // 해당 코스의 CourseDetail들에 대해 위치 표시 및 linePath에 좌표 추가
       courseDetail.features.forEach(function(feature) {
         var coordinates = feature.geometry.coordinates;
@@ -97,7 +104,22 @@
         
         }
       });
-    
+      // 출발 좌표에 마커 표시
+      var startMarkerPosition = linePath[0];
+      var startMarker = new kakao.maps.Marker({
+        position: startMarkerPosition,
+        map: map,
+        title: "출발지"
+      });
+
+      // 도착 좌표에 마커 표시
+      var endMarkerPosition = linePath[linePath.length - 1];
+      var endMarker = new kakao.maps.Marker({
+        position: endMarkerPosition,
+        map: map,
+        title: "도착지"
+      });
+          
       // 중간 인덱스 계산
       var middleIndex = Math.floor(linePath.length / 2);
       var center = linePath[middleIndex];
@@ -241,3 +263,22 @@ function showMountainMarker(latitude, longitude) {
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 {% endblock javascript %}
+
+
+{% comment %} // 출발지 마커에 인포윈도우 표시
+var startInfowindowContent = '<div style="padding:5px;">출발지</div>';
+var startInfowindow = new kakao.maps.InfoWindow({
+  content: startInfowindowContent,
+  position: startMarker.getPosition(),
+  offsetY: -40 // 인포윈도우를 마커 위로 40px 위로 이동
+});
+startInfowindow.open(map);
+
+// 도착지 마커에 인포윈도우 표시
+var endInfowindowContent = '<div style="padding:5px;">도착지</div>';
+var endInfowindow = new kakao.maps.InfoWindow({
+  content: endInfowindowContent,
+  position: endMarker.getPosition(),
+  offsetY: -40 // 인포윈도우를 마커 위로 40px 위로 이동
+});
+endInfowindow.open(map);  {% endcomment %}
