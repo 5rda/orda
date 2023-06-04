@@ -17,7 +17,7 @@
               <button id="등산로" class="{% if active_button_id == '등산로' %}active-button{% endif %}">등산로</button>
             </li>
             <li class="header__nav--item">
-              <button id="인증샷" class="{% if active_button_id == '인증샷' %}active-button{% endif %}">인증샷</button>
+              <a id="인증샷" class="{% if active_button_id == '인증샷' %}active-button{% endif %}" href="{% url 'posts:proofshot' %}">인증샷</a>
             </li>
           </ul>
         </div>

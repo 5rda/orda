@@ -13,17 +13,35 @@ from django.http import JsonResponse
 
 
 def index(request):
+    query = request.GET.get('q')
+    search_option = request.GET.get('search_option')
+
     view_posts = Post.objects.order_by('-view_count')
     like_posts = Post.objects.annotate(like_count=Count('like_users')).order_by('-like_count')
-    posts = Post.objects.order_by('-created_at')
-    
+
+    if query and search_option:
+        if search_option == 'title':
+            filtered_posts = Post.objects.filter(title__contains=query)
+        elif search_option == 'author':
+            filtered_posts = Post.objects.filter(user__username__contains=query)
+        elif search_option == 'content':
+            filtered_posts = Post.objects.filter(content__contains=query)
+        elif search_option == 'title_content':
+            filtered_posts = Post.objects.filter(Q(title__contains=query) | Q(content__contains=query))
+    else:
+        filtered_posts = Post.objects.order_by('-created_at')
+
     context = {
         'view_posts': view_posts,
         'like_posts': like_posts,
-        'posts': posts,
-   
+        'posts': filtered_posts,
+        'query': query,
     }
-    return render(request, 'posts/index.html', context)
+
+    if query:
+        return render(request, 'posts/search.html', context)
+    else:
+        return render(request, 'posts/index.html', context)
 
 
 def detail(request, post_pk):
@@ -203,12 +221,44 @@ def comment_dislikes(request, post_pk, comment_pk):
 
 
 def search(request):
-    query = request.GET.get('query')
-    posts = Post.objects.filter(Q(title__icontains=query) | Q(content__icontains=query)).distinct()
+    query = request.GET.get('q')
+    search_option = request.GET.get('search_option')
+
+    view_posts = Post.objects.order_by('-view_count')
+    like_posts = Post.objects.annotate(like_count=Count('like_users')).order_by('-like_count')
+
+    if query and search_option:
+        if search_option == 'title':
+            filtered_posts = Post.objects.filter(title__contains=query)
+        elif search_option == 'author':
+            filtered_posts = Post.objects.filter(user__username__contains=query)
+        elif search_option == 'content':
+            filtered_posts = Post.objects.filter(content__contains=query)
+        elif search_option == 'title_content':
+            filtered_posts = Post.objects.filter(Q(title__contains=query) | Q(content__contains=query))
+    else:
+        filtered_posts = Post.objects.order_by('-created_at')
+
     context = {
-        'posts': posts
+        'view_posts': view_posts,
+        'like_posts': like_posts,
+        'posts': filtered_posts,
+        'query': query,
     }
+
     return render(request, 'posts/search.html', context)
+
+
+def proofshot(request):
+    posts = Post.objects.order_by('-created_at')
+    view_posts = Post.objects.order_by('-view_count')
+    
+    context = {
+        'posts': posts,
+        'view_posts': view_posts,
+    }
+
+    return render(request, 'posts/proofshot.html', context)
 
 
 def get_first_image_from_content(content):
