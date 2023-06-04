@@ -31,7 +31,11 @@ class PostForm(forms.ModelForm):
 
 class PostCommentForm(forms.ModelForm):
     content = forms.CharField(
-        widget=forms.TextInput(attrs={'placeholder': '댓글 내용', 'class': 'form-control'}),
+        widget=forms.TextInput(
+            attrs={
+                'placeholder': '작성자에게 격려의 댓글을 달아주세요!', 
+                'class': 'my-2 fs-6 p-2 focus:outline-none',
+                'style': 'width: 90%;'}),
         label=''
     )
 

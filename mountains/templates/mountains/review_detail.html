@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+  <b>{{ review.mountain.name }}</b>
+  <hr>
+  <div>내용: {{ review.content }}</div>
+  <div>이미지:
+    {% if review.image %}
+      <img src="{{ review.image.url }}" alt="">
+    {% endif %}
+  </div>
+  <div>태그:
+    {% for tag in tags %}
+      {{ tag }}
+    {% endfor %}
+  </div>
+  <hr>
+  <form action="{% url 'mountains:review_delete' review.mountain.pk review.pk %}" method="POST">
+    {% csrf_token %}
+    <input type="submit" value="삭제">
+  </form>
+  <hr>
+  <form action="{% url 'mountains:review_likes' review.mountain.pk review.pk %}" method="POST">
+    {% csrf_token %}
+    {% if request.user in review.like_users.all %}
+      <input type="submit" value="좋아요 취소">
+    {% else %}
+      <input type="submit" value="좋아요">
+    {% endif %}
+  </form>
+  {{ review.like_users.count }}
+  <hr>
+  
+{% endblock content %}

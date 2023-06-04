@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% load static %}
+{% load custom_filters %}
 
 {% block style %}
   <link rel="stylesheet" href="{% static 'css/profile.css' %}">
@@ -9,18 +10,29 @@
 {% block content %}
 <section>
   <div class="profile__container">
+    {% comment %} 프로필 {% endcomment %}
     <article class="profile__article1">
       <div class="profile__userbox">
         <div class="profile__user--info">
           <div class="profile__user--imgbox">
-            {% if person.profile %}
-              <img class="profile__user--img" src="{{ person.profile }}" alt="">
+            {% if person.profile_img %}
+              <img class="profile__user--img {% if level == 2 %}level2 {% elif level == 3 %}level3 {% elif level == 4 %}level4 {% elif level == 5 %} level5{% endif %}" src="{{ person.profile_img.url }}" alt="">
+              {% if level == 5 %}
+                <img class="level5--img" src="{% static 'img/level5.png' %}" alt="level5">
+              {% endif %}
             {% else %}
-              <img class="profile__user--img" src="{% static 'img/profile_no_img.png' %}" alt="">
+              <img class="profile__user--img {% if level == 2 %}level2 {% elif level == 3 %}level3 {% elif level == 4 %}level4 {% elif level == 5 %} level5{% endif %}" src="{% static 'img/profile_no_img.png' %}" alt="">
+              {% if level == 5 %}
+                <img class="level5--img" src="{% static 'img/level5.png' %}" alt="level5">
+              {% endif %}
             {% endif %}
-          </div>
-          <div class="profile__user--stat">
+            </div>
+            <div class="profile__user--stat">
             <div class="profile__user--name">{{ person.nickname }}</div>
+            <div class="progress profile__user--expbar" role="progressbar" aria-label="Example with label" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" title="다음 레벨까지 {{ restexp }}점 남았습니다.">
+              <div class="progress-bar bg-success" style="width: {{ expbar }}%"></div>
+              <p class="profile__user--expcount">{{ score }}/{{ max_score }}</p>
+            </div>
             <div class="profile__user--follow">
               <p class="profile__user--followtext">팔로워</p><button id="followers-count" class="profile__user--followercount">{{ person.followers.all|length }}</button>
               <p style="font-size: 12px; line-height: 20px; margin: 0 5px;">|</p>
@@ -61,7 +73,7 @@
             <div class="d-flex flex-row profile__user--info2cnt">
               <span>0</span>
               <span style="margin: 0 3px; font-size: 12px; line-height: 20px;">|</span>
-              <span>0</span>
+              <span>{{ post|length }}</span>
             </div>
           </button>
           <button class="profile__user--bookmark">
@@ -81,15 +93,20 @@
             <div class="d-flex flex-row profile__user--info2cnt">
               <span>0</span>
               <span style="margin: 0 3px; font-size: 12px; line-height: 20px;">|</span>
-              <span>0</span>
+              <span>{{ liked_posts|length }}</span>
             </div>
           </button>
         </div>
       </div>
     </article>
+
     <article class="profile__article2"></article>
+
+    {% comment %} 컨텐츠 {% endcomment %}
     <article class="profile__article3">
       <div class="profile__contentbox">
+
+        {% comment %} 나의글 목록 {% endcomment %}
         <div class="profile__content1" style="display: block;">
           <div class="profile__content1--review">
             <div class="profile__content1--reviewtext">
@@ -106,22 +123,33 @@
               <span style="margin-left: 5px; color: var(--main-color);">{{ posts|length }}</span>
             </div>
             <div class="profile__content1--mycoursecontent">
-              {% if posts %}
-                {% for post in posts %}
-                  {% if post.user == person %}
-                    <div>
-                      <a href="{% url 'posts:detail' post.pk %}">{{ post.title }}</a>
-                      좋아요: {{ post.like_users.count }}
-                      작성: {{ post.created_at|date:"y.m.d H:i" }}
-                    </div>
-                  {% endif %}
-                {% endfor %}
-              {% else %}
-                <p class="profile__content--nonewrite">등록된 글이 없습니다.</p>
-              {% endif %}
+              <div class="profile__content--postbox">
+                {% if posts %}
+                  {% for post in posts %}
+                    {% if post.user == person %}
+                      <a class="profile__content--post" title="{{ post.title }}" href="{% url 'posts:detail' post.pk %}">
+                        <div class="profile__content--imgbox">
+                          {% with first_image_url=post.content|get_first_image_from_content %}
+                            {% if first_image_url %}
+                              <img class="profile__content--img" src="{{ first_image_url }}" alt="썸네일">
+                            {% else %}
+                              <img class="profile__content--img" src="{% static 'img/nav_logo.png' %}" alt="대체이미지">
+                            {% endif %}
+                          {% endwith %}
+                        </div>
+                        <p class="profile__content--posttext">{{ post.title }}</p>
+                      </a>
+                    {% endif %}
+                  {% endfor %}
+                {% else %}
+                  <p class="profile__content--nonewrite">등록된 글이 없습니다.</p>
+                {% endif %}
+              </div>
             </div>
           </div>
         </div>
+
+        {% comment %} 북마크 목록 {% endcomment %}
         <div class="profile__content2" style="display: none;">
           <div class="profile__content2--bookmark">
             <div class="profile__content2--bookmarktext">
@@ -133,6 +161,8 @@
             </div>
           </div>
         </div>
+
+        {% comment %} 좋아요 목록 {% endcomment %}
         <div class="profile__content3" style="display: none;">
           <div class="profile__content3--mountain">
             <div class="profile__content3--mountaintext">
@@ -149,21 +179,31 @@
                 <span style="margin-left: 5px; color: var(--main-color);">{{ liked_posts|length }}</span>
             </div>
             <div class="profile__content3--mycoursecontent">
+              <div class="profile__content--postbox">
                 {% if liked_posts %}
-                    {% for post in liked_posts %}
-                        <div>
-                            <a href="{% url 'posts:detail' post.pk %}">{{ post.title }}</a>
-                            좋아요: {{ post.like_users.count }}
-                            작성: {{ post.created_at|date:"y.m.d H:i" }}
-                        </div>
-                    {% endfor %}
+                  {% for post in liked_posts %}
+                    <a class="profile__content--post" title="{{ post.title }}" href="{% url 'posts:detail' post.pk %}">
+                      <div class="profile__content--imgbox">
+                        {% with first_image_url=post.content|get_first_image_from_content %}
+                          {% if first_image_url %}
+                            <img class="profile__content--img" src="{{ first_image_url }}" alt="썸네일">
+                          {% else %}
+                            <img class="profile__content--img" src="{% static 'img/nav_logo.png' %}" alt="대체이미지">
+                          {% endif %}
+                        {% endwith %}
+                      </div>
+                      <p class="profile__content--posttext">{{ post.title }}</p>
+                    </a>
+                  {% endfor %}
                 {% else %}
-                    <p class="profile__content--nonewrite">좋아요한 글이 없습니다.</p>
+                  <p class="profile__content--nonewrite">좋아요한 글이 없습니다.</p>
                 {% endif %}
+              </div>
             </div>
-        </div>
+          </div>
         </div>
 
+        {% comment %} 팔로워 목록 {% endcomment %}
         <div class="profile__content4" style="display: none;">
           <div class="profile__content4--follower">
             <div class="profile__content4--followertext">
@@ -177,9 +217,15 @@
                       <a class="d-flex flex-row" href="{% url 'accounts:profile' follower.pk %}">
                         <div class="profile__follow--imgbox">
                           {% if follower.profile %}
-                            <img class="profile__follow--img" src="{{ follower.profile }}" alt="">
+                            <img class="profile__follow--img {% if level == 2 %}level2 {% elif level == 3 %}level3 {% elif level == 4 %}level4 {% elif level == 5 %} level5{% endif %}" src="{{ follower.profile }}" alt="팔로워유저이미지">
+                            {% if level == 5 %}
+                              <img class="level5--img" src="{% static 'img/level5.png' %}" alt="level5">
+                            {% endif %}
                           {% else %}
-                            <img class="profile__follow--img" src="{% static 'img/profile_no_img.png' %}" alt="">
+                            <img class="profile__follow--img {% if level == 2 %}level2 {% elif level == 3 %}level3 {% elif level == 4 %}level4 {% elif level == 5 %} level5{% endif %}" src="{% static 'img/profile_no_img.png' %}" alt="유저대체이미지">
+                            {% if level == 5 %}
+                              <img class="level5--img" src="{% static 'img/level5.png' %}" alt="level5">
+                            {% endif %}
                           {% endif %}
                         </div>
                         <div class="profile__follow--info">
@@ -211,10 +257,11 @@
           </div>
         </div>
 
+        {% comment %} 팔로윙 목록 {% endcomment %}
         <div class="profile__content5" style="display: none;">
           <div class="profile__content5--following">
             <div class="profile__content5--followingtext">
-              <p>팔로워</p>
+              <p>팔로윙</p>
             </div>
             <div class="profile__content5--followingcontent">
               {% if person.followings.all %}
@@ -224,9 +271,15 @@
                       <a class="d-flex flex-row" href="{% url 'accounts:profile' following.pk %}">
                         <div class="profile__follow--imgbox">
                           {% if following.profile %}
-                            <img class="profile__follow--img" src="{{ following.profile }}" alt="">
+                            <img class="profile__follow--img {% if level == 2 %}level2 {% elif level == 3 %}level3 {% elif level == 4 %}level4 {% elif level == 5 %} level5{% endif %}" src="{{ following.profile }}" alt="팔로윙유저이미지">
+                            {% if level == 5 %}
+                              <img class="level5--img" src="{% static 'img/level5.png' %}" alt="level5">
+                            {% endif %}
                           {% else %}
-                            <img class="profile__follow--img" src="{% static 'img/profile_no_img.png' %}" alt="">
+                            <img class="profile__follow--img {% if level == 2 %}level2 {% elif level == 3 %}level3 {% elif level == 4 %}level4 {% elif level == 5 %} level5{% endif %}" src="{% static 'img/profile_no_img.png' %}" alt="">
+                            {% if level == 5 %}
+                              <img class="level5--img" src="{% static 'img/level5.png' %}" alt="level5">
+                            {% endif %}
                           {% endif %}
                         </div>
                         <div class="profile__follow--info">

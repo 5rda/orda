@@ -70,6 +70,13 @@ class CourseDetail(models.Model):
         return str(self.crs_name)
 
 
+class Tag(models.Model):
+    name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.name
+
+
 class Review(models.Model):
     def image_path(instance, filename):
         return f'reviews/{instance.mountain.name}/{filename}'
@@ -79,12 +86,11 @@ class Review(models.Model):
     image = models.ImageField(blank=True, upload_to=image_path)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    tags = models.CharField(max_length=200)
+    tags = models.ManyToManyField(Tag, related_name='reviews')
     like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='like_reviews')
 
     def __str__(self):
         return self.content
-
 
 
 # class CourseBookmark(models.Model):
