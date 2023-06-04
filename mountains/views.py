@@ -1,15 +1,14 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic import DetailView, ListView
 from django.contrib.gis.serializers.geojson import Serializer
 from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
 from .models import *
-import json, os
+from django.db.models import F, Count
 from django.conf import settings
-from django.core.files.storage import FileSystemStorage
+from .forms import ReviewCreationForm
+from django.contrib.auth.decorators import login_required
 # Create your views here.
-
-def index(request):
-    return render(request, 'mountains/index.html')
 
 
 class MountainListView(ListView):
@@ -17,12 +16,39 @@ class MountainListView(ListView):
     context_object_name = 'mountains'
     model = Mountain
 
+    def get_queryset(self):
+        sort_option = self.request.GET.get('sort', 'likes')  # 기본값으로 가나다순을 사용
+
+        if sort_option == 'likes':
+            queryset = Mountain.objects.order_by('-likes')  # 좋아요순으로 정렬
+        elif sort_option == 'reviews':
+            queryset = Mountain.objects.order_by('-reviews_count')  # 리뷰 개수순으로 정렬
+        elif sort_option == 'id':
+            queryset = Mountain.objects.order_by('id')  # 가나다순으로 정렬
+        elif sort_option == 'views':
+            queryset = Mountain.objects.order_by('-views')  # 조회순으로 정렬
+        elif sort_option == 'height':
+            queryset = Mountain.objects.order_by('height') # 고도순으로 정렬
+        else:
+            queryset = Mountain.objects.all()  # 기본적으로 모든 데이터 조회
+
+        return queryset
+
 
 class MountainDetailView(DetailView):
     template_name = 'mountains/mountain_detail.html'
     context_object_name = 'mountain'
     model = Mountain
 
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        # Increase the views count
+        Mountain.objects.filter(pk=self.object.pk).update(views=F('views') + 1)
+
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         mountain = self.get_object()
@@ -32,7 +58,6 @@ class MountainDetailView(DetailView):
         for course in courses:
             geojson_data = serializer.serialize(CourseDetail.objects.filter(crs_name=course), fields=('geom', 'is_waypoint', 'waypoint_name'))
             course_details[course.pk] =geojson_data
-        # print(course_details)
         context = {
             'mountain': mountain,
             'courses': courses,
@@ -43,3 +68,97 @@ class MountainDetailView(DetailView):
         # with open(file_path, 'w', encoding='utf-8') as file:
         #     file.write(json_data)
         return context
+
+
+class CourseListView(ListView):
+    template_name = 'mountains/course_list.html'
+    context_object_name = 'courses'
+    model = Course
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        sort_option = self.request.GET.get('sort', '')  # 기본값으로 전체
+
+        if sort_option == 'bookmarks':
+            queryset = queryset.annotate(bookmarks_count=Count('bookmarks'))
+            queryset = queryset.order_by('-bookmarks_count')
+
+        return queryset
+
+
+def mountain_likes(request, mountain_pk):
+    mountain = get_object_or_404(Mountain, pk=mountain_pk)
+    user = request.user
+    if request.user in mountain.likes.all():
+        mountain.likes.remove(request.user)
+        is_liked = False
+    else:
+        mountain.likes.add(request.user)
+        is_liked = True
+
+    return JsonResponse({'is_liked': is_liked})    
+
+
+def bookmark(request, mountain_pk, course_pk):
+    mountain = get_object_or_404(Mountain, pk=mountain_pk)
+    course = get_object_or_404(Course, pk=course_pk)
+    user = request.user
+    if course in user.bookmarks.all():
+        user.bookmarks.remove(course)
+        is_bookmarked = False
+    else:
+        user.bookmarks.add(course)
+        is_bookmarked = True
+    
+    return JsonResponse({'is_bookmarked': is_bookmarked})
+
+
+@login_required
+def create_review(request, pk):
+    mountain = Mountain.objects.get(pk=pk)
+
+    if request.method == 'POST':
+        form = ReviewCreationForm(request.POST, request.FILES)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.mountain = mountain
+            review.user = request.user
+            review.save()
+            form.save_m2m()
+
+            return redirect('mountains:review_detail', mountain.pk, review.pk)
+    else:
+        form = ReviewCreationForm()
+    context = {
+        'form': form,
+        'mountain': mountain,
+    }
+    return render(request, 'mountains/create_review.html', context)
+
+
+@login_required
+def review_likes(request, pk, review_pk):
+    review = Review.objects.get(pk=review_pk)
+    if request.user in review.like_users.all():
+        review.like_users.remove(request.user)
+    else:
+        review.like_users.add(request.user)
+    return redirect('mountains:review_detail', pk, review.pk)
+
+
+@login_required
+def review_delete(request, pk, review_pk):
+    review = Review.objects.get(pk=review_pk)
+    if review.user == request.user:
+        review.delete()
+        return redirect('mountains:mountain_detail', pk)
+    
+
+def review_detail(request, pk, review_pk):
+    review = Review.objects.get(pk=review_pk)
+    tags = review.tags.all()
+    context = {
+        'review': review,
+        'tags': tags,
+    }
+    return render(request, 'mountains/review_detail.html', context)

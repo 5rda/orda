@@ -3,9 +3,17 @@
   <ul>
     <li>{{ mountain.pk }}</li>
     <li>{{ mountain.name }}</li>
+    <li>{{ mountain.subname }}</li>
+    <li>조회수: {{ mountain.views }}</li>
     <div id="mountain-map" style="width:500px;height:400px;"></div>
     <li>{{ mountain.region }}</li>
     <li>{{ mountain.height }}</li>
+    <form>
+      {% csrf_token %}
+      <button id="mountain-likes-btn" type="submit" data-mountain-pk-2="{{ mountain.pk }}">
+        <p>좋아요 추가</p>
+      </button>  
+    </form>  
     <li id="latitude">{{ mountain.geom.y }}</li>
     <li id="longitude">{{ mountain.geom.x }}</li>
   </ul>
@@ -18,15 +26,23 @@
         <div id="map-{{ course.pk }}" style="width: 100%; height: 300px;"></div>
         <li>총거리: {{ course.distance }}m</li>
         <li>소요시간: {{ course.duration }}</li>
+        <form>
+          {% csrf_token %}
+          <button id="bookmark-btn-{{ course.pk }}" type="submit" data-mountain-pk="{{ mountain.pk }}" data-course-pk="{{ course.pk }}">
+            <p>북마크 추가</p>
+          </button>
+        </form>
         <br>
         <hr>
     {% empty %}
         <li>No courses available.</li>
     {% endfor %}
   </ul>
-
+  {% endblock content %}
+  {% block javascript %}
   <!-- 카카오맵 API 로드 -->
-  <script type="text/javascript">
+  <script>
+    
     function loadKakaoMapScript(callback) {
         if (window.kakao) {
             // 이미 카카오맵 API가 로드되어 있는 경우
@@ -56,25 +72,26 @@
     
       var linePath = [];
       var waypointPositions = [];
-
+      var waypointNames = [];
       // 해당 코스의 CourseDetail들에 대해 위치 표시 및 linePath에 좌표 추가
       courseDetail.features.forEach(function(feature) {
         var coordinates = feature.geometry.coordinates;
         var x = coordinates[0];
         var y = coordinates[1];
-    
+        var excludedNames = ['국가지점', '쉼터', '자연경관', '갈림길', '이정표', '표시', '벤치', '화장실', '주의', '현위치', '조망점', '계곡', '비석'];
         if (!feature.properties.is_waypoint) {
           linePath.push(new kakao.maps.LatLng(y, x));
-        } else {
+        } else if (!excludedNames.some(name => feature.properties.waypoint_name.includes(name))) {
           waypointPositions.push(new kakao.maps.LatLng(y, x));
-          
+          waypointNames.push(feature.properties.waypoint_name)
           // 마커를 표시합니다
-          var waypointName = feature.properties.waypoint_name;
+          
           waypointPositions.forEach(function (position, index) {
+            
             var marker = new kakao.maps.Marker({
               position: position,
               map: map,
-              title: waypointName
+              title: waypointNames[index]
             });
           });
         
@@ -128,9 +145,9 @@ function showMountainMarker(latitude, longitude) {
   loadKakaoMapScript(function () {
     {% for course in courses %}
       var courseId = {{ course.pk }};
-        var courseDetails = {{ course_details|safe }};
-        var courseDetail = JSON.parse(courseDetails[courseId]);
-        initMap(courseId, courseDetail);
+      var courseDetails = {{ course_details|safe }};
+      var courseDetail = JSON.parse(courseDetails[courseId]);
+      initMap(courseId, courseDetail);
     {% endfor %}
 
     // 산의 위치에 마커 표시
@@ -141,4 +158,86 @@ function showMountainMarker(latitude, longitude) {
   });
 
 </script>
-  {% endblock content %}
+
+<script>
+  function bookmark(courseId) {
+    const bookmarkBtn = document.getElementById('bookmark-btn-' + courseId);
+    const mountainCsrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+
+    if (bookmarkBtn) {
+      bookmarkBtn.addEventListener('click', () => {
+        event.preventDefault(); // 폼의 기본 동작 중지
+        const mountainPk = bookmarkBtn.getAttribute('data-mountain-pk');
+        const coursePk = bookmarkBtn.getAttribute('data-course-pk');
+        fetch(`/mountains/${mountainPk}/course/${coursePk}/bookmark/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': mountainCsrftoken
+          },
+          body: JSON.stringify({})
+        })
+          .then(response => response.json())
+          .then(data => {
+            const isBookmarked = data.is_bookmarked;
+            // 서버로부터의 응답을 처리
+            if (isBookmarked) {
+              // 북마크 추가 시 동작
+              bookmarkBtn.innerText = '북마크 제거';
+              alert('북마크가 추가되었습니다.');
+            } else {
+              // 북마크 제거 시 동작
+              bookmarkBtn.innerText = '북마크 추가';
+              alert('북마크가 제거되었습니다.');
+            }
+          })
+          .catch(error => {
+            // 에러 처리
+            console.error(error);
+          });
+      });
+    }
+  }
+
+  {% for course in courses %}
+    bookmark({{ course.pk }});
+  {% endfor %}
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const mountainLikesBtn = document.getElementById('mountain-likes-btn');
+    if (mountainLikesBtn) {
+      mountainLikesBtn.addEventListener('click', (event) => {
+        event.preventDefault();
+        const mountainPk2 = mountainLikesBtn.getAttribute('data-mountain-pk-2');
+        const csrfToken = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+        axios.post(`/mountains/${mountainPk2}/likes/`, null, {
+          headers: {
+            'X-CSRFToken': csrfToken,
+          },
+        })
+          .then((response) => {
+            const isLiked = response.data.is_liked;
+            // 서버로부터의 응답을 처리
+            if (isLiked === true) {
+              // 팔로우 성공 시 동작
+              mountainLikesBtn.innerHTML = '<p>좋아요 제거</p>';
+              alert('좋아요가 추가되었습니다.');
+            } else {
+              // 언팔로우 성공 시 동작
+              mountainLikesBtn.innerHTML = '<p>좋아요 추가</p>';
+              alert('좋아요가 제거되었습니다.');
+            }
+          })
+          .catch((error) => {
+            // 에러 처리
+            console.error(error);
+          });
+      });
+    }
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+{% endblock javascript %}

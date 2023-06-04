@@ -1,5 +1,18 @@
 {% extends 'base.html' %}
 {% block content %}
+
+<form>
+  <label for="sort-select">정렬:</label>
+  <select name="sort" id="sort-select">
+      <option value="likes" {% if request.GET.sort == "likes" %}selected{% endif %}>좋아요순</option>
+      <option value="reviews" {% if request.GET.sort == "reviews" %}selected{% endif %}>리뷰 개수순</option>
+      <option value="id" {% if request.GET.sort == "id" %}selected{% endif %}>가나다순</option>
+      <option value="views" {% if request.GET.sort == "views" %}selected{% endif %}>조회순</option>
+      <option value="height" {% if request.GET.sort == "height" %}selected{% endif %}>고도순</option>
+  </select>
+  <input type="submit" value="정렬 적용">
+</form>
+
   {% for mountain in mountains %}
     <ul>
       <li>{{ mountain.pk }}</li>

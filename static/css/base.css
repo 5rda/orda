@@ -3,7 +3,9 @@
   --background-color: #AEDF9B;
   --sub-color: #DCDCDC;
   --green-btn: #47A945;
+  --red-color: rgb(229, 89, 59)
 }
+
 
 #wrapper{
   height: auto;

@@ -1,121 +1,266 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{% extends "base.html" %}
+{% load static %}
+{% load custom_filters %}
+{% block style %}
+  {% comment %} <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/ckeditor.js"></script>
-  <script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/translations/ko.js"></script>
-  <style>
-    img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-    }
-  </style>
-</head>
-<body>
-  <div>
-    제목: {{ post.title }}
-  </div>
-  <div>
-    내용: {{ post.content|safe }}
+  <script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/translations/ko.js"></script> {% endcomment %}
+<style>
+</style>
+<link rel="stylesheet" href="{% static 'css/posts_detail.css' %}">
+<link rel="stylesheet" href="{% static 'css/posts_index.css' %}">
+{% comment %} <link rel="stylesheet" href="{% static 'css/posts_create.css' %}"> {% endcomment %}
+{% endblock style %}
+{% block content %}
+<div class="post__wrap">
+  {% comment %} 제목 {% endcomment %}
+  <div class="title__wrap">
+    {{ post.title }}
   </div>
 
-  <hr>
-
-  <form action="{% url 'posts:likes' post.pk %}" method="POST">
-    {% csrf_token %} 
-    {% if request.user in post.like_users.all %}
-    <button type="submit">좋아요 취소</button>
-    {% else %}
-    <button type="submit">좋아요</button>
-    {% endif %}
-    <div>좋아요: {{ post.like_users.count }}</div>
-  </form>
-  
-  {% if request.user == post.user %}
-    <a href="{% url 'posts:update' post.pk %}"><button>수정</button></a>
-    <form method="POST" action="{% url 'posts:delete' post.pk %}">
-      {% csrf_token %}
-      <button type="submit">삭제</button> 
-    </form>
-  {% endif %}
-  <a href="{% if 'profile' in request.META.HTTP_REFERER %}{% url 'accounts:profile' person.pk %}{% else %}{% url 'posts:index' %}{% endif %}"><button>뒤로 가기</button></a>
-  
-  <hr>
-
-  <div>
-    댓글 목록
-    <div>댓글 개수: {{ post.postcomment_set.count }}</div>
+  {% comment %} 유저 정보 + 팔로우 {% endcomment %}
+  <div class="post__userdata__wrap">
+    <div class="post__userdata--box">
+      <div>
+        <a href="{% url 'accounts:profile' post.user.pk %}">
+          {% if post.user.profile_img %}
+            <img class="user__img" src="{{ post.user.profile_img.url }}" alt="{{ post.user }}프로필">
+          {% else %}
+            <img class="user__img" src="{% static 'img/profile_no_img.png' %}" alt="no">
+          {% endif %}
+      </div>
+      <div class="post__user--box">
+        <p style="font-weight: bold;">{{ post.user }}</p>
+        </a>
+      <div class="post__data--box">
+        <p> {{ post.updated_at|date:'Y. m. d. h. i'}} |&nbsp;</p>          
+        {% if request.user == post.user %}
+        <a href="{% url 'posts:update' post.pk %}">수정 |&nbsp;</a>
+        <form action="{% url 'posts:delete' post.pk %}" method="POST">
+          {% csrf_token %}
+          <input type="submit" value="삭제">
+        </form>
+        {% endif %}
+      </div>
+      </div>
+    </div>
+    
     <div>
-      <form action="{% url 'posts:comment_create' post.pk %}" method="POST">
-        {% csrf_token %} 
-        {{ postcomment_form.content }}
-        <button type="submit">작성</button>
-      </form>
+      {% comment %} 팔로우 {% endcomment %}
+      {% if request.user != post.user %}
+        {% comment %} <form action="{% url 'accounts:follow' post.user.pk %}" method="POST"> {% endcomment %}
+        <form id="follow-form" data-user-id="{{ post.user.pk }}">
+
+          {% csrf_token %}
+          {% if request.user in post.user.followers.all %}
+            <input type="submit" class="follw__btn rounded btn__hover" value="팔로잉">
+          {% else %}
+            <input type="submit" class="follw__btn rounded btn__hover" value="팔로워">
+          {% endif %}
+        </form>
+      {% endif %}
     </div>
   </div>
 
-  <hr>
+    
+  {% comment %} ck에디터 출력부분/ 사진 크기 조정 미완성 {% endcomment %}
+  <div class="content__wrap">
+    {% comment %} 특수문자 그대로 출력 |safe {% endcomment %}
+    {{ post.content|safe }}
+  </div>
 
-  {% for postcomment in postcomments %}
-    <li style="list-style: none">
-      <div id="comment-{{ postcomment.pk }}">
-        {{ postcomment.user.username }}: <span class="comment-content">{{ postcomment.content }}</span>
-        {% if request.user.is_authenticated and request.user == postcomment.user %}
-        <div id="comment-edit-form-{{ postcomment.pk }}" class="comment-update-form" style="display: none;">
-          <form class="edit-comment-form" action="{% url 'posts:comment_update' post.pk postcomment.pk %}" method="POST" data-comment-id="{{ postcomment.pk }}">
-            {% csrf_token %}
-            <input type="text" name="content" value="{{ postcomment.content }}">
-            <button type="submit">수정</button>
-          </form>
+   
+
+  {% comment %} <a href="javascript:history.back()"><button>뒤로 가기</button></a> {% endcomment %}
+
+
+  {% comment %} 댓글 {% endcomment %}
+  <div id="comment-section">
+    <div class="comment__top--text">댓글 <span style="color:var(--main-color)" id="post_comments">{{ post.postcomment_set.count }}</span>
+    </div>
+    <form class="comment-form" action="{% url 'posts:comment_create' post.pk %}" method="POST">
+      {% csrf_token %} 
+      <div class="flex--d-row flex--align-c container">
+        <div class="col-1">
+          <img src="{% static 'img/profile_no_img.png' %}" class="user__img" alt="no">
         </div>
-        <button class="edit-comment-button" data-comment-id="{{ postcomment.pk }}">댓글수정</button>
-
-        <form action="{% url 'posts:comment_delete' post.pk postcomment.pk %}" method="POST">
-          {% csrf_token %}
-          <button type="submit">삭제</button>
-        </form>
-        {% endif %}
-
-        <form action="{% url 'posts:comment_likes' post.pk postcomment.pk %}" method="POST">
-          {% csrf_token %} 
-          {% if request.user in postcomment.like_users.all %}
-            <button type="submit">좋아요 취소</button>
-          {% else %}
-            <button type="submit">좋아요</button>
-          {% endif %}
-          댓글 좋아요: {{ postcomment.like_users.count }}
-        </form>
-
-        <form action="{% url 'posts:comment_dislikes' post.pk postcomment.pk %}" method="POST">
-          {% csrf_token %} 
-          {% if request.user in postcomment.dislike_users.all %}
-            <button type="submit">싫어요 취소</button>
-          {% else %}
-            <button type="submit">싫어요</button>
-          {% endif %}
-          댓글 싫어요: {{ postcomment.dislike_users.count }}
-        </form>
+        <div class="comment__inputbox rounded col-11">
+          <div id="comment-content-id" style="width: 90%;">{{ postcomment_form.content }}</div>
+          <button type="submit" id="comment-submit-btn">작성</button>
+        </div>
       </div>
-    </li>
-    <hr>
-  {% endfor %}
-    
-  <!-- 이전 게시물 링크 -->
-  {% if previous_post %}
-  <a href="{% url 'posts:detail' previous_post.pk %}"><button>이전</button></a>
-  {% endif %}
+    </form>
 
-  <!-- 다음 게시물 링크 -->
-  {% if next_post %}
-  <a href="{% url 'posts:detail' next_post.pk %}"><button>다음</button></a>
-  {% endif %}
+
+    <ul class="comments__wrap">
+      {% for postcomment in postcomments %}
+        <li id="comment-{{ postcomment.pk }}" class="container mb-2" style="list-style: none;">
+          <div class="flex--d-row">
+            <div class="col-1">
+              {% comment %} 프로필 이미지 {% endcomment %}
+              <a href="{% url 'accounts:profile' postcomment.user.pk %}">
+                {% if postcomment.user.profile_img %}
+                <img class="user__img" src="{{ postcomment.user.profile_img.url }}" alt="{{ post.user }}프로필">
+                {% else %}
+                <img class="user__img" src="{% static 'img/profile_no_img.png' %}" alt="no">
+                {% endif %}
+              </a>
+            </div>
+            <div class="flex--d-col col-11">
+              <div class="flex--d-row flex--between">
+                <p style="font-weight:bold;">{{ postcomment.user.username }}</p>
+                {% if request.user.is_authenticated and request.user == postcomment.user %}
+                  <div class="dropdown">
+                    <button type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                      <li>
+                        <form action="{% url 'posts:comment_delete' post.pk postcomment.pk %}" method="POST">
+                          {% csrf_token %}
+                          <button type="submit" class="dropdown-item delete-comment-btn" data-comment-id="{{ postcomment.pk }}"  data-post-id="{{post.pk}}">삭제</button>
+                        </form>
+                      </li>
+                      <li>
+                        {% comment %} 댓글 수정부분 원하시는 데 갖다 놓으세요 {% endcomment %}
+                        <div id="comment-edit-form-{{ postcomment.pk }}" class="comment-update-form" style="display: none;">
+                        <form class="edit-comment-form" action="{% url 'posts:comment_update' post.pk postcomment.pk %}" method="POST" data-comment-id="{{ postcomment.pk }}">
+                          {% csrf_token %}
+                          <input type="text" name="content" value="{{ postcomment.content }}">
+                          <button type="submit">수정</button>
+                        </form>
+                        </div>
+                        <button class="edit-comment-button" data-comment-id="{{ postcomment.pk }}">댓글수정</button> 
+                      </li>
+                    </ul>
+                  </div>
+                {% endif %} 
+              </div>
+
+              {% comment %} 싫어요가 10이상이면 보기 버튼 나오게 하기 {% endcomment %}
+              <button class="comment-toggle-btn" {% if postcomment.dislike_users.count < 10 %}
+              style="display: none;" {% endif %} id="comment-toggle-{{postcomment.pk}}" data-comment-id="{{ postcomment.pk }}">[보기]</button>
+              <p class="comment__context {% if postcomment.dislike_users.count >= 10 %}
+              hidden {% endif %}" id="comment-content-{{postcomment.pk}}"> {{ postcomment.content }}</p>
+              <div class="flex--d-row">          
+                {% comment %} <form action="{% url 'posts:comment_likes' post.pk postcomment.pk %}" method="POST"> {% endcomment %}
+                <form class="comment-like-form" id="like-form-{{postcomment.pk}}" data-post-id="{{post.pk}}" data-comment-id="{{postcomment.pk}}">
+                  {% csrf_token %} 
+                  {% if request.user in postcomment.like_users.all %}
+                    <button type="submit" id='like-{{ postcomment.pk }}'  class="bi bi-hand-thumbs-up-fill like__hover text-primary"></button>
+                  {% else %}
+                    <button type="submit" id='like-{{ postcomment.pk }}' class="bi bi-hand-thumbs-up like__hover" {% if request.user in postcomment.dislike_users.all %}
+                    disabled {% endif %}></button>
+                  {% endif %}
+                  <span class="me-3" id="cl_likes_count_{{postcomment.pk}}">
+                    {{ postcomment.like_users.count }}
+                  </span>
+                </form>
+              
+                {% comment %} <form action="{% url 'posts:comment_dislikes' post.pk postcomment.pk %}" method="POST"> {% endcomment %}
+                <form class="comment-dislike-form" id="like-form-{{postcomment.pk}}" data-post-id="{{post.pk}}" data-comment-id="{{postcomment.pk}}">
+                  {% csrf_token %} 
+                  {% if request.user in postcomment.dislike_users.all %}
+                    <button type="submit" id='dislike-{{ postcomment.pk }}' class="bi bi-hand-thumbs-down-fill text-danger like__hover"></button>
+                  {% else %}
+                    <button type="submit" id='dislike-{{ postcomment.pk }}'  class="bi bi-hand-thumbs-down like__hover" {% if request.user in postcomment.like_users.all %}
+                    disabled {% endif %}></button>
+                  {% endif %}
+                  <span class="me-3" id="cd_likes_count_{{postcomment.pk}}">
+                    {{ postcomment.dislike_users.count }}
+                  </span>
+                </form>
+              </div>
+            </div>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+
+    <hr>
+
+    {% comment %} 앞뒤 게시글 2개 {% endcomment %}
+    <div class="posts__wrap container rounded">
+      <div class="row">
+        {% for post in posts %}
+        <div class="col-6 col-md-3">
+          <div class="item">
+            <a href="{% url 'posts:detail' post.pk %}">
+              <div class="postindex__post">
+                <div class="postindex__post--imgbox">
+                  {% with first_image_url=post.content|get_first_image_from_content %}
+                    {% if first_image_url %}
+                      <img class="postindex__post--img" src="{{ first_image_url }}" alt="썸네일">
+                    {% else %}
+                      <img class="postindex__post--img" src="{% static 'img/nav_logo.png' %}" alt="대체이미지">
+                    {% endif %}
+                  {% endwith %}
+                  <button class="postindex__post--like" data-post={{ post.pk }}>
+                    <svg id="i-heart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="{% if request.user in post.like_users.all %}#FFB6C1{% else %}#DBDBDB{% endif %}" stroke="#FFB6C1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                      <path d="M4 16 C1 12 2 6 7 4 12 2 15 6 16 8 17 6 21 2 26 4 31 6 31 12 28 16 25 20 16 28 16 28 16 28 7 20 4 16 Z" />
+                    </svg>
+                  </button>
+                </div>
+                <div>
+                  <p class="postindex__post--title">{{ post.title }}</p>
+                  <div class="postindex__post--user">
+                    <div class="postindex__post--userimgbox">
+                      {% if post.user.profile %}
+                        <img class="postindex__post--userimg" src="{{ post.user.profile }}" alt="유저프로필">
+                      {% else %}
+                        <img class="postindex__post--userimg" src="{% static 'img/profile_no_img.png' %}" alt="대체프로필">
+                      {% endif %}
+                    </div>
+                    <p class="postindex__post--username">{{ post.user.username }}</p>
+                  </div>
+                  <div class="postindex__post--stat">
+                    <div>
+                      <span class="postindex__post--likecount" data-like={{ post.pk }}>좋아요 {{ post.like_users.count }}</span>
+                      <span>조회수 {{ post.view_count }}</span>
+                    </div>
+                    <p>{{ post.created_at|date:"y. m. d" }}</p>
+                  </div>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
     
-</body>
+</div>
+</div>
+
+      {% if request.user.is_authenticated and request.user == postcomment.user %}
+      e;">
+
+      {% endif %}
+{% endblock content %}
+
+{% block ect %}
+
+{% comment %} 창 줄이기 전 좋아요 + 댓글 위치 {% endcomment %}
+<div class="post__btn__wrap">
+  <form class="like-form" data-post-id="{{ post.pk }}">
+    {% csrf_token %}
+      {% if request.user in post.like_users.all %}
+      <button type="submit" class="like__btn--style bi bi-heart-fill heart--color like__hover icon--size" id="like-btn"></button>
+      {% else %}
+      <button type="submit" class="like__btn--style bi bi-heart like__hover icon--size" id="like-btn"></button>
+      {% endif %}
+      <div id="like-count" class="text-center">{{ post.like_users.count }}</div> 
+  </form>   
+  <div class="flex--d-col flex--between">
+    <button type="submit" id="go-comment-section" class="like__btn--style icon--size"><i class="bi bi-chat-square-dots like__hover"></i></button>
+    <div class="text-center">{{ post.postcomment_set.count }}</div>
+  </div>
+  </div>
+
+{% endblock ect %}
+
+{% block javascript %}
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
   $(document).ready(function() {
     $('.edit-comment-button').click(function() {
@@ -150,8 +295,7 @@
       });
     });
   });
-</script>
-<script>
+
   ClassicEditor
     .create(document.querySelector('#content'), {
       language: 'ko',
@@ -165,4 +309,6 @@
       console.error(error);
     });
 </script>
-</html>
+<script src="{% static 'js/post_detail.js' %}"></script>
+{% comment %} <script src="{% static 'js/ckeditor.js' %}"></script> {% endcomment %}
+{% endblock javascript %}
