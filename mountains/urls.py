@@ -13,6 +13,7 @@ urlpatterns = [
     path('<int:pk>/review_likes/<int:review_pk>/', review_likes, name='review_likes'),
 #     path('mountain_list/', MountainTestView.as_view(), name='mountain_test'),
     path('<int:pk>/review_delete/<int:review_pk>/', review_delete, name='review_delete'),
+    path('<int:pk>/review_update/<int:review_pk>/', review_update, name='review_update'),
     path('<int:pk>/review_detail/<int:review_pk>/', review_detail, name='review_detail'),
 ]
 

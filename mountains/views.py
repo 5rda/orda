@@ -214,10 +214,31 @@ def review_delete(request, pk, review_pk):
 def review_detail(request, pk, review_pk):
     review = Review.objects.get(pk=review_pk)
     tags = review.tags.all()
+    form = ReviewCreationForm(instance=review)
     context = {
         'review': review,
         'tags': tags,
+        'form': form,
     }
     return render(request, 'mountains/review_detail.html', context)
 
-  
+
+@login_required
+def review_update(request, pk, review_pk):
+    review = Review.objects.get(pk=review_pk)
+    if request.user == review.user:
+        if request.method == 'POST':
+            form = ReviewCreationForm(request.POST, request.FILES, instance=review)
+            if form.is_valid():
+                form.save()
+                return redirect('mountains:review_detail', review.mountain.pk, review.pk)
+        else:
+            form = ReviewCreationForm(instance=review)
+    else:
+        return JsonResponse({'success': True})
+    context = {
+        'form': form,
+        'review': review,
+    }
+    return JsonResponse({'success': True})
+
