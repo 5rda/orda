@@ -1,0 +1,55 @@
+.course__wrap {
+  margin: 30px 8%;
+  padding: 0px 16px;
+  min-width: 430px;
+}
+
+.align__list {
+  margin: 10px 5px; 
+  text-align: end;
+}
+
+.select__box{
+  border-bottom : solid 3px var(--main-color);
+  width: 100px;
+}
+
+.align__btn {
+  background-color : var(--main-color) !important;
+  padding: 2px 10px;
+  color: white;
+}
+
+
+.li__box {
+  padding: 10px 30px;
+  position: relative;
+}
+
+
+.flex--row {
+  display: flex;
+}
+
+.flex--col {
+  display: flex;
+  flex-direction: column;
+}
+
+.text--colormain {
+  color: var(--sub-color);
+}
+
+.bookmark--style{
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  font-size: 40px;
+}
+
+@media (max-width:1080px) {
+  .course__wrap {
+    margin: 30px 0px;
+    padding: 0px;
+  }
+} 

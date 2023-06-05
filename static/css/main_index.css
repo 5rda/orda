@@ -4,7 +4,7 @@
   align-items: center;
   width: 100%;
   background-color: #DDF0D6;
-  border-bottom: solid 5px var(--sub-color);
+  border-bottom: solid 5px var(--sub-color2);
   position: relative;
   min-height: 400px;
 }
@@ -43,7 +43,7 @@
 }
 
 .article__divbox {
-  padding: 150px 0px;
+  padding: 100px 0px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -52,7 +52,7 @@
 
 .article__divbox--color {
   background-color: var(--background-color);
-  padding: 105px 0px;
+  padding: 100px 0px;
   display: flex;
   flex-direction: column;
   justify-content: center;

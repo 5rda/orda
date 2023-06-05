@@ -39,14 +39,14 @@
       <img class='article__icon' src="{% static 'img/icon/search.png' %}" alt="">
       <P class='article__p--strong'>키워드 검색으로 찾으로 가기!</P>
       <a href="#"><button class='rounded-full article__btn'>탐색</button></a>
-      {% comment %}  {% url 'mountains:filter' %}  {% endcomment %}
+      {% comment %}  {% url 'mountains:search' %}  {% endcomment %}
     </div>
   
     <div class='article__divbox--color'>
       <P class='article__p'>내가 원하는 등산로만 보고싶다면?</P>
       <img class='article__icon' src="{% static 'img/icon/road.png' %}" alt="">
       <P class='article__p--strong'>등산로를 한눈에!</P>
-      <a href="#"><button class='rounded-full article__btn2'>등산로</button></a> 
+      <a href="{% url 'mountains:course_list' %}"><button class='rounded-full article__btn2'>등산로</button></a> 
       {% comment %}  {% url 'mountains:course' %}  {% endcomment %}
     </div>
   
