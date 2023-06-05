@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block style %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
+{% endblock style %}
+{% block content %}
+  {% for post in view_posts %}
+  <div class="item">
+    <a href="{% url 'posts:detail' post.pk %}">
+      <div class="postindex__post">
+        <div class="postindex__post--imgbox">
+          {% with first_image_url=post.content|get_first_image_from_content %}
+            {% if first_image_url %}
+              <img class="postindex__post--img" src="{{ first_image_url }}" alt="썸네일" style="width: 100%;">
+            {% else %}
+              <img class="postindex__post--img" src="{% static 'img/nav_logo.png' %}" alt="대체이미지">
+            {% endif %}
+          {% endwith %}
+        </div>
+      </div>
+    </a>
+  </div>
+  {% endfor %}
+{% endblock content %}
+{% block javascript %}
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+<script src="{% static 'js/posts_index.js' %}"></script>
+{% endblock javascript %}

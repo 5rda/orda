@@ -22,7 +22,7 @@ class Mountain(models.Model):
     class Meta:
         managed = False
         db_table = 'mountains_mountain'
-        ordering = ['id']
+        ordering = ['name']
 
     @property
     def reviews_count(self):
@@ -35,9 +35,12 @@ class Mountain(models.Model):
 class Course(models.Model):
     id = models.AutoField(primary_key=True)
     mntn_name = models.ForeignKey(Mountain, on_delete=models.CASCADE, to_field="name", db_column="mntn_name")
-    crs_name = models.CharField(max_length=100, unique=True)
-    distance = models.IntegerField(db_column='total_distance_int')
-    duration = models.DurationField(db_column='total_duration_int')
+    crs_name = models.CharField(max_length=100)
+    crs_name_detail = models.CharField(max_length=255, unique=True)
+    distance = models.FloatField(db_column='total_distance_km')
+    duration = models.CharField(max_length = 255, db_column='total_interval')
+    hidden_time = models.FloatField(db_column='total_time')
+    diff = models.CharField(max_length=30)
     bookmarks = models.ManyToManyField(settings.AUTH_USER_MODEL,  related_name='bookmarks',  db_table='mountains_course_bookmarks')
 
     class Meta:
@@ -46,24 +49,33 @@ class Course(models.Model):
         ordering = ['id']
 
     def __str__(self):
-        return self.crs_name
+        return self.crs_name_detail
     
 
 class CourseDetail(models.Model):
     id = models.AutoField(primary_key=True)
-    crs_name = models.ForeignKey(Course, on_delete=models.CASCADE, to_field="crs_name", db_column="crs_name")
+    crs_name = models.CharField(max_length=100)
+    crs_name_detail = models.ForeignKey(Course, on_delete=models.CASCADE, to_field="crs_name_detail", db_column="crs_name_detail")
     is_waypoint = models.BooleanField(default=False)
     waypoint_name = models.CharField(max_length=50)
     waypoint_category = models.CharField(max_length=256, db_column='category')
+    track = models.FloatField( db_column="track_se_1")
     geom = models.GeometryField()
 
     class Meta:
         managed = False
         db_table = 'mountains_coursedetail'
-        ordering = ['id']
+        ordering = ['crs_name_detail', 'track']
 
     def __str__(self):
         return str(self.crs_name)
+
+
+class Tag(models.Model):
+    name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.name
 
 
 class Review(models.Model):
@@ -75,12 +87,11 @@ class Review(models.Model):
     image = models.ImageField(blank=True, upload_to=image_path)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    tags = models.CharField(max_length=200)
+    tags = models.ManyToManyField(Tag, related_name='reviews')
     like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='like_reviews')
 
     def __str__(self):
         return self.content
-
 
 
 # class CourseBookmark(models.Model):

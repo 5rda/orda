@@ -49,12 +49,26 @@
   display: flex;
   flex-direction: column;
   text-align: center;
+  align-items: center;
 }
 
 .profile__user--name {
   font-size: 25px;
   font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.profile__user--expbar {
+  position: relative;
+  width: 70%;
   margin-bottom: 10px;
+}
+
+.profile__user--expcount {
+  position: absolute;
+  left: 50%;
+  color: #FFFFFF;
+  transform: translateX(-50%);
 }
 
 .profile__user--follow {
@@ -213,6 +227,43 @@
   margin: 0px auto;
 }
 
+.profile__content--imgbox {
+  box-sizing: border-box;
+  width: 140px;
+  height: 140px;
+  border-radius: 8px;
+}
+
+.profile__content--img {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+}
+
+.profile__content--postbox {
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  /* justify-content: center; */
+}
+
+.profile__content--post {
+  position: relative;
+  box-sizing: border-box;
+  width: 140px;
+  height: 170px;
+  margin: 0 5px;
+}
+
+.profile__content--posttext {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .profile__content1--review {
   margin-bottom: 60px;
 }
@@ -229,6 +280,7 @@
   height: 200px;
   border: solid 1px #DBDBDB;
   border-radius: 5px;
+  padding: 10px;
 }
 
 .profile__content1--mycourse {
@@ -247,6 +299,8 @@
   height: 200px;
   border: solid 1px #DBDBDB;
   border-radius: 5px;
+  padding: 10px;
+  position: relative
 }
 
 .profile__content2--bookmark {
@@ -265,6 +319,7 @@
   height: 200px;
   border: solid 1px #DBDBDB;
   border-radius: 5px;
+  padding: 10px;
 }
 
 .profile__content3--mountain {
@@ -283,6 +338,7 @@
   height: 200px;
   border: solid 1px #DBDBDB;
   border-radius: 5px;
+  padding: 10px;
 }
 
 .profile__content3--mycourse {
@@ -301,6 +357,7 @@
   height: 200px;
   border: solid 1px #DBDBDB;
   border-radius: 5px;
+  padding: 10px;
 }
 
 .profile__content4--follower {
@@ -319,6 +376,7 @@
   height: 200px;
   border: solid 1px #DBDBDB;
   border-radius: 5px;
+  padding: 10px;
 }
 
 .profile__content5--following {
@@ -337,6 +395,7 @@
   height: 200px;
   border: solid 1px #DBDBDB;
   border-radius: 5px;
+  padding: 10px;
 }
 
 
@@ -486,6 +545,7 @@
     flex-basis: 80%;
     flex-direction: column;
     text-align: start;
+    align-items: start;
     justify-content: flex-end;
     padding-left: 30px;
     margin-bottom: auto;
@@ -558,4 +618,38 @@
     font-size: 16px;
     color: #777777;
   }
+
+  .profile__user--expbar {
+    position: relative;
+    width: 40%;
+    margin-bottom: 10px;
+  }
+}
+
+/* level border */
+
+
+
+.level2 {
+  border: 3px solid yellow !important;
+}
+
+.level3 {
+  border: 3px solid green !important;
+}
+
+.level4 {
+  border: 3px solid red !important;
+}
+
+.level5 {
+  background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+  border: 3px solid transparent;
+}
+
+.level5--img {
+  position: absolute;
+  right: 0;
+  top: 0;
+  transform: translate(0%, -50%) rotate(28deg);
 }
