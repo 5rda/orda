@@ -16,6 +16,7 @@ class MountainListView(ListView):
     template_name = 'mountains/mountain_list.html'
     context_object_name = 'mountains'
     model = Mountain
+    paginate_by = 10
 
     def get_queryset(self):
         sort_option = self.request.GET.get('sort', 'likes')  # 기본값으로 가나다순을 사용
@@ -44,7 +45,6 @@ class MountainDetailView(DetailView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
 
-        # Increase the views count
         Mountain.objects.filter(pk=self.object.pk).update(views=F('views') + 1)
 
         context = self.get_context_data(object=self.object)
@@ -64,16 +64,18 @@ class MountainDetailView(DetailView):
             'courses': courses,
             'course_details': course_details
         }
-        # json_data = json.dumps(course_details, indent=4, sort_keys=True, ensure_ascii=False)
-        # file_path = os.path.join(settings.STATICFILES_DIRS[0], 'course_details.json')
-        # with open(file_path, 'w', encoding='utf-8') as file:
-        #     file.write(json_data)
+        json_data = json.dumps(course_details, indent=4, sort_keys=True, ensure_ascii=False)
+        file_path = os.path.join(settings.STATICFILES_DIRS[0], 'course_details2.json')
+        with open(file_path, 'w', encoding='utf-8') as file:
+            file.write(json_data)
         return context
+
 
 class CourseListView(ListView):
     template_name = 'mountains/course_list.html'
     context_object_name = 'courses'
-    model = Course    
+    model = Course
+    paginate_by = 5    
 
     def get_queryset(self):
         mountain_pk = self.kwargs['mountain_pk']
@@ -140,11 +142,11 @@ class CourseAllListView(ListView):
 def mountain_likes(request, mountain_pk):
     mountain = get_object_or_404(Mountain, pk=mountain_pk)
     user = request.user
-    if request.user in mountain.likes.all():
-        mountain.likes.remove(request.user)
+    if user in mountain.likes.all():
+        mountain.likes.remove(user)
         is_liked = False
     else:
-        mountain.likes.add(request.user)
+        mountain.likes.add(user)
         is_liked = True
 
     return JsonResponse({'is_liked': is_liked})    
@@ -241,4 +243,3 @@ def review_update(request, pk, review_pk):
         'review': review,
     }
     return JsonResponse({'success': True})
-
