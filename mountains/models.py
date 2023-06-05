@@ -22,7 +22,7 @@ class Mountain(models.Model):
     class Meta:
         managed = False
         db_table = 'mountains_mountain'
-        ordering = ['id']
+        ordering = ['name']
 
     @property
     def reviews_count(self):
@@ -59,12 +59,13 @@ class CourseDetail(models.Model):
     is_waypoint = models.BooleanField(default=False)
     waypoint_name = models.CharField(max_length=50)
     waypoint_category = models.CharField(max_length=256, db_column='category')
+    track = models.FloatField( db_column="track_se_1")
     geom = models.GeometryField()
 
     class Meta:
         managed = False
         db_table = 'mountains_coursedetail'
-        ordering = ['id']
+        ordering = ['crs_name_detail', 'track']
 
     def __str__(self):
         return str(self.crs_name)
