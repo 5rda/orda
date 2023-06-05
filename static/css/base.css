@@ -1,9 +1,15 @@
 :root {
   --main-color: #A2E04E;
   --background-color: #AEDF9B;
-  --sub-color: #DCDCDC;
+  --sub-color: #888888;
+  --sub-color2: #DCDCDC;
   --green-btn: #47A945;
   --red-color: rgb(229, 89, 59)
+}
+
+body {
+  font-family: 'NanumSquareNeo-Variable';
+  
 }
 
 
@@ -141,4 +147,12 @@
 .footer--wrap {
   text-align: center;
   padding: 40px 0 40px 0;
+}
+
+/* font */
+@font-face {
+  font-family: 'NanumSquareNeo-Variable';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_11-01@1.0/NanumSquareNeo-Variable.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
 }
