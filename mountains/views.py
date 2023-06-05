@@ -62,12 +62,13 @@ class MountainDetailView(DetailView):
         context = {
             'mountain': mountain,
             'courses': courses,
-            'course_details': course_details
+            'course_details': course_details,
+            'form': ReviewCreationForm()
         }
-        json_data = json.dumps(course_details, indent=4, sort_keys=True, ensure_ascii=False)
-        file_path = os.path.join(settings.STATICFILES_DIRS[0], 'course_details2.json')
-        with open(file_path, 'w', encoding='utf-8') as file:
-            file.write(json_data)
+        # json_data = json.dumps(course_details, indent=4, sort_keys=True, ensure_ascii=False)
+        # file_path = os.path.join(settings.STATICFILES_DIRS[0], 'course_details2.json')
+        # with open(file_path, 'w', encoding='utf-8') as file:
+        #     file.write(json_data)
         return context
 
 

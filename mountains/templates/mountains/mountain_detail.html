@@ -44,7 +44,10 @@
   {% if courses|length > 3 %}
     <a href="{% url 'mountains:course_list' mountain.pk %}">더보기</a>
   {% endif %}
-
+  <form action="{% url 'mountains:create_review' mountain.pk %}">
+    {{ form.as_p }}
+    <input type="submit" value="리뷰생성">
+  </form>
 {% endblock content %}
 
 {% block javascript %}
