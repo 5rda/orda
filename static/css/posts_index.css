@@ -164,3 +164,14 @@
 .owl-carousel .owl-next {
   right: 10px;
 }
+
+
+/* search */
+
+.postindex__searchbox {
+  margin: 16px 90px 16px 0;
+}
+
+.highlight {
+  color: var(--main-color);
+}
