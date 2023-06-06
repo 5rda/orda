@@ -1,16 +1,68 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-</head>
-<body>
-  {% for post in posts %}
-    <a href="{% url 'posts:detail' post.pk %}">
-      <div>{{ post.title }}</div>
-    </a>
+{% extends 'base.html' %}
+
+{% load static %}
+{% load custom_filters %}
+
+{% block style %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
+<link rel="stylesheet" href="{% static 'css/posts_index.css' %}">
+{% endblock style %}
+{% block content %}
+<div style="padding: 30px 60px;">
+  <h1>"{{ query }}"에 대한 마이코스 검색 결과입니다.</h1>
+  <div class="post-grid" id="postGrid">
+    {% if posts %}
+    {% for post in view_posts %}
+    <div class="item">
+      <a href="{% url 'posts:detail' post.pk %}">
+        <div class="postindex__post">
+          <div class="postindex__post--imgbox">
+            {% with first_image_url=post.content|get_first_image_from_content %}
+              {% if first_image_url %}
+                <img class="postindex__post--img" src="{{ first_image_url }}" alt="썸네일">
+              {% else %}
+                <img class="postindex__post--img" src="{% static 'img/nav_logo.png' %}" alt="대체이미지">
+              {% endif %}
+            {% endwith %}
+            <button class="postindex__post--like" onclick="likePost({{ post.pk }})">
+              <svg id="i-heart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="{% if request.user in post.like_users.all %}#FFB6C1{% else %}#DBDBDB{% endif %}" stroke="#FFB6C1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                <path d="M4 16 C1 12 2 6 7 4 12 2 15 6 16 8 17 6 21 2 26 4 31 6 31 12 28 16 25 20 16 28 16 28 16 28 7 20 4 16 Z" />
+              </svg>
+            </button>
+          </div>
+          <div>
+            <p class="postindex__post--title">{{ post.title }}</p>
+            <div class="postindex__post--user">
+              <div class="postindex__post--userimgbox">
+                {% if post.user.profile %}
+                  <img class="postindex__post--userimg" src="{{ post.user.profile }}" alt="유저프로필">
+                {% else %}
+                  <img class="postindex__post--userimg" src="{% static 'img/profile_no_img.png' %}" alt="대체프로필">
+                {% endif %}
+              </div>
+              <p class="postindex__post--username">{{ post.user.username }}</p>
+            </div>
+            <div class="postindex__post--stat">
+              <div>
+                <span class="postindex__post--likecount" data-like={{ post.pk }}>좋아요 {{ post.like_users.count }}</span>
+                <span>조회수 {{ post.view_count }}</span>
+              </div>
+              <p>{{ post.created_at|date:"y. m. d" }}</p>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
   {% endfor %}
-</body>
-</html>
+    {% else %}
+      <p>검색 결과가 없습니다.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock content %}
+{% block javascript %}
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+<script src="{% static 'js/posts_index.js' %}"></script>
+{% endblock javascript %}

@@ -20,14 +20,14 @@ def index(request):
     like_posts = Post.objects.annotate(like_count=Count('like_users')).order_by('-like_count')
 
     if query and search_option:
-        if search_option == 'subject':
-            filtered_posts = filtered_posts.filter(Q(title__icontains=query)).distinct()
+        if search_option == 'title':
+            filtered_posts = filtered_posts.filter(Q(title__contains=query))
+        elif search_option == 'author':
+            filtered_posts = filtered_posts.filter(Q(user__username__contains=query))
         elif search_option == 'content':
-            filtered_posts = filtered_posts.filter(Q(content__icontains=query)).distinct()
-        elif search_option == 'nickname':
-            filtered_posts = filtered_posts.filter(Q(user__username__icontains=query)).distinct()
-        elif search_option == 'total':
-            filtered_posts = filtered_posts.filter(Q(title__icontains=query) | Q(content__icontains=query)).distinct()
+            filtered_posts = filtered_posts.filter(Q(content__contains=query))
+        elif search_option == 'title_content':
+            filtered_posts = filtered_posts.filter(Q(title__contains=query) | Q(content__contains=query))
         else:
             filtered_posts = []
     else:
@@ -250,6 +250,18 @@ def search(request):
     }
 
     return render(request, 'posts/search.html', context)
+
+
+def proofshot(request):
+    posts = Post.objects.order_by('-created_at')
+    view_posts = Post.objects.order_by('-view_count')
+    
+    context = {
+        'posts': posts,
+        'view_posts': view_posts,
+    }
+
+    return render(request, 'posts/proofshot.html', context)
 
 
 def get_first_image_from_content(content):

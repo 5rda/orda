@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
   <ul>
     <li>{{ mountain.pk }}</li>
@@ -6,6 +7,7 @@
     <li>{{ mountain.subname }}</li>
     <li>조회수: {{ mountain.views }}</li>
     <div id="mountain-map" style="width:500px;height:400px;"></div>
+    <li><img src="{% get_static_prefix %}img/mountains/{{ mountain.name }}.png" alt="얍"></li>
     <li>{{ mountain.region }}</li>
     <li>{{ mountain.height }}</li>
     <form>
@@ -21,11 +23,12 @@
   <hr>
   <h2>course</h2>
   <ul>
-    {% for course in courses %}
-        <li>코스명: {{ course.crs_name }}</li>
-        <div id="map-{{ course.pk }}" style="width: 100%; height: 300px;"></div>
-        <li>총거리: {{ course.distance }}m</li>
+    {% for course in courses|slice:":3" %}
+        <li>코스명: {{ course.crs_name_detail }}</li>
+        <div id="map2-{{ course.pk }}" style="width: 100%; height: 300px;"></div>
+        <li>총거리: {{ course.distance }}km</li>
         <li>소요시간: {{ course.duration }}</li>
+        <li>난이도: {{ course.diff }}</li>
         <form>
           {% csrf_token %}
           <button id="bookmark-btn-{{ course.pk }}" type="submit" data-mountain-pk="{{ mountain.pk }}" data-course-pk="{{ course.pk }}">
@@ -38,35 +41,60 @@
         <li>No courses available.</li>
     {% endfor %}
   </ul>
-  {% endblock content %}
-  {% block javascript %}
+  {% if courses|length > 3 %}
+    <a href="{% url 'mountains:course_list' mountain.pk %}">더보기</a>
+  {% endif %}
+  <form action="{% url 'mountains:create_review' mountain.pk %}">
+    {{ form.as_p }}
+    <input type="submit" value="리뷰생성">
+  </form>
+{% endblock content %}
+
+{% block javascript %}
   <!-- 카카오맵 API 로드 -->
-  <script>
-    
-    function loadKakaoMapScript(callback) {
-        if (window.kakao) {
-            // 이미 카카오맵 API가 로드되어 있는 경우
-            callback();
-        } else {
-            // 카카오맵 API 로드
-            var script = document.createElement("script");
-            script.type = "text/javascript";
-            script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=d39fcd60ffdc96ae99454337f5e45a16&libraries=services&autoload=false";
-            document.head.appendChild(script);
-            
-            script.onload = function () {
-                kakao.maps.load(function () {
-                    callback();
-                });
+<script>
+  function loadKakaoMapScript(callback) {
+      if (window.kakao) {
+          // 이미 카카오맵 API가 로드되어 있는 경우
+          callback();
+      } else {
+          // 카카오맵 API 로드
+          var script = document.createElement("script");
+          script.type = "text/javascript";
+          script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=d39fcd60ffdc96ae99454337f5e45a16&libraries=services&autoload=false";
+          document.head.appendChild(script);
+          
+          script.onload = function () {
+              kakao.maps.load(function () {
+                  callback();
+              });
             };
+          }
         }
+    // 산 좌표를 찍는 카카오 MAP
+    function showMountainMarker(latitude, longitude) {
+      var container = document.getElementById('mountain-map');
+      var options = {
+        center: new kakao.maps.LatLng(latitude, longitude),
+        level: 10
+      };
+      var map = new kakao.maps.Map(container, options);
+    
+      var markerPosition = new kakao.maps.LatLng(latitude, longitude);
+    
+      var marker = new kakao.maps.Marker({
+        position: markerPosition
+      });
+    
+      marker.setMap(map);
+    
     }
     // 카카오맵 초기화 함수
     function initMap(courseId, courseDetail) {
-      var container = document.getElementById('map-' + courseId);
+      var container = document.getElementById('map2-' + courseId);
       var options = {
         center: new kakao.maps.LatLng(37.5665, 126.9780), 
-        level: 6
+        level: 7
       };
       var map = new kakao.maps.Map(container, options);
     
@@ -97,7 +125,22 @@
         
         }
       });
-    
+      // 출발 좌표에 마커 표시
+      var startMarkerPosition = linePath[0];
+      var startMarker = new kakao.maps.Marker({
+        position: startMarkerPosition,
+        map: map,
+        title: "출발지"
+      });
+
+      // 도착 좌표에 마커 표시
+      var endMarkerPosition = linePath[linePath.length - 1];
+      var endMarker = new kakao.maps.Marker({
+        position: endMarkerPosition,
+        map: map,
+        title: "도착지"
+      });
+          
       // 중간 인덱스 계산
       var middleIndex = Math.floor(linePath.length / 2);
       var center = linePath[middleIndex];
@@ -117,43 +160,21 @@
     }
 
 
-// 산 좌표를 찍는 카카오 MAP
-function showMountainMarker(latitude, longitude) {
-  var container = document.getElementById('mountain-map');
-  var options = {
-    center: new kakao.maps.LatLng(latitude, longitude),
-    level: 10
-  };
-  var map = new kakao.maps.Map(container, options);
-
-  var markerPosition = new kakao.maps.LatLng(latitude, longitude);
-
-  var marker = new kakao.maps.Marker({
-    position: markerPosition
-  });
-
-  marker.setMap(map);
-
-  // 지도 중심을 마커의 위치로 이동합니다
-  map.setCenter(markerPosition);
-
-  // 부드럽게 마커가 위치한 곳으로 이동합니다
-  map.panTo(markerPosition);
-}
 
   // 카카오맵 API 로드 후 초기화 함수 호출
   loadKakaoMapScript(function () {
-    {% for course in courses %}
+    // 산의 위치에 마커 표시
+    var mountainLatitude = parseFloat(document.getElementById('latitude').textContent);
+    var mountainLongitude = parseFloat(document.getElementById('longitude').textContent);
+    showMountainMarker(mountainLatitude, mountainLongitude);
+
+    {% for course in courses|slice:":3" %}
       var courseId = {{ course.pk }};
       var courseDetails = {{ course_details|safe }};
       var courseDetail = JSON.parse(courseDetails[courseId]);
       initMap(courseId, courseDetail);
     {% endfor %}
 
-    // 산의 위치에 마커 표시
-    var mountainLatitude = parseFloat(document.getElementById('latitude').textContent);
-    var mountainLongitude = parseFloat(document.getElementById('longitude').textContent);
-    showMountainMarker(mountainLatitude, mountainLongitude);
 
   });
 
@@ -241,3 +262,22 @@ function showMountainMarker(latitude, longitude) {
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 {% endblock javascript %}
+
+
+{% comment %} // 출발지 마커에 인포윈도우 표시
+var startInfowindowContent = '<div style="padding:5px;">출발지</div>';
+var startInfowindow = new kakao.maps.InfoWindow({
+  content: startInfowindowContent,
+  position: startMarker.getPosition(),
+  offsetY: -40 // 인포윈도우를 마커 위로 40px 위로 이동
+});
+startInfowindow.open(map);
+
+// 도착지 마커에 인포윈도우 표시
+var endInfowindowContent = '<div style="padding:5px;">도착지</div>';
+var endInfowindow = new kakao.maps.InfoWindow({
+  content: endInfowindowContent,
+  position: endMarker.getPosition(),
+  offsetY: -40 // 인포윈도우를 마커 위로 40px 위로 이동
+});
+endInfowindow.open(map);  {% endcomment %}
