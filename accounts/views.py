@@ -12,8 +12,9 @@ import os
 from dotenv import load_dotenv
 from django.http import JsonResponse
 from bs4 import BeautifulSoup
-from mountains.models import Mountain, Course
+from mountains.models import Mountain, Course, CourseDetail
 from .models import VisitedCourse
+from django.contrib.gis.serializers.geojson import Serializer
 
 
 def login(request):
@@ -63,6 +64,16 @@ def profile(request, user_pk):
     liked_posts = Post.objects.filter(like_users=person)
     # posts_comments = person.postcomment_set.all().count()
     # mountains_comments = person.comment_set.all().count()
+
+    liked_mountains = Mountain.objects.filter(likes=person)
+    bookmark_course = Course.objects.filter(bookmarks=person)
+
+    serializer = Serializer()
+    course_details = {}
+    for course in bookmark_course:
+        geojson_data = serializer.serialize(CourseDetail.objects.filter(crs_name_detail=course), fields=('geom', 'is_waypoint', 'waypoint_name', 'crs_name_detail'))
+        course_details[course.pk] =geojson_data
+
     score = posts.count() * 40
     #  + mountains_comments * 30 + posts_comments * 5
 
@@ -105,6 +116,9 @@ def profile(request, user_pk):
         'rest': rest,
         'max_score': max_score,
         'liked_posts': liked_posts,
+        'liked_mountains': liked_mountains,
+        'bookmark_course': bookmark_course,
+        'course_details': course_details,
 
         # 추가
         'score': score,

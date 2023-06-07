@@ -64,6 +64,7 @@ class MountainDetailView(DetailView):
             course_details[course.pk] =geojson_data
 
         now_weather_data = self.get_weather_forecast()
+        print(now_weather_data)
         tem = now_weather_data['기온']
         hum = now_weather_data['습도']
         sky = now_weather_data['하늘상태']
@@ -274,7 +275,10 @@ class MountainDetailView(DetailView):
                 base_time = str(now.hour-1) + "30"
             base_date = today
 
-        now_time = '0'+str(now.hour)+'0'+'0'
+        if now.hour < 10:
+            now_time = '0'+str(now.hour)+'0'+'0'
+        else:
+            now_time = str(now.hour)+'0'+'0'
 
         queryParams = '?' + urlencode({ 
               quote_plus('serviceKey') : serviceKeyDecoded,
@@ -289,6 +293,7 @@ class MountainDetailView(DetailView):
         # API 요청 보내기
         response = requests.get(url + queryParams, verify=False)
         items = response.json().get('response').get('body').get('items') #데이터들 아이템에 저장
+
         now_weather_data = dict()
 
         for item in items['item']:
