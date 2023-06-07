@@ -57,7 +57,7 @@ courseDetail.features.forEach(function(feature) {
 // 출발 마커 이미지
 var startMarkerPosition = linePath[0];
 var startMarkerImage = new kakao.maps.MarkerImage(
-  '/static/img/icon/start.png',
+  '/static/img/icons/start.png',
   new kakao.maps.Size(100, 100),
   { offset: new kakao.maps.Point(50, 80) }
   );
@@ -72,7 +72,7 @@ var startMarker = new kakao.maps.Marker({
 // 도착 마커 이미지
 var endMarkerPosition = linePath[0];
 var endMarkerImage = new kakao.maps.MarkerImage(
-  '/static/img/icon/end.png',
+  '/static/img/icons/end.png',
   new kakao.maps.Size(100, 100),
   { offset: new kakao.maps.Point(50, 80) }
   );

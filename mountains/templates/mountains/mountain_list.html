@@ -88,7 +88,7 @@
         {% endfor %}
 
         {% if page_obj.has_next %}
-          <a href="?page={{ page_obj.next_page_number }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" class="page__btn ">&gt;&gt;</a>
+          <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" class="page__btn ">&gt;&gt;</a>
         {% endif %}
       {% endif %}
     </div>
@@ -99,9 +99,8 @@
 
 {% block javascript %}
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script src="{% static 'js/list_order.js' %}"></script>
 <script src="{% static 'js/mountains_likes.js' %}"></script>
+<script src="{% static 'js/list_order.js' %}"></script>
 <script>
-
 </script>
 {% endblock javascript %}

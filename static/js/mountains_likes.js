@@ -12,6 +12,8 @@ forms.forEach((form) => {
     }).then((response) => {
       const isLiked = response.data.is_liked;
       const likeBtn = form.querySelector(`#like-btn`)
+      console.log(isLiked)
+      console.log(likeBtn)
       if (isLiked){
         likeBtn.className = "bi bi-heart-fill like__btn--style"
       } else {
