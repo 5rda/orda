@@ -103,29 +103,12 @@
               <div class="flex--d-row flex--between">
                 <p style="font-weight:bold;">{{ postcomment.user.username }}</p>
                 {% if request.user.is_authenticated and request.user == postcomment.user %}
-                  <div class="dropdown">
-                    <button type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                      <i class="bi bi-three-dots-vertical"></i>
-                    </button>
-                    <ul class="dropdown-menu">
-                      <li>
-                        <form action="{% url 'posts:comment_delete' post.pk postcomment.pk %}" method="POST" class="delete-comment-form">
-                          {% csrf_token %}
-                          <button type="submit" class="dropdown-item delete-comment-btn" data-comment-id="{{ postcomment.pk }}"  data-post-id="{{post.pk}}">삭제</button>
-                        </form>                        
-                      </li>
-                      <li>
-                        {% comment %} 댓글 수정부분 원하시는 데 갖다 놓으세요 {% endcomment %}
-                        <div id="comment-edit-form-{{ postcomment.pk }}" class="comment-update-form" style="display: none;">
-                        <form class="edit-comment-form" action="{% url 'posts:comment_update' post.pk postcomment.pk %}" method="POST" data-comment-id="{{ postcomment.pk }}">
-                          {% csrf_token %}
-                          <input type="text" name="content" value="{{ postcomment.content }}">
-                          <button type="submit">수정</button>
-                        </form>
-                        </div>
-                        <button class="edit-comment-button" data-comment-id="{{ postcomment.pk }}">댓글수정</button> 
-                      </li>
-                    </ul>
+                  <div class="flex--d-row text--subcolor">
+                    <button class="edit-comment-button" data-comment-id="{{ postcomment.pk }}">수정  &nbsp;</button> 
+                    <form action="{% url 'posts:comment_delete' post.pk postcomment.pk %}" method="POST">
+                      {% csrf_token %}
+                      <button type="submit" class="dropdown-item delete-comment-btn" data-comment-id="{{ postcomment.pk }}"  data-post-id="{{post.pk}}">삭제</button>
+                    </form>
                   </div>
                 {% endif %} 
               </div>
@@ -135,8 +118,18 @@
               style="display: none;" {% endif %} id="comment-toggle-{{postcomment.pk}}" data-comment-id="{{ postcomment.pk }}">[보기]</button>
               <p class="comment__context {% if postcomment.dislike_users.count >= 10 %}
               hidden {% endif %}" id="comment-content-{{postcomment.pk}}"> {{ postcomment.content }}</p>
+
+              {% comment %} 댓글 수정 {% endcomment %}
+              <div id="comment-edit-form-{{ postcomment.pk }}" class="comment-update-form  comment__inputbox rounded" style="display: none;">
+                <form class="edit-comment-form w-full flex--d-row flex--between py-2 px-1" action="{% url 'posts:comment_update' post.pk postcomment.pk %}" method="POST" data-comment-id="{{ postcomment.pk }}">
+                  {% csrf_token %}
+                  <input type="text" name="content" class="focus:outline-none w-11/12" value="{{ postcomment.content }}">
+                  <button type="submit">수정</button>
+                </form>
+              </div>
+
+              {% comment %} 댓글 좋아요 {% endcomment %}
               <div class="flex--d-row">          
-                {% comment %} <form action="{% url 'posts:comment_likes' post.pk postcomment.pk %}" method="POST"> {% endcomment %}
                 <form class="comment-like-form" id="like-form-{{postcomment.pk}}" data-post-id="{{post.pk}}" data-comment-id="{{postcomment.pk}}">
                   {% csrf_token %} 
                   {% if request.user in postcomment.like_users.all %}
