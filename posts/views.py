@@ -13,23 +13,21 @@ from django.http import JsonResponse
 
 
 def index(request):
-    query = request.GET.get('query', '')
+    query = request.GET.get('q')
     search_option = request.GET.get('search_option')
-    
+
     view_posts = Post.objects.order_by('-view_count')
     like_posts = Post.objects.annotate(like_count=Count('like_users')).order_by('-like_count')
 
     if query and search_option:
         if search_option == 'title':
-            filtered_posts = filtered_posts.filter(Q(title__contains=query))
+            filtered_posts = Post.objects.filter(title__contains=query)
         elif search_option == 'author':
-            filtered_posts = filtered_posts.filter(Q(user__username__contains=query))
+            filtered_posts = Post.objects.filter(user__username__contains=query)
         elif search_option == 'content':
-            filtered_posts = filtered_posts.filter(Q(content__contains=query))
+            filtered_posts = Post.objects.filter(content__contains=query)
         elif search_option == 'title_content':
-            filtered_posts = filtered_posts.filter(Q(title__contains=query) | Q(content__contains=query))
-        else:
-            filtered_posts = []
+            filtered_posts = Post.objects.filter(Q(title__contains=query) | Q(content__contains=query))
     else:
         filtered_posts = Post.objects.order_by('-created_at')
 
@@ -38,7 +36,6 @@ def index(request):
         'like_posts': like_posts,
         'posts': filtered_posts,
         'query': query,
-        'name': search_option,
     }
 
     if query:
@@ -70,6 +67,7 @@ def detail(request, post_pk):
     return render(request, 'posts/detail.html', context)
 
 
+@login_required
 def create(request):
     if request.method == 'POST':
         form = PostForm(request.POST, request.FILES)
@@ -87,6 +85,7 @@ def create(request):
     return render(request, 'posts/create.html', context)
 
 
+@login_required
 def update(request, post_pk):
     post = Post.objects.get(pk=post_pk)
     if request.user != post.user:
@@ -138,6 +137,7 @@ def likes(request, post_pk):
     # return redirect('posts:detail', post.pk)
 
 
+@login_required
 def comment_create(request, post_pk):
     post = Post.objects.get(pk=post_pk)
     postcomment_form = PostCommentForm(request.POST)
@@ -159,6 +159,7 @@ def comment_create(request, post_pk):
     # return render(request, 'posts/detail.html', context)
 
 
+@login_required
 def comment_update(request, post_pk, comment_pk):
     postcomment = PostComment.objects.get(pk=comment_pk)
 
@@ -178,6 +179,7 @@ def comment_update(request, post_pk, comment_pk):
     return render(request, 'posts/comment_update.html', context)
 
 
+@login_required
 def comment_delete(request, post_pk, comment_pk):
     postcomment = PostComment.objects.get(pk=comment_pk)
     if request.user == postcomment.user:
@@ -189,6 +191,7 @@ def comment_delete(request, post_pk, comment_pk):
     # return redirect('posts:detail', post_pk)
 
 
+@login_required
 def comment_likes(request, post_pk, comment_pk):
     comment = PostComment.objects.get(pk=comment_pk)
     if comment.like_users.filter(pk=request.user.pk).exists():
@@ -206,6 +209,7 @@ def comment_likes(request, post_pk, comment_pk):
     # return redirect('posts:detail', post_pk)
 
 
+@login_required
 def comment_dislikes(request, post_pk, comment_pk):
     comment = PostComment.objects.get(pk=comment_pk)
     if comment.dislike_users.filter(pk=request.user.pk).exists():
@@ -271,3 +275,4 @@ def get_first_image_from_content(content):
         return img_tag['src']
     else:
         return None
+    
