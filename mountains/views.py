@@ -163,8 +163,10 @@ def bookmark(request, mountain_pk, course_pk):
     else:
         user.bookmarks.add(course)
         is_bookmarked = True
-    
-    return JsonResponse({'is_bookmarked': is_bookmarked})
+    context = {
+        'is_bookmarked' : is_bookmarked,
+    }
+    return JsonResponse(context)
 
 
 @login_required

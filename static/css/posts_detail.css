@@ -139,6 +139,10 @@
   margin-top: 25px ;
 }
 
+.text--subcolor {
+  color: var(--sub-color)
+}
+
 
 
 @media (max-width:1080px) {
