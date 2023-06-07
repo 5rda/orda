@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block style %}
+<style>
+  .marker-title {
+    background-color: white;
+    color: black;
+    padding: 5px;
+    font-weight: bold;
+    position: absolute;
+    top: 5px;
+    transform: translateX(-50%);
+  }
+  .info-window {
+    position: relative;
+    width: 150px; /* Set the desired width */
+  }
+  .visited {
+    color: black;
+  }
+  .unvisited {
+    color: gray;
+  }
+</style>
+{% endblock style %}
+
+{% block content %}
+<!-- 지도를 표시하는 div -->
+<div id="map" style="width:100%;height:500px;"></div>
+
+<div>
+  <h1>다녀온 산</h1>
+  {% for mountain in mountains %}
+    {% if mountain.name in visited_mountains %}
+      {{ mountain.name }}
+      <ul>
+        {% for course in mountain.course_set.all %}
+          {% if course in visited_courses %}
+            <li class='visited'>{{ course.crs_name_detail }}</li>
+          {% else %}
+            <li class='unvisited'>{{ course.crs_name_detail }}</li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+      <hr>
+    {% endif %}
+  {% endfor %}
+</div>
+
+{% endblock content %}
+
+{% block javascript %}
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=d39fcd60ffdc96ae99454337f5e45a16&libraries=services,clusterer"></script>
+<script>
+  // 지도를 표시할 div와  지도 옵션으로  지도를 생성
+  var mapContainer = document.getElementById('map');
+  var mapOption = {
+    center: new kakao.maps.LatLng(37.5665, 126.9780),
+    level: 13
+  };
+  var map = new kakao.maps.Map(mapContainer, mapOption);
+
+  // 마커를 표시할 위치와 산 이름, 코스명 객체 배열
+  var positions = [];
+
+  {% for mountain in mountains %}
+    var content = '<strong>{{ mountain.name }}</strong><br>';
+    {% for course in mountain.course_set.all %}
+    content += '<div>{{ course.crs_name_detail }} <form action="{% url "accounts:my_memories" %}" method="POST">{% csrf_token %}<input type="hidden" name="course_id" value="{{ course.id }}"><input type="submit" {% if course in visited_courses %}value="갔음"{% else %}value="안갔음"{% endif %} class="btn btn-outline-primary"></form></div>';
+    {% endfor %}
+
+    var position = {
+      title: "{{ mountain.name }}",
+      latlng: new kakao.maps.LatLng({{ mountain.geom.y }}, {{ mountain.geom.x }}),
+      content: content
+    };
+    positions.push(position);
+  {% endfor %}
+  
+  // 마커 이미지 및 크기 커스텀
+  var imageSrc = "{% static 'img/mountain.png' %}";
+  var imageSize = new kakao.maps.Size(25, 25);
+  var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
+
+  var markers = [];
+
+  for (var i = 0; i < positions.length; i++) {
+    var marker = new kakao.maps.Marker({
+      position: positions[i].latlng,
+      title: positions[i].title,
+      image: markerImage
+    });
+    markers.push(marker);
+  }
+
+  // 마커 클러스터러 생성
+  var clusterer = new kakao.maps.MarkerClusterer({
+    map: map,
+    averageCenter: true,
+    minLevel: 10,
+    disableClickZoom: true
+  });
+
+  clusterer.addMarkers(markers);
+
+  // 인포창 생성 및 지도 표시
+  var infowindows = [];
+  var titleWindows = [];
+  var infoWindow = null;
+
+  for (var i = 0; i < positions.length; i++) {
+    var infowindow = new kakao.maps.InfoWindow({
+      content: '<div class="info-content">' + positions[i].content + '</div>'
+    });
+
+    infowindows.push(infowindow);
+
+    var titleWindow = new kakao.maps.CustomOverlay({
+      position: positions[i].latlng,
+      content: '<div class="marker-title">' + positions[i].title + '</div>'
+    });
+
+    titleWindows.push(titleWindow);
+
+    kakao.maps.event.addListener(markers[i], 'click', makeClickListener(i));
+    kakao.maps.event.addListener(markers[i], 'mouseover', makeOverListener(i));
+    kakao.maps.event.addListener(markers[i], 'mouseout', makeOutListener(i));
+  }
+
+  // 마커 클릭시 인포창을 표시하는 함수
+  function makeClickListener(index) {
+    return function() {
+      if (infoWindow) {
+        infoWindow.close();
+      }
+      infoWindow = infowindows[index];
+      infoWindow.open(map, markers[index]);
+    };
+  }
+
+  // 마커 위로 마우스오버시 산 이름을 표시하는 함수
+  function makeOverListener(index) {
+    return function() {
+      titleWindows[index].setMap(map);
+    };
+  }
+
+  // 마커 밖으로 마우스아웃시 산 이름이 사라지는 함수
+  function makeOutListener(index) {
+    return function() {
+      titleWindows[index].setMap(null);
+    };
+  }
+
+  // 인포창를 닫는 함수
+  function closeInfoWindow() {
+    if (infoWindow) {
+      infoWindow.close();
+      infoWindow = null;
+    }
+  }
+
+  // 마커 외부를 클릭시 인포창을 닫는 함수
+  kakao.maps.event.addListener(map, 'click', function() {
+    closeInfoWindow();
+  });
+
+  // 클러스터러 클릭시 맵을 1레벨씩 확대하는 함수
+  kakao.maps.event.addListener(clusterer, 'clusterclick', function(cluster) {
+    var level = map.getLevel();
+    map.setLevel(level - 1);
+    map.setCenter(cluster.getCenter());
+  });
+
+</script>
+{% endblock javascript %}
