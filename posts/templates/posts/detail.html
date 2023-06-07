@@ -120,14 +120,15 @@
               hidden {% endif %}" id="comment-content-{{postcomment.pk}}"> {{ postcomment.content }}</p>
 
               {% comment %} 댓글 수정 {% endcomment %}
-              <div id="comment-edit-form-{{ postcomment.pk }}" class="comment-update-form  comment__inputbox rounded" style="display: none;">
+        
+              <div id="comment-edit-form-{{ postcomment.pk }}" class="comment-update-form" style="display: none;">
                 <form class="edit-comment-form w-full flex--d-row flex--between py-2 px-1" action="{% url 'posts:comment_update' post.pk postcomment.pk %}" method="POST" data-comment-id="{{ postcomment.pk }}">
                   {% csrf_token %}
-                  <input type="text" name="content" class="focus:outline-none w-11/12" value="{{ postcomment.content }}">
+                  <input type="text" name="content" class="focus:outline-none w-11/12 rounded-lg bg-gray-200 px-2 py-1" value="{{ postcomment.content }}">
                   <button type="submit">수정</button>
                 </form>
               </div>
-
+            
               {% comment %} 댓글 좋아요 {% endcomment %}
               <div class="flex--d-row">          
                 <form class="comment-like-form" id="like-form-{{postcomment.pk}}" data-post-id="{{post.pk}}" data-comment-id="{{postcomment.pk}}">
@@ -244,10 +245,10 @@
       var commentId = $(this).data('comment-id');
       $('#comment-edit-form-' + commentId).toggle();
       $('#comment-' + commentId + ' .comment-content').toggle();
-      $(this).toggle();
+      $(this).toggle(); // Add this line to hide the edit button
     });
 
-    $('.edit-comment-form').submit(function(event) {
+    $('.edit-comment-form w-full flex--d-row flex--between py-2 px-1').submit(function(event) {
       event.preventDefault();
       var commentId = $(this).data('comment-id');
       var content = $(this).find('input[name=content]').val();
@@ -258,8 +259,11 @@
         url: form.attr('action'),
         data: form.serialize(),
         success: function(response) {
+          // Update the comment content
           $('#comment-' + commentId + ' .comment-content').text(content);
+          // Show the edit button again
           $('.edit-comment-button[data-comment-id=' + commentId + ']').toggle();
+          // Hide the edit form
           $('#comment-edit-form-' + commentId).toggle();
           $('#comment-' + commentId + ' .comment-content').toggle();
         },
@@ -269,7 +273,8 @@
       });
     });
   });
-
+</script>
+<script>
   ClassicEditor
     .create(document.querySelector('#content'), {
       language: 'ko',
