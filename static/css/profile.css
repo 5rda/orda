@@ -316,10 +316,23 @@
 }
 
 .profile__content2--bookmarkcontent {
+  position: relative;
   height: 200px;
   border: solid 1px #DBDBDB;
   border-radius: 5px;
   padding: 10px;
+}
+
+.profile__content--courselist {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.profile__content--course {
+  flex-grow: 1;
+  width: 100%;
 }
 
 .profile__content3--mountain {
