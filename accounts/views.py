@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, reverse
 from .forms import CustomUserCreationForm, CustomUserChangeForm, CustomUserAuthenticationForm, CustomUserPasswordChangeForm
 from django.contrib.auth import get_user_model, update_session_auth_hash
 from django.contrib.auth import login as auth_login
@@ -14,6 +14,9 @@ from django.http import JsonResponse
 from bs4 import BeautifulSoup
 from mountains.models import Mountain, Course, CourseDetail
 from .models import VisitedCourse
+from accounts.models import Notification
+from .models import Notification
+from django.http import JsonResponse
 from django.contrib.gis.serializers.geojson import Serializer
 
 
@@ -71,6 +74,13 @@ def profile(request, user_pk):
     visited_courses = person.visitedcourse_set.all().count()
 
     liked_posts = Post.objects.filter(like_users=person)
+    # posts_comments = person.postcomment_set.all().count()
+    # mountains_comments = person.comment_set.all().count()
+    score = posts.count() * 40
+    #  + mountains_comments * 30 + posts_comments * 5
+    user = request.user
+    notifications = user.notifications.all()
+
     liked_mountains = Mountain.objects.filter(likes=person)
     bookmark_course = Course.objects.filter(bookmarks=person)
 
@@ -129,6 +139,7 @@ def profile(request, user_pk):
         'score': score,
         'expbar': expbar,
         'restexp': restexp,
+        'notifications': notifications,
     }
     return render(request, 'accounts/profile.html', context)
 
@@ -173,7 +184,7 @@ def password_change(request):
 @login_required
 def follow(request, user_pk):
     User = get_user_model()
-    person  = User.objects.get(pk=user_pk)
+    person = User.objects.get(pk=user_pk)
     me = request.user
 
     if person != me:
@@ -183,11 +194,16 @@ def follow(request, user_pk):
         else:
             person.followers.add(me)
             is_followed = True
+
+            # 알림 생성 로직 추가
+            message = f'{me.username}님이 당신을 팔로우합니다.'
+            notification = Notification.objects.create(user=person, notification_type='팔로우', message=message)
+
         context = {
-            'is_followed':is_followed,
-            'followings_count':person.followings.count(),
-            'followers_count':person.followers.count(),
-            'followers': [{'username': f.username,'pk': f.pk} for f in person.followers.all()]
+            'is_followed': is_followed,
+            'followings_count': person.followings.count(),
+            'followers_count': person.followers.count(),
+            'followers': [{'username': f.username, 'pk': f.pk} for f in person.followers.all()]
         }
         return JsonResponse(context)
     return redirect('accounts:profile', person.pk)
@@ -347,6 +363,20 @@ def my_memories(request):
     return render(request, 'accounts/my_memories.html', context)
 
 
+def notification(request):
+    user = request.user
+    notifications = user.notifications.all()
+    return render(request, 'accounts/notification.html', {'notifications': notifications})
 
 
+def notification_check(request, notification_id):
+    notification = Notification.objects.get(id=notification_id)
+    notification.is_read = True
+    notification.save()
+    return redirect('accounts:notification')
 
+
+def notification_delete(request, notification_id):
+    notification = Notification.objects.get(id=notification_id)
+    notification.delete()
+    return redirect('accounts:notification')
