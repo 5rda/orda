@@ -1,12 +1,10 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% load static %}
 {% load custom_filters %}
 {% block style %}
   {% comment %} <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/ckeditor.js"></script>
   <script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/translations/ko.js"></script> {% endcomment %}
-<style>
-</style>
 <link rel="stylesheet" href="{% static 'css/posts_detail.css' %}">
 <link rel="stylesheet" href="{% static 'css/posts_index.css' %}">
 {% comment %} <link rel="stylesheet" href="{% static 'css/posts_create.css' %}"> {% endcomment %}
@@ -36,7 +34,7 @@
         <p> {{ post.updated_at|date:'Y. m. d. h. i'}} |&nbsp;</p>          
         {% if request.user == post.user %}
         <a href="{% url 'posts:update' post.pk %}">수정 |&nbsp;</a>
-        <form action="{% url 'posts:delete' post.pk %}" method="POST">
+        <form action="{% url 'posts:delete' post.pk %}" method="POST" id="delete-form">
           {% csrf_token %}
           <input type="submit" value="삭제">
         </form>
@@ -50,7 +48,6 @@
       {% if request.user != post.user %}
         {% comment %} <form action="{% url 'accounts:follow' post.user.pk %}" method="POST"> {% endcomment %}
         <form id="follow-form" data-user-id="{{ post.user.pk }}">
-
           {% csrf_token %}
           {% if request.user in post.user.followers.all %}
             <input type="submit" class="follw__btn rounded btn__hover" value="팔로잉">
@@ -62,17 +59,13 @@
     </div>
   </div>
 
-    
   {% comment %} ck에디터 출력부분/ 사진 크기 조정 미완성 {% endcomment %}
   <div class="content__wrap">
     {% comment %} 특수문자 그대로 출력 |safe {% endcomment %}
     {{ post.content|safe }}
   </div>
 
-   
-
   {% comment %} <a href="javascript:history.back()"><button>뒤로 가기</button></a> {% endcomment %}
-
 
   {% comment %} 댓글 {% endcomment %}
   <div id="comment-section">
@@ -91,12 +84,12 @@
       </div>
     </form>
 
-
     <ul class="comments__wrap">
       {% for postcomment in postcomments %}
         <li id="comment-{{ postcomment.pk }}" class="container mb-2" style="list-style: none;">
           <div class="flex--d-row">
             <div class="col-1">
+
               {% comment %} 프로필 이미지 {% endcomment %}
               <a href="{% url 'accounts:profile' postcomment.user.pk %}">
                 {% if postcomment.user.profile_img %}
@@ -116,10 +109,10 @@
                     </button>
                     <ul class="dropdown-menu">
                       <li>
-                        <form action="{% url 'posts:comment_delete' post.pk postcomment.pk %}" method="POST">
+                        <form action="{% url 'posts:comment_delete' post.pk postcomment.pk %}" method="POST" class="delete-comment-form">
                           {% csrf_token %}
                           <button type="submit" class="dropdown-item delete-comment-btn" data-comment-id="{{ postcomment.pk }}"  data-post-id="{{post.pk}}">삭제</button>
-                        </form>
+                        </form>                        
                       </li>
                       <li>
                         {% comment %} 댓글 수정부분 원하시는 데 갖다 놓으세요 {% endcomment %}
@@ -231,15 +224,8 @@
     
 </div>
 </div>
-
-      {% if request.user.is_authenticated and request.user == postcomment.user %}
-      e;">
-
-      {% endif %}
 {% endblock content %}
-
 {% block ect %}
-
 {% comment %} 창 줄이기 전 좋아요 + 댓글 위치 {% endcomment %}
 <div class="post__btn__wrap">
   <form class="like-form" data-post-id="{{ post.pk }}">
@@ -256,9 +242,7 @@
     <div class="text-center">{{ post.postcomment_set.count }}</div>
   </div>
   </div>
-
 {% endblock ect %}
-
 {% block javascript %}
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
@@ -267,7 +251,7 @@
       var commentId = $(this).data('comment-id');
       $('#comment-edit-form-' + commentId).toggle();
       $('#comment-' + commentId + ' .comment-content').toggle();
-      $(this).toggle(); // Add this line to hide the edit button
+      $(this).toggle();
     });
 
     $('.edit-comment-form').submit(function(event) {
@@ -281,11 +265,8 @@
         url: form.attr('action'),
         data: form.serialize(),
         success: function(response) {
-          // Update the comment content
           $('#comment-' + commentId + ' .comment-content').text(content);
-          // Show the edit button again
           $('.edit-comment-button[data-comment-id=' + commentId + ']').toggle();
-          // Hide the edit form
           $('#comment-edit-form-' + commentId).toggle();
           $('#comment-' + commentId + ' .comment-content').toggle();
         },
@@ -308,6 +289,15 @@
     .catch(error => {
       console.error(error);
     });
+</script>
+<script>
+  document.getElementById("delete-form").addEventListener("submit", function(event) {
+    event.preventDefault();
+    var confirmDelete = confirm("삭제하시겠습니까?");
+    if (confirmDelete) {
+      this.submit();
+    }
+  });
 </script>
 <script src="{% static 'js/post_detail.js' %}"></script>
 {% comment %} <script src="{% static 'js/ckeditor.js' %}"></script> {% endcomment %}

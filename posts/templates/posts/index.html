@@ -1,21 +1,17 @@
 {% extends 'base.html' %}
-
 {% load static %}
 {% load custom_filters %}
-{% load highlight_filter %}
-
 {% block style %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
 <link rel="stylesheet" href="{% static 'css/posts_index.css' %}">
 {% endblock style %}
-
 {% block content %}
 <div style="padding: 30px 60px;">
   {% comment %} 조회순 {% endcomment %}
   <section style="margin-bottom: 120px;">
     <h1 class="postindex__Content--title">조회수가 높은 마이코스</h1>
     <div class="owl-carousel" style="margin-bottom: 120px; padding: 0 100px;">
-      {% for post in view_posts|slice:":8" %}
+      {% for post in view_posts %}
         <div class="item">
           <a href="{% url 'posts:detail' post.pk %}">
             <div class="postindex__post">
@@ -64,7 +60,7 @@
   <section style="margin-bottom: 120px;">
     <h1 class="postindex__Content--title">좋아요가 많은 마이코스</h1>
     <div class="owl-carousel" style="margin-bottom: 120px; padding: 0 100px;">
-      {% for post in like_posts|slice:":8" %}
+      {% for post in like_posts %}
         <div class="item">
           <a href="{% url 'posts:detail' post.pk %}">
             <div class="postindex__post">
@@ -110,26 +106,7 @@
   </section>
 
   <section style="margin-bottom: 120px;">
-    <div class="d-flex flex-row justify-content-between">
-      <h1 class="postindex__Content--title">전체 글</h1>
-      <form class="postindex__searchbox" id="searchForm" action="{% url 'posts:index' %}" method="GET">
-        <div class="input-group">
-          <select class="form-select form-select-sm" name="search_option" style="width: 140px;">
-            <option value="title">제목</option>
-            <option value="author">작성자</option>
-            <option value="content">내용</option>
-            <option value="title_content">제목+내용</option>
-          </select>
-          <input class="form-control" type="text" name="query" id="search_query" value="{{ query|default_if_none:'' }}" placeholder="검색어를 입력하세요" style="width: 230px;">
-          <button class="input-group-text" type="submit" id="btn_search">
-            <svg id="i-search" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="18" height="18" fill="none" stroke="#B2B2B2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-              <circle cx="14" cy="14" r="12" />
-              <path d="M23 23 L30 30"  />
-            </svg>
-          </button>
-        </div>
-      </form>
-    </div>
+    <h1 class="postindex__Content--title">전체 글<span>({{ posts|length }})</span></h1>  
     <div class="post-grid" id="postGrid">
       {% for post in posts %}
         <a href="{% url 'posts:detail' post.pk %}">
@@ -173,8 +150,7 @@
       {% endfor %}
     </div>
     <button id="loadMoreBtn">더 보기</button>
-    
-  </section> 
+  </section>
 </div>
 
 <form method="GET" action="{% url 'posts:index' %}">
