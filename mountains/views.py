@@ -55,6 +55,8 @@ class MountainDetailView(DetailView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        # 산관련
         mountain = self.get_object()
         serializer = Serializer()
         courses = mountain.course_set.all()
@@ -63,6 +65,12 @@ class MountainDetailView(DetailView):
             geojson_data = serializer.serialize(CourseDetail.objects.filter(crs_name_detail=course), fields=('geom', 'is_waypoint', 'waypoint_name', 'crs_name_detail'))
             course_details[course.pk] =geojson_data
 
+        # 리뷰 관련
+        reviews = Review.objects.filter(mountain=mountain)
+
+
+
+        # 기타
         now_weather_data = self.get_weather_forecast()
         tem = now_weather_data['기온']
         hum = now_weather_data['습도']
@@ -133,10 +141,14 @@ class MountainDetailView(DetailView):
                 region = region[:-1]
 
         context = {
+            # 산 관련
             'mountain': mountain,
             'courses': courses,
             'course_details': course_details,
+
+            # 리뷰 관련
             'form': ReviewCreationForm(),
+            'reviews': reviews,
 
             # 날씨
             'tem': tem,
@@ -274,7 +286,10 @@ class MountainDetailView(DetailView):
                 base_time = str(now.hour-1) + "30"
             base_date = today
 
-        now_time = '0'+str(now.hour)+'0'+'0'
+        if now.hour < 10:
+            now_time = '0'+str(now.hour)+'0'+'0'
+        else:
+            now_time = str(now.hour)+'0'+'0'
 
         queryParams = '?' + urlencode({ 
               quote_plus('serviceKey') : serviceKeyDecoded,
@@ -477,14 +492,14 @@ def create_review(request, pk):
             review.save()
             form.save_m2m()
 
-            return redirect('mountains:review_detail', mountain.pk, review.pk)
+            return redirect('mountains:mountain_detail', pk)
     else:
         form = ReviewCreationForm()
     context = {
         'form': form,
-        'mountain': mountain,
+        'pk': pk,
     }
-    return render(request, 'mountains/create_review.html', context)
+    return render(request, 'mountains/mountain_detail.html', context)
 
 
 @login_required
@@ -494,14 +509,8 @@ def review_likes(request, pk, review_pk):
         review.like_users.remove(request.user)
     else:
         review.like_users.add(request.user)
-    return redirect('mountains:review_detail', pk, review.pk)
+    return redirect('mountains:mountain_detail', pk)
 
-
-# class MountainTestView(ListView):
-#     model = Mountain
-#     template_name = 'mountains/mountain_test.html'
-#     context_object_name = 'mountains'
-    
 
 @login_required
 def review_delete(request, pk, review_pk):
@@ -511,18 +520,6 @@ def review_delete(request, pk, review_pk):
         return redirect('mountains:mountain_detail', pk)
     
 
-def review_detail(request, pk, review_pk):
-    review = Review.objects.get(pk=review_pk)
-    tags = review.tags.all()
-    form = ReviewCreationForm(instance=review)
-    context = {
-        'review': review,
-        'tags': tags,
-        'form': form,
-    }
-    return render(request, 'mountains/review_detail.html', context)
-
-
 @login_required
 def review_update(request, pk, review_pk):
     review = Review.objects.get(pk=review_pk)
@@ -531,13 +528,13 @@ def review_update(request, pk, review_pk):
             form = ReviewCreationForm(request.POST, request.FILES, instance=review)
             if form.is_valid():
                 form.save()
-                return redirect('mountains:review_detail', review.mountain.pk, review.pk)
+                return redirect('mountains:mountain_detail', review.mountain.pk)
         else:
             form = ReviewCreationForm(instance=review)
     else:
-        return JsonResponse({'success': True})
+        return JsonResponse({'message': '해당 리뷰를 작성한 유저가 아닙니다.'})
     context = {
         'form': form,
         'review': review,
     }
-    return JsonResponse({'success': True})
+    return render(request, 'mountains/mountain_detail.html', context)

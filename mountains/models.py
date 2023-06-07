@@ -82,7 +82,7 @@ class Review(models.Model):
     def image_path(instance, filename):
         return f'reviews/{instance.mountain.name}/{filename}'
     mountain = models.ForeignKey(Mountain, on_delete=models.CASCADE)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, db_column='user_id')
     content = models.TextField()
     image = models.ImageField(blank=True, upload_to=image_path)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -90,16 +90,10 @@ class Review(models.Model):
     tags = models.ManyToManyField(Tag, related_name='reviews')
     like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='like_reviews')
 
+    class Meta:
+        db_table = 'mountains_review'
     def __str__(self):
         return self.content
-
-
-# class CourseBookmark(models.Model):
-#     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-#     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-
-#     class Meta:
-#         db_table = 'mountains_course_bookmarks'
 
 
 
