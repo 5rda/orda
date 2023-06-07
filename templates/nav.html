@@ -48,11 +48,6 @@
                   <button id="마이코스 작성" type="submit">마이코스 작성</button>
                 </form>
               </div>
-              <div class="header__user--item">
-                <form action="{% url 'accounts:notification' %}" method="GET">
-                  <button id="알림" type="submit">알림{% if notifications %} ({{ notifications.count }}){% endif %}</button>
-                </form>
-              </div>
             {% else %}
               <div class="header__user--item">
                 <button id="로그인" class="{% if active_button_id == '로그인' %}active-button{% endif %}"><a href="{% url 'accounts:login' %}">로그인</a></button>
