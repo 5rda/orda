@@ -1,54 +1,221 @@
 {% extends 'base.html' %}
 {% load static %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/mountains_detail.css' %}">
+{% endblock style %}
+
 {% block content %}
-  <ul>
-    <li>{{ mountain.pk }}</li>
-    <li>{{ mountain.name }}</li>
-    <li>{{ mountain.subname }}</li>
-    <li>조회수: {{ mountain.views }}</li>
-    <div id="mountain-map" style="width:500px;height:400px;"></div>
-    <li><img src="{% get_static_prefix %}img/mountains/{{ mountain.name }}.png" alt="얍"></li>
-    <li>{{ mountain.region }}</li>
-    <li>{{ mountain.height }}</li>
-    <form>
-      {% csrf_token %}
-      <button id="mountain-likes-btn" type="submit" data-mountain-pk-2="{{ mountain.pk }}">
-        <p>좋아요 추가</p>
-      </button>  
-    </form>  
-    <li id="latitude">{{ mountain.geom.y }}</li>
-    <li id="longitude">{{ mountain.geom.x }}</li>
-  </ul>
-  <br>
-  <hr>
-  <h2>course</h2>
-  <ul>
-    {% for course in courses|slice:":3" %}
-        <li>코스명: {{ course.crs_name_detail }}</li>
-        <div id="map2-{{ course.pk }}" style="width: 100%; height: 300px;"></div>
-        <li>총거리: {{ course.distance }}km</li>
-        <li>소요시간: {{ course.duration }}</li>
-        <li>난이도: {{ course.diff }}</li>
-        <form>
-          {% csrf_token %}
-          <button id="bookmark-btn-{{ course.pk }}" type="submit" data-mountain-pk="{{ mountain.pk }}" data-course-pk="{{ course.pk }}">
-            <p>북마크 추가</p>
-          </button>
-        </form>
+<div class="mountains__detail--warp">
+  <section style="margin-bottom: 50px;">
+    <div class="mountains__detail--infobox">
+      <div class="mountains__detail--imgbox">
+        <img class="mountains__detail--img" src="{% get_static_prefix %}img/mountains/{{ mountain.name }}.png" alt="얍">
+      </div>
+      <div style="width:6%;"></div>
+      <div class="mountains__detail--info">
+        <div class="mountains__detail--titlebox">
+          <h1 class="mountains__detail--title">{{ mountain.name }}</h1>
+          <p class="mountains__detail--subtitle">{{ mountain.subname }}</p>
+        </div>
+        <table>
+          <tr class="mountains__detail--stat">
+            <th>지 역</th>
+            <td>{{ mountain.region }}</td>
+          </tr>
+          <tr class="mountains__detail--stat">
+            <th>고 도</th>
+            <td>{{ mountain.height }}m</td>
+          </tr>
+        </table>
+        <!-- Button trigger modal -->
+        <button type="button" class="mountain__detail--mapbtn" data-bs-toggle="modal" data-bs-target="#mountainMap">
+          지도 보기
+        </button>
+      </div>
+    </div>
+    
+    <!-- Modal -->
+    <div class="modal fade" id="mountainMap" tabindex="-1" aria-labelledby="mountainMapLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <div class="modal-body" style="width: 500px; height: 400px;">
+            <div id="mountain-map" style="width: 100%; height: 100%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr style="margin-bottom: 30px;">
+
+  <section style="margin-bottom: 50px;">
+    <div class="d-flex flex-row">
+      <div class="mountains__detail--weather">
+        <div class="d-flex flex-row justify-content-between">
+          <div class="weather--wrap">
+            <div class="d-flex flex-row justify-content-between" style="height: 60%; margin-bottom: 14px;">
+              <div class="weather--sky">
+                {% if now_time in sun %}
+                  {% if sky == '1' %}
+                    <img class="weather--skyimg" src="{% static 'img/weather/sunny.png' %}" alt="아침맑음" title="맑음">
+                  {% elif sky == '3' %}
+                    <img class="weather--skyimg" src="{% static 'img/weather/suncloudy.png' %}" alt="아침구름많음" title="구름많음">
+                  {% elif sky == '4' %}
+                    <img class="weather--skyimg" src="{% static 'img/weather/overcast.png' %}" alt="흐림" title="흐림">
+                  {% endif %}
+                {% else %}
+                  {% if sky == '1' %}
+                    <img class="weather--skyimg" src="{% static 'img/weather/moon.png' %}" alt="저녁맑음" title="맑음">
+                  {% elif sky == '3' %}
+                    <img class="weather--skyimg" src="{% static 'img/weather/mooncloudy.png' %}" alt="저녁구름많음" title="구름많음">
+                  {% elif sky == '4' %}
+                    <img class="weather--skyimg" src="{% static 'img/weather/overcast.png' %}" alt="흐림" title="흐림">
+                  {% endif %}
+                {% endif %}
+              </div>
+              <p class="weather--tem">{{ tem }}°</p>
+            </div>
+            <div class="d-flex flex-row justify-content-between">
+              <div class="weather--hvwr">
+                <p>습도</p>
+                <p>{{ hum }} %</p>
+              </div>
+              <div style="border-right: 1px solid #DBDBDB;"></div>
+              <div class="weather--hvwr">
+                <p>바람</p>
+                <p>{{ vec }} {{ wsd }} m/s</p>
+              </div>
+              <div style="border-right: 1px solid #DBDBDB;"></div>
+              <div class="weather--hvwr">
+                <p>1시간강수량</p>
+                {% if rain == '강수없음' %}
+                  <p>- mm</p>
+                {% else %}
+                  <p>{{ rain }} mm</p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <div></div>
+          <div class="air--warp">
+            <div class="d-flex flex-column justify-content-between align-items-center">
+              <div class="air--fine_dust">
+                {% for key, value in fine_dust.items %}
+                  {% if key == region %}
+                    <div class="air--imgbox">
+                      {% if value == '좋음' %}
+                        <img class="air--img" src="{% static 'img/air/smile.png' %}" alt="미세먼지좋음">
+                      {% elif value == '보통' %}
+                        <img class="air--img" src="{% static 'img/air/neutral.png' %}" alt="미세먼지보통">
+                      {% else %}
+                        <img class="air--img" src="{% static 'img/air/sad.png' %}" alt="미세먼지나쁨">
+                      {% endif %}
+                    </div>
+                    <p>미세먼지 {{ value }}</p>
+                  {% endif %}
+                {% endfor %}
+              </div>
+              <div class="air--ozone">
+                {% for key, value in ozone.items %}
+                  {% if key == region %}
+                  <div class="air--imgbox">
+                    {% if value == '좋음' %}
+                      <img class="air--img" src="{% static 'img/air/smile.png' %}" alt="오존좋음">
+                    {% elif value == '보통' %}
+                      <img class="air--img" src="{% static 'img/air/neutral.png' %}" alt="오존보통">
+                    {% else %}
+                      <img class="air--img" src="{% static 'img/air/sad.png' %}" alt="오존나쁨">
+                    {% endif %}
+                  </div>
+                  <p>오존 {{ value }}</p>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="width: 6%;"></div>
+      <div class="mountains__detail--newslist">
+        <p class="mountains__detail--newstitle">관련 뉴스</p>
+        {% for item in result %}
+          <a class="mountains__detail--newsitem" href="{{ item.link }}"><p title="{{ item.title }}">{{ item.title }}</p></a>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  
+  <hr style="margin-bottom: 30px;">
+
+  <section>
+    <h1 class="mountain__detail--coursetitle">{{ mountain.name }} 코스목록</h1>
+    <ul class="mountain__detail--courselist">
+      {% for course in courses|slice:":3" %}
+        <li class="mountain__detail--course">
+          <a href="#" class="flex flex-col items-center bg-white border border-gray-200 rounded-lg shadow md:flex-row hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
+            {% comment %} <img class="object-cover w-full rounded-t-lg h-96 md:h-auto md:w-48 md:rounded-none md:rounded-l-lg" src="/docs/images/blog/image-4.jpg" alt=""> {% endcomment %}
+            <div class="object-cover w-full rounded-t-lg h-96 md:h-auto md:w-48 md:rounded-none md:rounded-l-lg" id="map2-{{ course.pk }}" style="width: 76%; height: 300px;"></div>
+            <div class="flex flex-col justify-between p-4 leading-normal" style="width: 24%;">
+              <h5 class="mb-5 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{ course.crs_name_detail }}</h5>
+              <ul>
+                <li class="mb-3 font-normal text-gray-700 dark:text-gray-400">총거리: {{ course.distance }}km</li>
+                <li class="mb-3 font-normal text-gray-700 dark:text-gray-400">소요시간: {{ course.duration }}</li>
+                <li class="mb-3 font-normal text-gray-700 dark:text-gray-400">난이도: {{ course.diff }}</li>
+                <form>
+                  {% csrf_token %}
+                  <button id="bookmark-btn-{{ course.pk }}" type="submit" data-mountain-pk="{{ mountain.pk }}" data-course-pk="{{ course.pk }}">
+                    <p>북마크 추가</p>
+                  </button>
+                </form>
+              </ul>
+            </div>
+          </a>
+        </li>
         <br>
-        <hr>
-    {% empty %}
+      {% empty %}
         <li>No courses available.</li>
-    {% endfor %}
-  </ul>
-  {% if courses|length > 3 %}
-    <a href="{% url 'mountains:course_list' mountain.pk %}">더보기</a>
-  {% endif %}
+      {% endfor %}
+    </ul>
+
+    {% if courses|length > 3 %}
+      <a href="{% url 'mountains:course_list' mountain.pk %}">더보기</a>
+    {% endif %}
+  </section>
+
+  <hr style="margin-bottom: 30px;">    
+  
   <form action="{% url 'mountains:create_review' mountain.pk %}">
     {{ form.as_p }}
     <input type="submit" value="리뷰생성">
   </form>
+</div>
+
+
+<p id="latitude" style="display: none;">{{ mountain.geom.y }}</p>
+<p id="longitude" style="display: none;">{{ mountain.geom.x }}</p>
+
+<div class="mountain__btn__wrap">
+  <form class="like-form" data-mountain-id="{{ mountain.pk }}">
+    {% csrf_token %}
+    {% if request.user in mountain.likes.all %}
+    <button type="submit" class="mountain__btn--style bi bi-heart-fill heart--color like__hover icon--size" id="mountain-likes-btn"></button>
+    {% else %}
+    <button type="submit" class="mountain__btn--style bi bi-heart like__hover icon--size" id="mountain-likes-btn"></button>
+    {% endif %}
+    <div id="mountain-likes-count" class="text-center">{{ mountain.likes.count }}</div> 
+  </form>   
+  <div class="flex--d-col flex--between">
+    <button type="submit" id="go-comment-section" class="mountain__btn--style icon--size"><i class="bi bi-chat-square-dots like__hover"></i></button>
+    <div class="text-center"></div>
+  </div>
+  </div>
+
+  <p>조회수: {{ mountain.views }}</p>
+  
 {% endblock content %}
+
 
 {% block javascript %}
   <!-- 카카오맵 API 로드 -->
@@ -87,8 +254,8 @@
       });
     
       marker.setMap(map);
-    
     }
+    
     // 카카오맵 초기화 함수
     function initMap(courseId, courseDetail) {
       var container = document.getElementById('map2-' + courseId);
@@ -226,7 +393,7 @@
 </script>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  {% comment %} document.addEventListener('DOMContentLoaded', () => {
     const mountainLikesBtn = document.getElementById('mountain-likes-btn');
     if (mountainLikesBtn) {
       mountainLikesBtn.addEventListener('click', (event) => {
@@ -257,7 +424,36 @@
           });
       });
     }
-  });
+  }); {% endcomment %}
+
+  const forms = document.querySelectorAll(".like-form");
+  const mountainCsrftokenLike = document.querySelector("[name=csrfmiddlewaretoken]").value;
+
+  forms.forEach((form) => {
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const mountainId = e.target.dataset.mountainId;
+      axios({
+        method: 'post',
+        url: `/mountains/${mountainId}/likes/`,
+        headers: {"X-CSRFToken" : mountainCsrftokenLike},
+      }).then((response) => {
+        const isLiked = response.data.is_liked;
+        const likeBtn = form.querySelector(`#mountain-likes-btn`);
+        if (isLiked){
+          likeBtn.className = 'mountain__btn--style bi bi-heart-fill heart--color like__hover icon--size';
+        } else{
+          likeBtn.className = 'mountain__btn--style bi bi-heart like__hover icon--size';
+        }
+        const likeCountTag = form.querySelector('#mountain-likes-count')
+        const likeCountData = response.data.like_count
+        likeCountTag.textContent = likeCountData
+      })
+      .catch((error) => {
+        console.log(error.response)
+      })
+    })
+  })
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>

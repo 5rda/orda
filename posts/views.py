@@ -67,6 +67,7 @@ def detail(request, post_pk):
     return render(request, 'posts/detail.html', context)
 
 
+@login_required
 def create(request):
     if request.method == 'POST':
         form = PostForm(request.POST, request.FILES)
@@ -84,6 +85,7 @@ def create(request):
     return render(request, 'posts/create.html', context)
 
 
+@login_required
 def update(request, post_pk):
     post = Post.objects.get(pk=post_pk)
     if request.user != post.user:
@@ -135,6 +137,7 @@ def likes(request, post_pk):
     # return redirect('posts:detail', post.pk)
 
 
+@login_required
 def comment_create(request, post_pk):
     post = Post.objects.get(pk=post_pk)
     postcomment_form = PostCommentForm(request.POST)
@@ -156,6 +159,7 @@ def comment_create(request, post_pk):
     # return render(request, 'posts/detail.html', context)
 
 
+@login_required
 def comment_update(request, post_pk, comment_pk):
     postcomment = PostComment.objects.get(pk=comment_pk)
 
@@ -175,6 +179,7 @@ def comment_update(request, post_pk, comment_pk):
     return render(request, 'posts/comment_update.html', context)
 
 
+@login_required
 def comment_delete(request, post_pk, comment_pk):
     postcomment = PostComment.objects.get(pk=comment_pk)
     if request.user == postcomment.user:
@@ -186,6 +191,7 @@ def comment_delete(request, post_pk, comment_pk):
     # return redirect('posts:detail', post_pk)
 
 
+@login_required
 def comment_likes(request, post_pk, comment_pk):
     comment = PostComment.objects.get(pk=comment_pk)
     if comment.like_users.filter(pk=request.user.pk).exists():
@@ -203,6 +209,7 @@ def comment_likes(request, post_pk, comment_pk):
     # return redirect('posts:detail', post_pk)
 
 
+@login_required
 def comment_dislikes(request, post_pk, comment_pk):
     comment = PostComment.objects.get(pk=comment_pk)
     if comment.dislike_users.filter(pk=request.user.pk).exists():

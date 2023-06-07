@@ -1,0 +1,223 @@
+th {
+  display: flex;
+  align-items: start;
+  width: 50px;
+}
+
+.mountains__detail--warp {
+  margin: 30px 16%;
+  padding: 0px 16px;
+  min-width: 430px;
+  position: relative;
+}
+
+/* section1 */
+
+.mountains__detail--titlebox {
+  margin-bottom: 15px;
+}
+
+.mountains__detail--title {
+  font-size: 2rem;
+  font-weight: bold; 
+}
+
+.mountains__detail--subtitle {
+  color: var(--sub-color);
+}
+
+.mountains__detail--imgbox {
+  position: relative;
+  width: 55%;
+  height: 0;
+  padding-bottom: 47%;
+}
+
+.mountains__detail--img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;  
+}
+
+.mountains__detail--infobox {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.mountains__detail--info {
+  position: relative;
+  width: 39%;
+}
+
+.mountains__detail--stat {
+  font-size: 1.1rem;
+  margin-bottom: 16px;
+}
+
+.mountain__detail--mapbtn {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+
+.modal-body {
+  position: relative;
+}
+
+#mountain-map > div > div > div > img {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+/* section2 */
+
+.mountains__detail--weather {
+  width: 47%;
+}
+
+.weather--wrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 70%;
+}
+
+.weather--sky {
+  position: relative;
+  width: 50%;
+  padding: 10px;
+}
+
+.weather--skyimg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;  
+}
+
+.weather--tem {
+  display: flex;
+  width: 50%;
+  justify-content: center;
+  align-items: center;
+  font-size: 4rem;
+  font-weight: bold;
+}
+
+.weather--hvwr {
+  font-size: 1.3rem;
+  text-align: center;
+}
+
+.air--warp {
+  width: 25%;
+}
+
+.air--imgbox {
+  position: relative;
+  width:100%;
+  padding: 15px;
+}
+
+.air--img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; 
+}
+
+.air--fine_dust {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  width:100%;
+  height: 47%;
+}
+
+.air--ozone {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  width:100%;
+  height: 47%;
+}
+
+.mountains__detail--newslist {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 47%;
+  position: relative;
+}
+
+.mountains__detail--newstitle {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.mountains__detail--newsitem > p {
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* section3 */
+.mountain__detail--coursetitle {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.mountain__detail--courselist {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.mountain__detail--course {
+  flex-grow: 1;
+  
+  width: 100%;
+}
+
+
+/* side btn */
+.mountain__btn--style {
+  border: solid 1px var(--sub-color);
+  background-color: rgba(255,255,255,0.5);
+  box-shadow: rgba(63, 71, 77, 0.25) 0px 2px 10px !important;
+  border-radius : 100%;
+  width: 50px;
+  height: 50px;
+  padding: 12px;
+  margin: 10px 5px;
+}
+
+.mountain__btn--style2 {
+  margin: 5px 20px;
+}
+
+.mountain__btn__wrap{
+  position: fixed;
+  top:40%;
+  right:120px;
+}
+
+.like__hover:hover{
+  color: var(--background-color);
+}
+
+.heart--color {
+  color: var(--red-color);
+}

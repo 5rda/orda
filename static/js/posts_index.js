@@ -96,3 +96,20 @@ $(document).ready(function() {
     }
   });
 });
+
+
+// const page_elements = document.getElementsByClassName('page-link')
+// Array.from(page_elements).forEach(function(element) {
+//   element.addEventListener('click', function(event) {
+//     event.preventDefault();
+//     document.getElementById('page').value = this.dataset.page;
+//     document.getElementById('searchForm').submit();
+//   });
+// });
+
+// const btn_search = document.getElementById('btn_search');
+// btn_search.addEventListener('click', function() {
+//   document.getElementById('query').value = document.getElementById('search_query').value;
+//   document.getElementById('page').value = 1;
+//   document.getElementById('searchForm').submit();
+// })

@@ -1,13 +1,10 @@
 {% extends 'base.html' %}
-
 {% load static %}
 {% load custom_filters %}
-
 {% block style %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
 <link rel="stylesheet" href="{% static 'css/posts_index.css' %}">
 {% endblock style %}
-
 {% block content %}
 <div style="padding: 30px 60px;">
   {% comment %} 조회순 {% endcomment %}
