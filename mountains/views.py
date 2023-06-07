@@ -18,7 +18,7 @@ class MountainListView(ListView):
     template_name = 'mountains/mountain_list.html'
     context_object_name = 'mountains'
     model = Mountain
-    paginate_by = 10
+    paginate_by = 12
 
     def get_queryset(self):
         sort_option = self.request.GET.get('sort', 'likes')  # 기본값으로 가나다순을 사용
@@ -72,6 +72,7 @@ class MountainDetailView(DetailView):
 
         # 기타
         now_weather_data = self.get_weather_forecast()
+        print(now_weather_data)
         tem = now_weather_data['기온']
         hum = now_weather_data['습도']
         sky = now_weather_data['하늘상태']
@@ -304,6 +305,7 @@ class MountainDetailView(DetailView):
         # API 요청 보내기
         response = requests.get(url + queryParams, verify=False)
         items = response.json().get('response').get('body').get('items') #데이터들 아이템에 저장
+
         now_weather_data = dict()
 
         for item in items['item']:
