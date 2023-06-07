@@ -18,7 +18,7 @@ class MountainListView(ListView):
     template_name = 'mountains/mountain_list.html'
     context_object_name = 'mountains'
     model = Mountain
-    paginate_by = 10
+    paginate_by = 12
 
     def get_queryset(self):
         sort_option = self.request.GET.get('sort', 'likes')  # 기본값으로 가나다순을 사용
