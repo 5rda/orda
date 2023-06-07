@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from mountains.models import Mountain, Course
 
 
 class User(AbstractUser):
@@ -13,3 +14,19 @@ class User(AbstractUser):
     message = models.CharField(max_length=200, blank=True)
     kakao_user_id = models.CharField(max_length=50, unique=True, blank=True, null=True)
     naver_user_id = models.CharField(max_length=50, unique=True, blank=True, null=True)
+    visited_courses = models.ManyToManyField(Course, through='VisitedCourse', related_name='visitors', blank=True)
+
+
+class VisitedCourse(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    mountain_name = models.CharField(max_length=50)
+    mountain_id = models.IntegerField()
+
+    def __str__(self):
+        return self.mountain_name
+
+    def save(self, *args, **kwargs):
+        self.mountain_name = self.course.mntn_name
+        self.mountain_id = self.course.mntn_name.id
+        super().save(*args, **kwargs)

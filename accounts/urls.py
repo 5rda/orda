@@ -15,4 +15,5 @@ urlpatterns = [
     path('kakao/callback/', views.kakao_callback, name='kakao_callback'),
     path('naver/login/', views.naver_login, name='naver_login'),
     path('naver/callback/', views.naver_callback, name='naver_callback'),
+    path('my_memories/', views.my_memories, name='my_memories'),
 ]

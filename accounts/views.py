@@ -12,6 +12,8 @@ import os
 from dotenv import load_dotenv
 from django.http import JsonResponse
 from bs4 import BeautifulSoup
+from mountains.models import Mountain, Course
+from .models import VisitedCourse
 
 
 def login(request):
@@ -282,3 +284,41 @@ def get_first_image_from_content(content):
         return img_tag['src']
     else:
         return None
+    
+
+@login_required
+def my_memories(request):
+    mountains = Mountain.objects.all()
+    visited_courses = request.user.visited_courses.all()
+    visited_mountains = (
+        VisitedCourse.objects.filter(user=request.user)
+        .values_list('mountain_name', flat=True)
+        .distinct()
+    )
+
+    if request.method == 'POST':
+        course_id = request.POST.get('course_id')
+        course = Course.objects.get(id=course_id)
+
+        if course in visited_courses:
+            request.user.visited_courses.remove(course)
+        else:
+            VisitedCourse.objects.create(
+                user=request.user,
+                course=course,
+                mountain_name=course.mntn_name,
+                mountain_id=course.mntn_name.id
+            )
+        return redirect('accounts:my_memories')
+
+    context = {
+        'mountains': mountains,
+        'visited_courses': visited_courses,
+        'visited_mountains': visited_mountains,
+    }
+    return render(request, 'accounts/my_memories.html', context)
+
+
+
+
+
