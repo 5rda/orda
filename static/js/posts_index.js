@@ -58,8 +58,7 @@ if (postlikeBtns) {
           likesCountTags.forEach((likesCountTag) => {
             const likeId = likesCountTag.getAttribute('data-like');
             if (postId === likeId) {
-              const likesCountData = response.data.likes_count
-          
+              const likesCountData = response.data.like_count
               likesCountTag.textContent = '좋아요' + ' ' + likesCountData
             }
           });
