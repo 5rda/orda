@@ -67,13 +67,15 @@ th {
 }
 
 .modal-body {
-  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-#mountain-map > div > div > div > img {
-  position: absolute;
-  left: 0;
-  top: 0;
+#mountain-map {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1/1;
 }
 
 /* section2 */
@@ -188,6 +190,14 @@ th {
 .mountain__detail--course {
   flex-grow: 1;
   width: 100%;
+}
+
+
+/* section4 */
+.mountain__detail--reviewtitle {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 15px;
 }
 
 
