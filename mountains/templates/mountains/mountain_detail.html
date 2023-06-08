@@ -255,15 +255,26 @@
     {{ review.like_users.count }}
     <hr>
     <!-- 수정 버튼 -->
-    <button id="editBtn">수정</button>
+    <button class="editBtn">수정</button>
 
     <!-- 모달창 -->
-    <div id="editModal" class="modal">
+    <div class="editModal modal">
       <div class="modal-content">
         <button id="editModalClose" class="modal-close">X</button>
         <form id="editForm" action="{% url 'mountains:review_update' review.mountain.pk review.pk %}" method="POST" enctype="multipart/form-data">
           {% csrf_token %}
-          {{ form.as_p }}
+          <label for="review-content">내용</label>
+          <div id="review-content">{{ form.content }}</div>
+
+          <label for="review-image">이미지</label>
+          <div id="review-image">
+            {{ form.image }}
+            <img id="preview" class="preview-image" src="#" alt="Preview Image" style="display: none;">
+          </div>
+
+          <label for="review-tags">태그 선택</label>
+          <div id="review-tags">{{ form.tags }}</div>
+
           <button type="submit" class="btn btn-outline-primary">수정</button>
         </form>
       </div>
@@ -275,10 +286,19 @@
   <!-- 리뷰 생성 -->
   <form action="{% url 'mountains:create_review' mountain.pk %}" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ form.as_p }}
-    {{ form.non_field_errors }}
-    {{ form.tags.errors }}
-    <input type="submit" value="리뷰 작성">
+    <label for="review-content">내용</label>
+    <div id="review-content">{{ form.content }}</div>
+
+    <label for="review-image">이미지</label>
+    <div id="review-image">
+      {{ form.image }}
+      <img id="preview" class="preview-image" src="#" alt="Preview Image" style="display: none;">
+    </div>
+
+    <label for="review-tags">태그 선택</label>
+    <div id="review-tags">{{ form.tags }}</div>
+
+    <button type="submit" class="btn btn-outline-primary">수정</button>
   </form>
 </div>
 
@@ -309,7 +329,7 @@
 
 
 {% block javascript %}
-  <!-- 카카오맵 API 로드 -->
+<!-- 카카오맵 API 로드 -->
 <script>
   function loadKakaoMapScript(callback) {
       if (window.kakao) {
@@ -534,27 +554,46 @@
 
 <script>
   // 수정 버튼 클릭 시 모달창 열기
-  document.getElementById("editBtn").addEventListener("click", function() {
-      document.getElementById("editModal").style.display = "block";
-  });
+  var editButtons = document.getElementsByClassName("editBtn");
+  var editModals = document.getElementsByClassName("editModal");
+
+  for (var i = 0; i < editButtons.length; i++) {
+      var editButton = editButtons[i];
+      var editModal = editModals[i];
+
+      editButton.addEventListener("click", function () {
+          editModal.style.display = "block";
+      });
+  }
 
   // 모달창 닫기 버튼 클릭 시 모달창 닫기
-  document.getElementById("editModalClose").addEventListener("click", function() {
-      document.getElementById("editModal").style.display = "none";
-  });
+  var editModalCloses = document.getElementsByClassName("modal-close");
+
+  for (var i = 0; i < editModalCloses.length; i++) {
+      var editModalClose = editModalCloses[i];
+
+      editModalClose.addEventListener("click", function () {
+          var modal = this.parentElement.parentElement;
+          modal.style.display = "none";
+      });
+  }
 
   // 모달창 영역 외의 클릭 이벤트 처리
-  window.addEventListener('click', function(event) {
-    var modal = document.getElementById('editModal');
-    if (event.target === modal) {
-      closeModal();
+  window.addEventListener("click", function (event) {
+    var modals = document.getElementsByClassName("modal");
+
+    for (var i = 0; i < modals.length; i++) {
+        var modal = modals[i];
+
+        if (event.target === modal) {
+            closeModal(modal);
+        }
     }
   });
 
   // 모달창 닫기 함수
-  function closeModal() {
-    var modal = document.getElementById('editModal');
-    modal.style.display = 'none';
+  function closeModal(modal) {
+      modal.style.display = "none";
   }
 </script>
 
@@ -579,6 +618,31 @@
       }
     }
   }
+</script>
+
+
+<script>
+  var imageInputs = document.querySelectorAll("#review-image input[type=file]");
+
+  // 이미지 파일 변경 시 미리보기 업데이트
+  imageInputs.forEach(function (input) {
+    input.addEventListener("change", function (event) {
+      var preview = input.parentNode.querySelector(".preview-image");
+      var file = event.target.files[0];
+
+      if (file) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          preview.src = e.target.result;
+          preview.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      } else {
+        preview.src = "";
+        preview.style.display = "none";
+      }
+    });
+  });
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>

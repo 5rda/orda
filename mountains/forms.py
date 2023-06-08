@@ -2,6 +2,18 @@ from django import forms
 from .models import *
 
 class ReviewCreationForm(forms.ModelForm):
+    content = forms.CharField(
+        widget=forms.Textarea(),
+    )
+
+    image = forms.ImageField(
+        widget=forms.ClearableFileInput(
+            attrs={
+                'onchange': "previewImage(event)"
+            }
+        ),
+    )
+
     tags = forms.ModelMultipleChoiceField(
         queryset=Tag.objects.all(),
         widget=forms.CheckboxSelectMultiple,
