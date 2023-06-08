@@ -4,7 +4,7 @@
 {% block style %}
 <link rel="stylesheet" href="{% static 'css/mountains_detail.css' %}">
 <style>
-  /* 모달 스타일 */
+  {% comment %} /* 모달 스타일 */
   .modal {
     display: none;
     position: fixed;
@@ -13,9 +13,9 @@
     height: 100%;
     overflow: auto;
     background-color: rgba(0, 0, 0, 0.4);
-  }
+  } {% endcomment %}
 
-  .modal-content {
+  {% comment %} .modal-content {
     background-color: #fefefe;
     margin: auto;
     margin-top: 100px;
@@ -29,7 +29,7 @@
 
   .modal-close { 
     text-align: right;
-  }
+  } {% endcomment %}
 </style>
 {% endblock style %}
 
@@ -58,7 +58,7 @@
         </table>
         <!-- Button trigger modal -->
         <button type="button" class="mountain__detail--mapbtn" data-bs-toggle="modal" data-bs-target="#mountainMap">
-          지도 보기
+          지도보기
         </button>
       </div>
     </div>
@@ -67,9 +67,12 @@
     <div class="modal fade" id="mountainMap" tabindex="-1" aria-labelledby="mountainMapLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          <div class="modal-body" style="width: 500px; height: 400px;">
-            <div id="mountain-map" style="width: 100%; height: 100%;"></div>
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="mountainMapLabel">{{ mountain.name }}</h1>
+            <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div id="mountain-map"></div>            
           </div>
         </div>
       </div>
@@ -182,7 +185,7 @@
     <ul class="mountain__detail--courselist">
       {% for course in courses|slice:":3" %}
         <li class="mountain__detail--course">
-          <a href="#" class="flex flex-col items-center bg-white border border-gray-200 rounded-lg shadow md:flex-row hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
+          <div href="#" class="flex flex-col items-center bg-white border border-gray-200 rounded-lg shadow md:flex-row hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
             {% comment %} <img class="object-cover w-full rounded-t-lg h-96 md:h-auto md:w-48 md:rounded-none md:rounded-l-lg" src="/docs/images/blog/image-4.jpg" alt=""> {% endcomment %}
             <div class="object-cover w-full rounded-t-lg h-96 md:h-auto md:w-48 md:rounded-none md:rounded-l-lg" id="map2-{{ course.pk }}" style="width: 76%; height: 300px;"></div>
             <div class="flex flex-col justify-between p-4 leading-normal" style="width: 24%;">
@@ -199,7 +202,7 @@
                 </form>
               </ul>
             </div>
-          </a>
+          </div>
         </li>
         <br>
       {% empty %}
@@ -212,7 +215,15 @@
     {% endif %}
   </section>
 
-  <hr style="margin-bottom: 30px;">    
+  <hr style="margin-bottom: 30px;">
+
+  <section>
+    <h1 class="mountain__detail--coursetitle">리뷰 {{ reviews|length }}</h1>
+    <div>
+      
+    </div>
+  </section>
+
   {% for review in reviews %}
     <div>pk: {{ review.pk }}</div>
     <div>작성자: {{ review.user }}</div>
@@ -276,23 +287,24 @@
 <p id="longitude" style="display: none;">{{ mountain.geom.x }}</p>
 
 <div class="mountain__btn__wrap">
+  <div class="flex--d-col flex--between">
+    <button type="submit" id="go-comment-section" class="mountain__btn--style icon--size" title="조회수"><i class="bi bi-eye-fill like__hover"></i></button>
+    <div class="text-center">{{ mountain.views }}</div>
+  </div>
   <form class="like-form" data-mountain-id="{{ mountain.pk }}">
     {% csrf_token %}
     {% if request.user in mountain.likes.all %}
-    <button type="submit" class="mountain__btn--style bi bi-heart-fill heart--color like__hover icon--size" id="mountain-likes-btn"></button>
+    <button type="submit" class="mountain__btn--style bi bi-heart-fill heart--color like__hover icon--size" id="mountain-likes-btn" title="좋아요"></button>
     {% else %}
-    <button type="submit" class="mountain__btn--style bi bi-heart like__hover icon--size" id="mountain-likes-btn"></button>
+    <button type="submit" class="mountain__btn--style bi bi-heart like__hover icon--size" id="mountain-likes-btn" title="좋아요"></button>
     {% endif %}
     <div id="mountain-likes-count" class="text-center">{{ mountain.likes.count }}</div> 
   </form>   
   <div class="flex--d-col flex--between">
-    <button type="submit" id="go-comment-section" class="mountain__btn--style icon--size"><i class="bi bi-chat-square-dots like__hover"></i></button>
+    <button type="submit" id="go-comment-section" class="mountain__btn--style icon--size" title="리뷰"><i class="bi bi-pencil like__hover"></i></button>
     <div class="text-center"></div>
   </div>
-  </div>
-
-  <p>조회수: {{ mountain.views }}</p>
-  
+ </div>
 {% endblock content %}
 
 
@@ -314,96 +326,97 @@
               kakao.maps.load(function () {
                   callback();
               });
-            };
-          }
-        }
-    // 산 좌표를 찍는 카카오 MAP
-    function showMountainMarker(latitude, longitude) {
-      var container = document.getElementById('mountain-map');
-      var options = {
-        center: new kakao.maps.LatLng(latitude, longitude),
-        level: 10
-      };
-      var map = new kakao.maps.Map(container, options);
-    
-      var markerPosition = new kakao.maps.LatLng(latitude, longitude);
-    
-      var marker = new kakao.maps.Marker({
-        position: markerPosition
-      });
-    
-      marker.setMap(map);
-    }
-    
-    // 카카오맵 초기화 함수
-    function initMap(courseId, courseDetail) {
-      var container = document.getElementById('map2-' + courseId);
-      var options = {
-        center: new kakao.maps.LatLng(37.5665, 126.9780), 
-        level: 7
-      };
-      var map = new kakao.maps.Map(container, options);
-    
-      var linePath = [];
-      var waypointPositions = [];
-      var waypointNames = [];
-      // 해당 코스의 CourseDetail들에 대해 위치 표시 및 linePath에 좌표 추가
-      courseDetail.features.forEach(function(feature) {
-        var coordinates = feature.geometry.coordinates;
-        var x = coordinates[0];
-        var y = coordinates[1];
-        var excludedNames = ['국가지점', '쉼터', '자연경관', '갈림길', '이정표', '표시', '벤치', '화장실', '주의', '현위치', '조망점', '계곡', '비석'];
-        if (!feature.properties.is_waypoint) {
-          linePath.push(new kakao.maps.LatLng(y, x));
-        } else if (!excludedNames.some(name => feature.properties.waypoint_name.includes(name))) {
-          waypointPositions.push(new kakao.maps.LatLng(y, x));
-          waypointNames.push(feature.properties.waypoint_name)
-          // 마커를 표시합니다
-          
-          waypointPositions.forEach(function (position, index) {
-            
-            var marker = new kakao.maps.Marker({
-              position: position,
-              map: map,
-              title: waypointNames[index]
-            });
-          });
-        
-        }
-      });
-      // 출발 좌표에 마커 표시
-      var startMarkerPosition = linePath[0];
-      var startMarker = new kakao.maps.Marker({
-        position: startMarkerPosition,
-        map: map,
-        title: "출발지"
-      });
+          };
+      }
+  }
 
-      // 도착 좌표에 마커 표시
-      var endMarkerPosition = linePath[linePath.length - 1];
-      var endMarker = new kakao.maps.Marker({
-        position: endMarkerPosition,
-        map: map,
-        title: "도착지"
-      });
+  // 산 좌표를 찍는 카카오 MAP
+  function showMountainMarker(latitude, longitude) {
+    var container = document.getElementById('mountain-map');
+    var options = {
+      center: new kakao.maps.LatLng(latitude, longitude),
+      level: 10
+    };
+    var map = new kakao.maps.Map(container, options);
+  
+    var markerPosition = new kakao.maps.LatLng(latitude, longitude);
+  
+    var marker = new kakao.maps.Marker({
+      position: markerPosition
+    });
+  
+    marker.setMap(map);
+  }
+    
+  // 카카오맵 초기화 함수
+  function initMap(courseId, courseDetail) {
+    var container = document.getElementById('map2-' + courseId);
+    var options = {
+      center: new kakao.maps.LatLng(37.5665, 126.9780), 
+      level: 7
+    };
+    var map = new kakao.maps.Map(container, options);
+  
+    var linePath = [];
+    var waypointPositions = [];
+    var waypointNames = [];
+    // 해당 코스의 CourseDetail들에 대해 위치 표시 및 linePath에 좌표 추가
+    courseDetail.features.forEach(function(feature) {
+      var coordinates = feature.geometry.coordinates;
+      var x = coordinates[0];
+      var y = coordinates[1];
+      var excludedNames = ['국가지점', '쉼터', '자연경관', '갈림길', '이정표', '표시', '벤치', '화장실', '주의', '현위치', '조망점', '계곡', '비석'];
+      if (!feature.properties.is_waypoint) {
+        linePath.push(new kakao.maps.LatLng(y, x));
+      } else if (!excludedNames.some(name => feature.properties.waypoint_name.includes(name))) {
+        waypointPositions.push(new kakao.maps.LatLng(y, x));
+        waypointNames.push(feature.properties.waypoint_name)
+        // 마커를 표시합니다
+        
+        waypointPositions.forEach(function (position, index) {
           
-      // 중간 인덱스 계산
-      var middleIndex = Math.floor(linePath.length / 2);
-      var center = linePath[middleIndex];
-    
-      // Polyline을 이용하여 선 그리기
-      var polyline = new kakao.maps.Polyline({
-        path: linePath, // linePath에 저장된 좌표들로 설정
-        strokeWeight: 3,
-        strokeColor: '#FF0000',
-        strokeOpacity: 0.7,
-        strokeStyle: 'solid'
-      });
-      polyline.setMap(map);
-    
-      // 부드럽게 마커가 위치한 곳으로 이동합니다
-      map.panTo(center);
-    }
+          var marker = new kakao.maps.Marker({
+            position: position,
+            map: map,
+            title: waypointNames[index]
+          });
+        });
+      
+      }
+    });
+    // 출발 좌표에 마커 표시
+    var startMarkerPosition = linePath[0];
+    var startMarker = new kakao.maps.Marker({
+      position: startMarkerPosition,
+      map: map,
+      title: "출발지"
+    });
+
+    // 도착 좌표에 마커 표시
+    var endMarkerPosition = linePath[linePath.length - 1];
+    var endMarker = new kakao.maps.Marker({
+      position: endMarkerPosition,
+      map: map,
+      title: "도착지"
+    });
+        
+    // 중간 인덱스 계산
+    var middleIndex = Math.floor(linePath.length / 2);
+    var center = linePath[middleIndex];
+  
+    // Polyline을 이용하여 선 그리기
+    var polyline = new kakao.maps.Polyline({
+      path: linePath, // linePath에 저장된 좌표들로 설정
+      strokeWeight: 3,
+      strokeColor: '#FF0000',
+      strokeOpacity: 0.7,
+      strokeStyle: 'solid'
+    });
+    polyline.setMap(map);
+  
+    // 부드럽게 마커가 위치한 곳으로 이동합니다
+    map.panTo(center);
+  }
 
 
 
@@ -420,10 +433,27 @@
       var courseDetail = JSON.parse(courseDetails[courseId]);
       initMap(courseId, courseDetail);
     {% endfor %}
-
-
   });
 
+  var map;
+
+  function initializeMap() {
+    var container = document.getElementById('mountain-map');
+    var options = {
+      center: new kakao.maps.LatLng(37.5665, 126.9780),
+      level: 7
+    };
+    map = new kakao.maps.Map(container, options);
+  }
+
+  // 모달이 열릴 때 초기화 함수 호출
+  $('#mountainMap').on('shown.bs.modal', function (e) {
+    initializeMap();
+
+    var latitude = parseFloat(document.getElementById('latitude').textContent);
+    var longitude = parseFloat(document.getElementById('longitude').textContent);
+    showMountainMarker(latitude, longitude);
+  });
 </script>
 
 <script>
@@ -472,39 +502,6 @@
 </script>
 
 <script>
-  {% comment %} document.addEventListener('DOMContentLoaded', () => {
-    const mountainLikesBtn = document.getElementById('mountain-likes-btn');
-    if (mountainLikesBtn) {
-      mountainLikesBtn.addEventListener('click', (event) => {
-        event.preventDefault();
-        const mountainPk2 = mountainLikesBtn.getAttribute('data-mountain-pk-2');
-        const csrfToken = document.getElementsByName('csrfmiddlewaretoken')[0].value;
-        axios.post(`/mountains/${mountainPk2}/likes/`, null, {
-          headers: {
-            'X-CSRFToken': csrfToken,
-          },
-        })
-          .then((response) => {
-            const isLiked = response.data.is_liked;
-            // 서버로부터의 응답을 처리
-            if (isLiked === true) {
-              // 팔로우 성공 시 동작
-              mountainLikesBtn.innerHTML = '<p>좋아요 제거</p>';
-              alert('좋아요가 추가되었습니다.');
-            } else {
-              // 언팔로우 성공 시 동작
-              mountainLikesBtn.innerHTML = '<p>좋아요 추가</p>';
-              alert('좋아요가 제거되었습니다.');
-            }
-          })
-          .catch((error) => {
-            // 에러 처리
-            console.error(error);
-          });
-      });
-    }
-  }); {% endcomment %}
-
   const forms = document.querySelectorAll(".like-form");
   const mountainCsrftokenLike = document.querySelector("[name=csrfmiddlewaretoken]").value;
 
@@ -582,7 +579,7 @@
       }
     }
   }
-  </script>
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 {% endblock javascript %}
