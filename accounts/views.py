@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, reverse
 from .forms import CustomUserCreationForm, CustomUserChangeForm, CustomUserAuthenticationForm, CustomUserPasswordChangeForm
 from django.contrib.auth import get_user_model, update_session_auth_hash
 from django.contrib.auth import login as auth_login
@@ -12,30 +12,30 @@ import os
 from dotenv import load_dotenv
 from django.http import JsonResponse
 from bs4 import BeautifulSoup
-from mountains.models import Mountain, Course, CourseDetail
+from mountains.models import Mountain, Course
 from .models import VisitedCourse
 from django.contrib.gis.serializers.geojson import Serializer
 from django.utils.safestring import mark_safe
 from django.urls import reverse
 from accounts.models import Notification
 from .models import Notification
+from accounts.models import Notification
+from .models import User, Notification
+from django.urls import reverse
+from django.http import JsonResponse
+from django.utils.safestring import mark_safe
 
 
 def login(request):
     if request.user.is_authenticated:
-        return render(request, 'pjt/index.html')
+        return redirect('accounts:profile', request.user.pk)
     if request.method == 'POST':
         form = CustomUserAuthenticationForm(request, request.POST)
         if form.is_valid():
             auth_login(request, form.get_user())
-            prev_url = request.session.get('prev_url')
-            if prev_url:
-                del request.session['prev_url']
-                return redirect(prev_url)
-            return render(request, 'pjt/index.html')
+            return redirect('accounts:profile', request.user.pk )
     else:
         form = CustomUserAuthenticationForm()
-    request.session['prev_url'] = request.META.get('HTTP_REFERER')
     context = {
         'form': form,
     }
@@ -45,18 +45,18 @@ def login(request):
 @login_required
 def logout(request):
     auth_logout(request)
-    return render(request, 'pjt/index.html')
+    return redirect('mountains:index')
 
 
 def signup(request):
     if request.user.is_authenticated:
-        return render(request, 'pjt/index.html')
+        return redirect('mountains:index')
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save()
             auth_login(request, user)
-            return render(request, 'pjt/index.html')
+            return redirect('mountains:index')
     else:
         form = CustomUserCreationForm()
     context = {
@@ -70,21 +70,13 @@ def profile(request, user_pk):
     person = User.objects.get(pk=user_pk)
     post = Post.objects.filter(user=person)
     posts = person.post_set.all().order_by('-created_at')
-    reviews = person.review_set.all().count()
-    posts_comments = person.postcomment_set.all().count()
-    visited_courses = person.visitedcourse_set.all().count()
-
     liked_posts = Post.objects.filter(like_users=person)
-    liked_mountains = Mountain.objects.filter(likes=person)
-    bookmark_course = Course.objects.filter(bookmarks=person)
-
-    serializer = Serializer()
-    course_details = {}
-    for course in bookmark_course:
-        geojson_data = serializer.serialize(CourseDetail.objects.filter(crs_name_detail=course), fields=('geom', 'is_waypoint', 'waypoint_name', 'crs_name_detail'))
-        course_details[course.pk] =geojson_data
-    
-    score = posts.count() * 40 + reviews * 30 + visited_courses * 20 + posts_comments * 5
+    # posts_comments = person.postcomment_set.all().count()
+    # mountains_comments = person.comment_set.all().count()
+    score = posts.count() * 40
+    #  + mountains_comments * 30 + posts_comments * 5
+    user = request.user
+    notifications = user.notifications.all()
 
     if score < 200:
         level = 1
@@ -125,14 +117,12 @@ def profile(request, user_pk):
         'rest': rest,
         'max_score': max_score,
         'liked_posts': liked_posts,
-        'liked_mountains': liked_mountains,
-        'bookmark_course': bookmark_course,
-        'course_details': course_details,
 
         # 추가
         'score': score,
         'expbar': expbar,
         'restexp': restexp,
+        'notifications': notifications,
     }
     return render(request, 'accounts/profile.html', context)
 
@@ -155,7 +145,7 @@ def update(request):
 def delete(request):
     request.user.delete()
     auth_logout(request)
-    return render(request, 'pjt/index.html')
+    return redirect('mountains:index')
 
 
 @login_required
@@ -165,7 +155,7 @@ def password_change(request):
         if form.is_valid():
             user = form.save()
             update_session_auth_hash(request, user)
-            return redirect('accounts:profile', request.user.pk)
+            return redirect('mountains:index')
     else:
         form = CustomUserPasswordChangeForm(request.user)
     context = {
@@ -177,7 +167,7 @@ def password_change(request):
 @login_required
 def follow(request, user_pk):
     User = get_user_model()
-    person  = User.objects.get(pk=user_pk)
+    person = User.objects.get(pk=user_pk)
     me = request.user
 
     if person != me:
@@ -194,13 +184,13 @@ def follow(request, user_pk):
             notification = Notification.objects.create(user=person, notification_type='팔로우', message=message)
             
         context = {
-            'is_followed':is_followed,
-            'followings_count':person.followings.count(),
-            'followers_count':person.followers.count(),
-            'followers': [{'username': f.username,'pk': f.pk} for f in person.followers.all()]
+            'is_followed': is_followed,
+            'followings_count': person.followings.count(),
+            'followers_count': person.followers.count(),
+            'followers': [{'username': f.username, 'pk': f.pk} for f in person.followers.all()]
         }
         return JsonResponse(context)
-    return redirect('accounts:profile', person.pk)
+    return redirect('accounts:profile', person.username)
 
 
 load_dotenv()
@@ -237,13 +227,14 @@ def kakao_callback(request):
             user_info = response.json()
 
             kakao_user_id = user_info['id']
+            nickname = user_info['properties']['nickname']
             email = user_info['kakao_account']['email']
             profile_img = user_info['properties']['profile_image']
 
             user, created = User.objects.get_or_create(kakao_user_id=kakao_user_id)
 
             if created:
-                user.username = kakao_user_id
+                user.nickname = nickname
                 user.email = email
                 if 'http://' in profile_img:
                     profile_img = profile_img.replace('http://', '')
@@ -253,11 +244,8 @@ def kakao_callback(request):
                 image_url = f"http://{profile_img}"
                 response = urlopen(image_url)
                 user.profile_img.save(f"{kakao_user_id}.png", File(response))
-                auth_login(request, user)
-                return redirect('accounts:update')
-            else:
-                auth_login(request, user)
-                return render(request, 'pjt/index.html')
+            auth_login(request, user)
+            return redirect('mountains:index')
     return redirect('accounts:login')
 
 
@@ -288,29 +276,22 @@ def naver_callback(request):
             }
             response = requests.get('https://openapi.naver.com/v1/nid/me', headers=headers)
             user_info = response.json()
+            print(user_info)
 
             naver_user_id = user_info['response']['id']
-            if 'email' in user_info['response']:
-                email = user_info['response']['email']
-            else:
-                email = None
-            if 'profile_image' in user_info['response']:
-                profile_img = user_info['response']['profile_image']
-            else:
-                profile_img = None
+            nickname = user_info['response']['nickname']
+            email = user_info['response']['email']
+            profile_img = user_info['response']['profile_image']
 
             user, created = User.objects.get_or_create(naver_user_id=naver_user_id)
 
             if created:
-                user.username = naver_user_id
+                user.nickname = nickname
                 user.email = email
                 response = urlopen(profile_img)
                 user.profile_img.save(f"{naver_user_id}.png", File(response))
-                auth_login(request, user)
-                return redirect('accounts:update')
-            else:
-                auth_login(request, user)
-                return render(request, 'pjt/index.html')
+            auth_login(request, user)
+            return redirect('accounts:profile', user.pk)
     return redirect('accounts:login')
 
 
@@ -374,9 +355,4 @@ def notification_delete(request, notification_id):
     notification = Notification.objects.get(id=notification_id)
     notification.delete()
     return redirect('accounts:notification')
-
-
-
-
-
 
