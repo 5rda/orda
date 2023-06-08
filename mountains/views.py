@@ -340,7 +340,6 @@ class MountainDetailView(DetailView):
         # API 요청 보내기
         response = requests.get(url + queryParams, verify=False)
         items = response.json().get('response').get('body').get('items') #데이터들 아이템에 저장
-
         now_weather_data = dict()
 
         for item in items['item']:
@@ -420,7 +419,6 @@ class MountainDetailView(DetailView):
         return air
 
 
-
 class CourseListView(ListView):
     template_name = 'mountains/course_list.html'
     context_object_name = 'courses'
@@ -430,17 +428,17 @@ class CourseListView(ListView):
     def get_queryset(self):
         mountain_pk = self.kwargs['mountain_pk']
         mountain = Mountain.objects.get(pk=mountain_pk)
-        sort_option = self.request.GET.get('sort', '')  # 정렬 옵션 가져오기
+        sort = self.request.GET.get('sort', '')  # 정렬 옵션 가져오기
 
         queryset = Course.objects.filter(mntn_name=mountain)
 
-        if sort_option == 'bookmarks':
+        if sort== 'bookmarks':
             queryset = queryset.annotate(num_bookmarks=Count('bookmarks')).order_by('-num_bookmarks')
-        elif sort_option == 'distance':
+        elif sort == 'distance':
             queryset = queryset.order_by('distance')
-        elif sort_option == 'hidden_time':
+        elif sort == 'hidden_time':
             queryset = queryset.order_by('hidden_time')
-        elif sort_option == 'diff':
+        elif sort == 'diff':
             # 난이도 정렬을 추가
             queryset = queryset.annotate(
                 diff_order=Case(
@@ -458,17 +456,17 @@ class CourseListView(ListView):
         mountain_pk = self.kwargs['mountain_pk']
         courses = self.get_queryset()
         mountain = Mountain.objects.get(pk=mountain_pk)
-        sort_option = self.request.GET.get('sort', '')  # 정렬 옵션 가져오기
-
         serializer = Serializer()
-        course_details = {}
+        data = {}
         for course in courses:
-            geojson_data = serializer.serialize(CourseDetail.objects.filter(crs_name_detail=course), fields=('geom', 'is_waypoint', 'waypoint_name', 'crs_name_detail'))
-            course_details[course.pk] =geojson_data
+            geojson_data = serializer.serialize([course], geometry_field='geom')
+            data[course.pk] = geojson_data
+
+
         context = {
             'mountain': mountain,
             'courses': courses,
-            'course_details': course_details
+            'courses_data': data
         }        
         return context        
 
@@ -514,10 +512,10 @@ def mountain_likes(request, mountain_pk):
 
 
 def bookmark(request, mountain_pk, course_pk):
-    mountain = get_object_or_404(Mountain, pk=mountain_pk)
-    course = get_object_or_404(Course, pk=course_pk)
+    course = Course.objects.get(pk=course_pk)
     user = request.user
-    if course in user.bookmarks.all():
+    is_bookmarked = user.bookmarks.filter(pk=course_pk).exists()
+    if is_bookmarked:
         user.bookmarks.remove(course)
         is_bookmarked = False
     else:

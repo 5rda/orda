@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 from django.contrib.auth.models import AbstractUser
 from mountains.models import Mountain, Course
 from django.urls import reverse
@@ -35,6 +36,7 @@ class VisitedCourse(models.Model):
         self.mountain_name = self.course.mntn_name
         self.mountain_id = self.course.mntn_name.id
         super().save(*args, **kwargs)
+
         
 class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
@@ -49,6 +51,7 @@ class Notification(models.Model):
             return reverse('posts:detail', kwargs={'post_pk': self.post.pk})
         else:
             return reverse('accounts:profile', kwargs={'pk': self.user.pk})
-    
+
+          
     def __str__(self):
         return self.message
