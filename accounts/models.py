@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 from django.contrib.auth.models import AbstractUser
 from mountains.models import Mountain, Course
 
@@ -31,3 +32,21 @@ class VisitedCourse(models.Model):
         self.mountain_name = self.course.mntn_name
         self.mountain_id = self.course.mntn_name.id
         super().save(*args, **kwargs)
+
+
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    notification_type = models.CharField(max_length=50)
+    post = models.ForeignKey('posts.Post', on_delete=models.CASCADE, blank=True, null=True)
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def get_notification_url(self):
+        if self.notification_type == '댓글' and self.post:
+            return reverse('posts:detail', kwargs={'post_pk': self.post.pk})
+        else:
+            return reverse('accounts:profile', kwargs={'pk': self.user.pk})
+
+    def str(self):
+        return self.message        
