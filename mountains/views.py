@@ -330,7 +330,7 @@ class MountainDetailView(DetailView):
         queryParams = '?' + urlencode({ 
               quote_plus('serviceKey') : serviceKeyDecoded,
               quote_plus('base_date') : base_date, 
-              quote_plus('base_time') : 2030,
+              quote_plus('base_time') : base_time,
               quote_plus('nx') : nx,
               quote_plus('ny') : ny,
               quote_plus('dataType') : 'json',
@@ -340,7 +340,6 @@ class MountainDetailView(DetailView):
         # API 요청 보내기
         response = requests.get(url + queryParams, verify=False)
         items = response.json().get('response').get('body').get('items') #데이터들 아이템에 저장
-        print(response)
         now_weather_data = dict()
 
         for item in items['item']:
