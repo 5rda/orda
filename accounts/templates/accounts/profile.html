@@ -40,10 +40,9 @@
             </div>
             {% if request.user == person %}
               <div class="profile__user--edit">
-                <form action="{% url 'accounts:update' %}" method="POST">
-                  {% csrf_token %}
+                <a href="{% url 'accounts:update' %}">
                   <button class="profile__user--editbtn" type="submit">설정</button>
-                </form>
+                </a>
               </div>
             {% else %}
               <div class="profile__user--followbtnbox">
