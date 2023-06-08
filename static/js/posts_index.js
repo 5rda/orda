@@ -3,21 +3,21 @@ var loadMoreBtn = document.getElementById('loadMoreBtn');
 var page = 1;
 var perPage = 12; 
 
-function showMorePosts() {
-  var hiddenPosts = postGrid.querySelectorAll('.post-item.hidden');
-  var i = 0;
+if (loadMoreBtn) {
+  loadMoreBtn.addEventListener('click', function() {
+    var hiddenPosts = postGrid.querySelectorAll('.post-item.hidden');
+    var i = 0;
 
-  while (i < perPage && hiddenPosts[i]) {
-    hiddenPosts[i].classList.remove('hidden');
-    i++;
-  }
+    while (i < perPage && hiddenPosts[i]) {
+      hiddenPosts[i].classList.remove('hidden');
+      i++;
+    }
 
-  if (hiddenPosts.length <= perPage) {
-    loadMoreBtn.style.display = 'none';
-  }
+    if (hiddenPosts.length <= perPage) {
+      loadMoreBtn.style.display = 'none';
+    }
+  });  
 }
-
-loadMoreBtn.addEventListener('click', showMorePosts);
 
 var allPosts = postGrid.querySelectorAll('.post-item');
 allPosts.forEach(function(post, index) {
@@ -27,7 +27,9 @@ allPosts.forEach(function(post, index) {
 });
 
 if (allPosts.length <= perPage) {
-  loadMoreBtn.style.display = 'none';
+  if (loadMoreBtn) {
+    loadMoreBtn.style.display = 'none';
+  }
 }
 
 // 좋아요 비동기

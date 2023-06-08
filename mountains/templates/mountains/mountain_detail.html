@@ -4,7 +4,7 @@
 {% block style %}
 <link rel="stylesheet" href="{% static 'css/mountains_detail.css' %}">
 <style>
-  /* 모달 스타일 */
+  {% comment %} /* 모달 스타일 */
   .modal {
     display: none;
     position: fixed;
@@ -13,9 +13,9 @@
     height: 100%;
     overflow: auto;
     background-color: rgba(0, 0, 0, 0.4);
-  }
+  } {% endcomment %}
 
-  .modal-content {
+  {% comment %} .modal-content {
     background-color: #fefefe;
     margin: auto;
     margin-top: 100px;
@@ -29,7 +29,7 @@
 
   .modal-close { 
     text-align: right;
-  }
+  } {% endcomment %}
 </style>
 {% endblock style %}
 
@@ -58,7 +58,7 @@
         </table>
         <!-- Button trigger modal -->
         <button type="button" class="mountain__detail--mapbtn" data-bs-toggle="modal" data-bs-target="#mountainMap">
-          지도 보기
+          지도보기
         </button>
       </div>
     </div>
@@ -67,9 +67,12 @@
     <div class="modal fade" id="mountainMap" tabindex="-1" aria-labelledby="mountainMapLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          <div class="modal-body" style="width: 500px; height: 400px;">
-            <div id="mountain-map" style="width: 100%; height: 100%;"></div>
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="mountainMapLabel">{{ mountain.name }}</h1>
+            <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div id="mountain-map"></div>            
           </div>
         </div>
       </div>
@@ -182,7 +185,7 @@
     <ul class="mountain__detail--courselist">
       {% for course in courses|slice:":3" %}
         <li class="mountain__detail--course">
-          <a href="#" class="flex flex-col items-center bg-white border border-gray-200 rounded-lg shadow md:flex-row hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
+          <div href="#" class="flex flex-col items-center bg-white border border-gray-200 rounded-lg shadow md:flex-row hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
             {% comment %} <img class="object-cover w-full rounded-t-lg h-96 md:h-auto md:w-48 md:rounded-none md:rounded-l-lg" src="/docs/images/blog/image-4.jpg" alt=""> {% endcomment %}
             <div class="object-cover w-full rounded-t-lg h-96 md:h-auto md:w-48 md:rounded-none md:rounded-l-lg" id="map2-{{ course.pk }}" style="width: 76%; height: 300px;"></div>
             <div class="flex flex-col justify-between p-4 leading-normal" style="width: 24%;">
@@ -199,7 +202,7 @@
                 </form>
               </ul>
             </div>
-          </a>
+          </div>
         </li>
         <br>
       {% empty %}
@@ -212,7 +215,15 @@
     {% endif %}
   </section>
 
-  <hr style="margin-bottom: 30px;">    
+  <hr style="margin-bottom: 30px;">
+
+  <section>
+    <h1 class="mountain__detail--coursetitle">리뷰 {{ reviews|length }}</h1>
+    <div>
+      
+    </div>
+  </section>
+
   {% for review in reviews %}
     <div>pk: {{ review.pk }}</div>
     <div>작성자: {{ review.user }}</div>
@@ -244,15 +255,26 @@
     {{ review.like_users.count }}
     <hr>
     <!-- 수정 버튼 -->
-    <button id="editBtn">수정</button>
+    <button class="editBtn">수정</button>
 
     <!-- 모달창 -->
-    <div id="editModal" class="modal">
+    <div class="editModal modal">
       <div class="modal-content">
         <button id="editModalClose" class="modal-close">X</button>
         <form id="editForm" action="{% url 'mountains:review_update' review.mountain.pk review.pk %}" method="POST" enctype="multipart/form-data">
           {% csrf_token %}
-          {{ form.as_p }}
+          <label for="review-content">내용</label>
+          <div id="review-content">{{ form.content }}</div>
+
+          <label for="review-image">이미지</label>
+          <div id="review-image">
+            {{ form.image }}
+            <img id="preview" class="preview-image" src="#" alt="Preview Image" style="display: none;">
+          </div>
+
+          <label for="review-tags">태그 선택</label>
+          <div id="review-tags">{{ form.tags }}</div>
+
           <button type="submit" class="btn btn-outline-primary">수정</button>
         </form>
       </div>
@@ -264,10 +286,19 @@
   <!-- 리뷰 생성 -->
   <form action="{% url 'mountains:create_review' mountain.pk %}" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ form.as_p }}
-    {{ form.non_field_errors }}
-    {{ form.tags.errors }}
-    <input type="submit" value="리뷰 작성">
+    <label for="review-content">내용</label>
+    <div id="review-content">{{ form.content }}</div>
+
+    <label for="review-image">이미지</label>
+    <div id="review-image">
+      {{ form.image }}
+      <img id="preview" class="preview-image" src="#" alt="Preview Image" style="display: none;">
+    </div>
+
+    <label for="review-tags">태그 선택</label>
+    <div id="review-tags">{{ form.tags }}</div>
+
+    <button type="submit" class="btn btn-outline-primary">수정</button>
   </form>
 </div>
 
@@ -276,28 +307,29 @@
 <p id="longitude" style="display: none;">{{ mountain.geom.x }}</p>
 
 <div class="mountain__btn__wrap">
+  <div class="flex--d-col flex--between">
+    <button type="submit" id="go-comment-section" class="mountain__btn--style icon--size" title="조회수"><i class="bi bi-eye-fill like__hover"></i></button>
+    <div class="text-center">{{ mountain.views }}</div>
+  </div>
   <form class="like-form" data-mountain-id="{{ mountain.pk }}">
     {% csrf_token %}
     {% if request.user in mountain.likes.all %}
-    <button type="submit" class="mountain__btn--style bi bi-heart-fill heart--color like__hover icon--size" id="mountain-likes-btn"></button>
+    <button type="submit" class="mountain__btn--style bi bi-heart-fill heart--color like__hover icon--size" id="mountain-likes-btn" title="좋아요"></button>
     {% else %}
-    <button type="submit" class="mountain__btn--style bi bi-heart like__hover icon--size" id="mountain-likes-btn"></button>
+    <button type="submit" class="mountain__btn--style bi bi-heart like__hover icon--size" id="mountain-likes-btn" title="좋아요"></button>
     {% endif %}
     <div id="mountain-likes-count" class="text-center">{{ mountain.likes.count }}</div> 
   </form>   
   <div class="flex--d-col flex--between">
-    <button type="submit" id="go-comment-section" class="mountain__btn--style icon--size"><i class="bi bi-chat-square-dots like__hover"></i></button>
+    <button type="submit" id="go-comment-section" class="mountain__btn--style icon--size" title="리뷰"><i class="bi bi-pencil like__hover"></i></button>
     <div class="text-center"></div>
   </div>
-  </div>
-
-  <p>조회수: {{ mountain.views }}</p>
-  
+ </div>
 {% endblock content %}
 
 
 {% block javascript %}
-  <!-- 카카오맵 API 로드 -->
+<!-- 카카오맵 API 로드 -->
 <script>
   function loadKakaoMapScript(callback) {
     if (window.kakao) {
@@ -315,6 +347,7 @@
       document.head.appendChild(script);
     }
   }
+
   // 산 좌표를 찍는 카카오 MAP
   function showMountainMarker(latitude, longitude) {
     var container = document.getElementById('mountain-map');
@@ -385,7 +418,6 @@ function initMap(courseId, course) {
 };
 
 
-
   // 카카오맵 API 로드 후 초기화 함수 호출
   loadKakaoMapScript(function () {
     // 산의 위치에 마커 표시
@@ -401,6 +433,26 @@ function initMap(courseId, course) {
     {% endfor %}
   });
 
+  var map;
+
+  function initializeMap() {
+    var container = document.getElementById('mountain-map');
+    var options = {
+      center: new kakao.maps.LatLng(37.5665, 126.9780),
+      level: 7
+    };
+    map = new kakao.maps.Map(container, options);
+  }
+
+  // 모달이 열릴 때 초기화 함수 호출
+  $('#mountainMap').on('shown.bs.modal', function (e) {
+    initializeMap();
+
+
+    var latitude = parseFloat(document.getElementById('latitude').textContent);
+    var longitude = parseFloat(document.getElementById('longitude').textContent);
+    showMountainMarker(latitude, longitude);
+  });
 </script>
 
 <script>
@@ -449,39 +501,6 @@ function initMap(courseId, course) {
 </script>
 
 <script>
-  {% comment %} document.addEventListener('DOMContentLoaded', () => {
-    const mountainLikesBtn = document.getElementById('mountain-likes-btn');
-    if (mountainLikesBtn) {
-      mountainLikesBtn.addEventListener('click', (event) => {
-        event.preventDefault();
-        const mountainPk2 = mountainLikesBtn.getAttribute('data-mountain-pk-2');
-        const csrfToken = document.getElementsByName('csrfmiddlewaretoken')[0].value;
-        axios.post(`/mountains/${mountainPk2}/likes/`, null, {
-          headers: {
-            'X-CSRFToken': csrfToken,
-          },
-        })
-          .then((response) => {
-            const isLiked = response.data.is_liked;
-            // 서버로부터의 응답을 처리
-            if (isLiked === true) {
-              // 팔로우 성공 시 동작
-              mountainLikesBtn.innerHTML = '<p>좋아요 제거</p>';
-              alert('좋아요가 추가되었습니다.');
-            } else {
-              // 언팔로우 성공 시 동작
-              mountainLikesBtn.innerHTML = '<p>좋아요 추가</p>';
-              alert('좋아요가 제거되었습니다.');
-            }
-          })
-          .catch((error) => {
-            // 에러 처리
-            console.error(error);
-          });
-      });
-    }
-  }); {% endcomment %}
-
   const forms = document.querySelectorAll(".like-form");
   const mountainCsrftokenLike = document.querySelector("[name=csrfmiddlewaretoken]").value;
 
@@ -514,27 +533,46 @@ function initMap(courseId, course) {
 
 <script>
   // 수정 버튼 클릭 시 모달창 열기
-  document.getElementById("editBtn").addEventListener("click", function() {
-      document.getElementById("editModal").style.display = "block";
-  });
+  var editButtons = document.getElementsByClassName("editBtn");
+  var editModals = document.getElementsByClassName("editModal");
+
+  for (var i = 0; i < editButtons.length; i++) {
+      var editButton = editButtons[i];
+      var editModal = editModals[i];
+
+      editButton.addEventListener("click", function () {
+          editModal.style.display = "block";
+      });
+  }
 
   // 모달창 닫기 버튼 클릭 시 모달창 닫기
-  document.getElementById("editModalClose").addEventListener("click", function() {
-      document.getElementById("editModal").style.display = "none";
-  });
+  var editModalCloses = document.getElementsByClassName("modal-close");
+
+  for (var i = 0; i < editModalCloses.length; i++) {
+      var editModalClose = editModalCloses[i];
+
+      editModalClose.addEventListener("click", function () {
+          var modal = this.parentElement.parentElement;
+          modal.style.display = "none";
+      });
+  }
 
   // 모달창 영역 외의 클릭 이벤트 처리
-  window.addEventListener('click', function(event) {
-    var modal = document.getElementById('editModal');
-    if (event.target === modal) {
-      closeModal();
+  window.addEventListener("click", function (event) {
+    var modals = document.getElementsByClassName("modal");
+
+    for (var i = 0; i < modals.length; i++) {
+        var modal = modals[i];
+
+        if (event.target === modal) {
+            closeModal(modal);
+        }
     }
   });
 
   // 모달창 닫기 함수
-  function closeModal() {
-    var modal = document.getElementById('editModal');
-    modal.style.display = 'none';
+  function closeModal(modal) {
+      modal.style.display = "none";
   }
 </script>
 
@@ -559,7 +597,32 @@ function initMap(courseId, course) {
       }
     }
   }
-  </script>
+</script>
+
+
+<script>
+  var imageInputs = document.querySelectorAll("#review-image input[type=file]");
+
+  // 이미지 파일 변경 시 미리보기 업데이트
+  imageInputs.forEach(function (input) {
+    input.addEventListener("change", function (event) {
+      var preview = input.parentNode.querySelector(".preview-image");
+      var file = event.target.files[0];
+
+      if (file) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          preview.src = e.target.result;
+          preview.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      } else {
+        preview.src = "";
+        preview.style.display = "none";
+      }
+    });
+  });
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 {% endblock javascript %}
