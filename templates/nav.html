@@ -50,7 +50,7 @@
               </div>
               <div class="header__user--item">
                 <form action="{% url 'accounts:notification' %}" method="GET">
-                  <button id="알림" type="submit">알림{% if request.notification_count %} ({{ request.notification_count }}){% endif %}</button>
+                  <button id="알림" type="submit">알림{% if request.notification_count %}({{ request.notification_count }}){% endif %}</button>
                 </form>
               </div>
             {% else %}

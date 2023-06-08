@@ -38,3 +38,4 @@ class PostComment(models.Model):
             post_url = reverse('posts:detail', kwargs={'post_pk': self.post.pk})  
             message = f'{self.user.username}님이 <a href="{post_url}">{self.post.title}</a> 게시물에 댓글을 남겼습니다.'
             notification = Notification.objects.create(user=recipient, notification_type='댓글', message=message)
+            

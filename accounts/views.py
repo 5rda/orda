@@ -373,3 +373,4 @@ def notification_delete(request, notification_id):
     notification = Notification.objects.get(id=notification_id)
     notification.delete()
     return redirect('accounts:notification')
+
