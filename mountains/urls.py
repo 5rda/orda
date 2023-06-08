@@ -13,5 +13,6 @@ urlpatterns = [
     path('<int:pk>/review_likes/<int:review_pk>/', review_likes, name='review_likes'),
     path('<int:pk>/review_delete/<int:review_pk>/', review_delete, name='review_delete'),
     path('<int:pk>/review_update/<int:review_pk>/', review_update, name='review_update'),
+    path('search/', SearchView.as_view(), name='search')
 ]
 

@@ -1,75 +1,17 @@
 {% extends 'base.html' %}
-{% load static %}
-{% block style %}
-<style> 
-</style>
-<link rel="stylesheet" href="{% static 'css/mountains_courselist.css' %}">
-{% endblock style %}
-
 {% block content %}
-<form action="{% url 'mountains:course_all_list' %}" method="GET">
-  <select name="sido1" id="sido1"></select>
-  <select name="gugun1" id="gugun1"></select>
-  <input type="submit" value="지역선택">
+<h1>탐색</h1>
+<br>
+<hr>
+<form method="GET" action="{% url 'mountains:mountain_list' %}">
+  {{ form.as_p }}
+  <hr>
+  <br>
+  <select name="sido2" id="sido2"></select>
+  <select name="gugun2" id="gugun2"></select>
+  <button type="submit">탐색</button>
 </form>
-
-<div class="course__wrap">
-  <div class="align__list">
-    <form id="sort-form">
-      <label for="sort-select" class="sr-only">정렬</label>
-      <select name="sort" id="sort-select" class="select__box focus:outline-none focus:border-gray-200 peer">
-        <option value="" {% if request.GET.sort == "" %}selected{% endif %}>전체</option>
-        <option value="bookmarks" {% if request.GET.sort == "bookmarks" %}selected{% endif %}>북마크순</option>
-      </select>
-      {% comment %} <input type="submit" class="align__btn rounded" value="정렬"> {% endcomment %}
-    </form>
-  </div>
-
-  
-  <ul class=" grid grid-cols-1 xl:grid-cols-2 gap-4">
-    {% for course in courses %}
-    <li class="">
-      <a
-      {% if request.user.is_authenticated %}
-        href="{% url 'mountains:mountain_detail' course.mntn_name.pk %}" 
-      {% else %}
-        onclick="return confirm('로그인 하시겠습니까?')" href="{% url 'accounts:login' %}"
-      {% endif %}
-      class="flex flex-col bg-white border border-gray-200 rounded-lg shadow md:flex-row li__box">
-        <img class="object-cover w-full rounded-t-lg h-96 md:h-auto md:w-48 md:rounded-none md:rounded-l-lg me-3" src="{% get_static_prefix %}img/mountains/{{ course.mntn_name }}.png" alt="{{ course.mntn_name }}">
-        <div class="flex--col mt-3">
-          <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{ course.crs_name }}</h5>
-          <h5 class="mb-2 text-xl font-bold tracking-tight text--colormain">{{ course.mntn_name }}</h5>
-          <div class="flex--row">
-            <div class="me-4">
-              <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">거리</p>
-              <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">시간</p>
-              <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">난이도</p>
-              <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">지역</p>
-            </div>
-            <div class="">
-              <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">{{ course.distance }}km</p>
-              <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">{{ course.duration }}</p>
-              <p class="mb-3 font-normal text-gray-700 dark:text-gray-400" id="bookmark-count">{{ course.diff }}</p>
-              <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">{{ course.mntn_name.region }}</p>
-            </div>
-          </div>
-        </div>
-        <form class="bookmark-form" data-course-id="{{course.pk}}" data-mountain-id="{{ course.mntn_name.pk }}">
-          {% csrf_token %}
-          {% if request.user in course.bookmarks.all %}
-            <button id="bookmark-btn-{{ course.pk }}" type="submit" class="bi bi-bookmark-fill bookmark--style"></button>
-          {% else %}
-            <button id="bookmark-btn-{{ course.pk }}" type="submit" class="bi bi-bookmark bookmark--style"></button>
-          {% endif %}
-        </form>
-      </a>
-    </li>
-    {% endfor %}
-  </ul>
-</div>
 {% endblock content %}
-
 
 {% block javascript %}
 <script>
@@ -109,6 +51,9 @@
     // 시/도 선택시 구/군 설정
    
     $("select[name^=sido]").change(function() {
+    // var selectedSido = $(this).val();
+    //  $("#hidden_sido2").val(selectedSido);
+
      var area = "area"+$("option",$(this)).index($("option:selected",$(this))); // 선택지역의 구군 Array
      var $gugun = $(this).next(); // 선택영역 군구 객체
      $("option",$gugun).remove(); // 구군 초기화
@@ -121,17 +66,12 @@
       });
      }
    });
-  });
+
+//   $("select[name^=gugun]").change(function() {
+//    var selectedGugun = $(this).val();
+//    $("#hidden_gugun2").val(selectedGugun);
+//  });
+});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script src="{% static 'js/list_order.js' %}"></script>
-<script src="{% static 'js/mountains_courselist.js' %}"></script>
-<script></script>
-
 {% endblock javascript %}
-
-
-
-
-
