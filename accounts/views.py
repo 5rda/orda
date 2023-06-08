@@ -15,6 +15,10 @@ from bs4 import BeautifulSoup
 from mountains.models import Mountain, Course, CourseDetail
 from .models import VisitedCourse
 from django.contrib.gis.serializers.geojson import Serializer
+from django.utils.safestring import mark_safe
+from django.urls import reverse
+from accounts.models import Notification
+from .models import Notification
 
 
 def login(request):
@@ -183,6 +187,12 @@ def follow(request, user_pk):
         else:
             person.followers.add(me)
             is_followed = True
+            
+            follow_url = reverse('accounts:profile', kwargs={'user_pk': me.pk})
+            follow_link = mark_safe(f'<a href="{follow_url}">{me.username}</a>')
+            message = f'{follow_link}님이 당신을 팔로우합니다.'
+            notification = Notification.objects.create(user=person, notification_type='팔로우', message=message)
+            
         context = {
             'is_followed':is_followed,
             'followings_count':person.followings.count(),
@@ -345,6 +355,26 @@ def my_memories(request):
         'visited_mountains': visited_mountains,
     }
     return render(request, 'accounts/my_memories.html', context)
+
+
+def notification(request):
+    user = request.user
+    notifications = user.notifications.all()
+    return render(request, 'accounts/notification.html', {'notifications': notifications})
+
+
+def notification_check(request, notification_id):
+    notification = Notification.objects.get(id=notification_id)
+    notification.is_read = True
+    notification.save()
+    return redirect('accounts:notification')
+
+
+def notification_delete(request, notification_id):
+    notification = Notification.objects.get(id=notification_id)
+    notification.delete()
+    return redirect('accounts:notification')
+
 
 
 
