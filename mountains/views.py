@@ -106,6 +106,7 @@ class MountainDetailView(DetailView):
 
         # 기타
         now_weather_data = self.get_weather_forecast()
+        print(now_weather_data)
         tem = now_weather_data['기온']
         hum = now_weather_data['습도']
         sky = now_weather_data['하늘상태']
@@ -338,6 +339,7 @@ class MountainDetailView(DetailView):
         # API 요청 보내기
         response = requests.get(url + queryParams, verify=False)
         items = response.json().get('response').get('body').get('items') #데이터들 아이템에 저장
+
         now_weather_data = dict()
 
         for item in items['item']:

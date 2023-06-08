@@ -1,0 +1,82 @@
+.mountains__warp {
+  margin: 30px 8%;
+  padding: 0px 16px;
+  min-width: 430px;
+  position: relative;
+}
+
+.img--size {
+  height: 280px;
+  width: 382px;
+}
+
+.like__btn {
+  top:10px; 
+  right: 10px; 
+}
+
+.like__btn--style{
+  z-index: 1;
+  font-weight:bold;
+  font-size: 24px;
+  color: var(--red-color)
+}
+
+.display {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  width: 100%;
+}
+
+.flex--row {
+  display: flex;
+}
+
+.flex--col {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex__align--end {
+  justify-content: end;
+}
+
+.flex__align--between {
+  justify-content: space-between;
+}
+
+.position--relative {
+  position: relative;
+}
+
+.position--absolute {
+  position: absolute;  
+}
+
+.page__btn {
+  font-weight: bold; 
+  padding: 3px;
+  font-size: 20px;
+}
+
+.page__btn:hover {
+  color: var(--background-color);
+}
+
+.position--relative:hover .display{
+  opacity: 0.7;
+  background-color: black;
+  color:white;
+  padding-left: 10px;
+}
+
+.pagination__link--active{
+  color: var(--green-btn);
+}
+
+@media (max-width:1080px) {
+  .mountains__warp  {
+    margin: 30px 0px;
+    padding: 0px;
+  }
+}

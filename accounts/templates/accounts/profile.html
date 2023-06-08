@@ -82,7 +82,7 @@
             </svg>
             <p>북마크</p>
             <div class="d-flex flex-row profile__user--info2cnt">
-              <span>0</span>
+              <span>{{ bookmark_course|length }}</span>
             </div>
           </button>
           <button class="profile__user--like">
@@ -91,7 +91,7 @@
             </svg>
             <p>좋아요</p>
             <div class="d-flex flex-row profile__user--info2cnt">
-              <span>0</span>
+              <span>{{ liked_mountains|length }}</span>
               <span style="margin: 0 3px; font-size: 12px; line-height: 20px;">|</span>
               <span>{{ liked_posts|length }}</span>
             </div>
@@ -154,23 +154,50 @@
           <div class="profile__content2--bookmark">
             <div class="profile__content2--bookmarktext">
               <p>북마크</p>
-              <span style="margin-left: 5px; color: var(--main-color);">0</span>
+              <span style="margin-left: 5px; color: var(--main-color);">{{ bookmark_course|length }}</span>
             </div>
             <div class="profile__content2--bookmarkcontent">
-              <p class="profile__content--nonewrite">북마크한 글이 없습니다.</p>
+              <div class="profile__content--postbox">
+                {% if bookmark_course %}
+                  {% for course in bookmark_course %}
+                    <a class="profile__content--post" title="{{ course.crs_name }}" href="">
+                      <div class="profile__content--imgbox">                        
+                        <div id="map3-{{ course.pk }}" style="width: 100%;"></div>
+                      </div>
+                      <p class="profile__content--posttext">{{ course.crs_name_detail }}</p>
+                    </a>
+                  {% endfor %}
+                {% else %}
+                <p class="profile__content--nonewrite">북마크한 글이 없습니다.</p>
+                {% endif %}
+              </div>
             </div>
           </div>
         </div>
+            
 
         {% comment %} 좋아요 목록 {% endcomment %}
         <div class="profile__content3" style="display: none;">
           <div class="profile__content3--mountain">
             <div class="profile__content3--mountaintext">
               <p>산</p>
-              <span style="margin-left: 5px; color: var(--main-color);">0</span>
+              <span style="margin-left: 5px; color: var(--main-color);">{{ liked_mountains|length }}</span>
             </div>
             <div class="profile__content3--mountaincontent">
-              <p class="profile__content--nonewrite">좋아요한 글이 없습니다.</p>
+              <div class="profile__content--postbox">
+                {% if liked_mountains %}
+                  {% for mountain in liked_mountains %}
+                    <a class="profile__content--post" title="{{ mountain.name }}" href="{% url 'mountains:mountain_detail' mountain.pk %}">
+                      <div class="profile__content--imgbox">                        
+                        <img class="profile__content--img" src="{% get_static_prefix %}img/mountains/{{ mountain.name }}.png" alt="썸네일">
+                      </div>
+                      <p class="profile__content--posttext">{{ mountain.name }}</p>
+                    </a>
+                  {% endfor %}
+                {% else %}
+                  <p class="profile__content--nonewrite">좋아요한 글이 없습니다.</p>
+                {% endif %}
+              </div>
             </div>
           </div>
           <div class="profile__content3--mycourse">
@@ -315,4 +342,153 @@
 {% block javascript %}
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script type="text/javascript" src="{% static 'js/profile.js' %}"></script>
+
+<!-- 카카오맵 API 로드 -->
+<script>
+  function loadKakaoMapScript(callback) {
+      if (window.kakao) {
+          // 이미 카카오맵 API가 로드되어 있는 경우
+          callback();
+      } else {
+          console.log('로드하는중')
+          // 카카오맵 API 로드
+          var script = document.createElement("script");
+          script.type = "text/javascript";
+          script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=d39fcd60ffdc96ae99454337f5e45a16&libraries=services&autoload=false";
+          document.head.appendChild(script);
+          
+          script.onload = function () {
+              kakao.maps.load(function () {
+                  callback();
+              });
+          };
+      }
+  }
+  // 카카오맵 초기화 함수
+  function initMap(courseId, courseDetail) {
+    var container = document.getElementById('map3-' + courseId);
+    console.log(container)
+    var options = {
+      center: new kakao.maps.LatLng(37.5665, 126.9780), 
+      level: 6
+    };
+    var map = new kakao.maps.Map(container, options);
+  
+    var linePath = [];
+    var waypointPositions = [];
+    var waypointNames = [];
+
+    // 해당 코스의 CourseDetail들에 대해 위치 표시 및 linePath에 좌표 추가
+    courseDetail.features.forEach(function(feature) {
+      var coordinates = feature.geometry.coordinates;
+      var x = coordinates[0];
+      var y = coordinates[1];
+      var excludedNames = ['국가지점', '쉼터', '자연경관', '갈림길', '이정표', '표시', '벤치', '화장실', '주의', '현위치', '조망점', '계곡', '비석'];
+      if (!feature.properties.is_waypoint) {
+        linePath.push(new kakao.maps.LatLng(y, x));
+      } else if (!excludedNames.some(name => feature.properties.waypoint_name.includes(name))) {
+        waypointPositions.push(new kakao.maps.LatLng(y, x));
+        waypointNames.push(feature.properties.waypoint_name)
+        // 마커를 표시합니다
+        
+        waypointPositions.forEach(function (position, index) {
+          
+          var marker = new kakao.maps.Marker({
+            position: position,
+            map: map,
+            title: waypointNames[index]
+          });
+        });
+      
+      }
+    });
+    // 출발 좌표에 마커 표시
+    var startMarkerPosition = linePath[0];
+    var startMarker = new kakao.maps.Marker({
+      position: startMarkerPosition,
+      map: map,
+      title: "출발지"
+    });
+
+    // 도착 좌표에 마커 표시
+    var endMarkerPosition = linePath[linePath.length - 1];
+    var endMarker = new kakao.maps.Marker({
+      position: endMarkerPosition,
+      map: map,
+      title: "도착지"
+    });
+        
+    // 중간 인덱스 계산
+    var middleIndex = Math.floor(linePath.length / 2);
+    var center = linePath[middleIndex];
+  
+    // Polyline을 이용하여 선 그리기
+    var polyline = new kakao.maps.Polyline({
+      path: linePath, // linePath에 저장된 좌표들로 설정
+      strokeWeight: 3,
+      strokeColor: '#FF0000',
+      strokeOpacity: 0.7,
+      strokeStyle: 'solid'
+    });
+    polyline.setMap(map);
+  
+    // 부드럽게 마커가 위치한 곳으로 이동합니다
+    map.panTo(center);
+  }
+
+  // 카카오맵 API 로드 후 초기화 함수 호출
+  loadKakaoMapScript(function () {
+    {% for course in bookmark_course %}
+      var courseId = {{ course.pk }};
+      var courseDetails = {{ course_details|safe }};
+      var courseDetail = JSON.parse(courseDetails[courseId]);
+      initMap(courseId, courseDetail);
+    {% endfor %}
+  });
+</script>
+
+<script>
+  function bookmark(courseId) {
+    const bookmarkBtn = document.getElementById('bookmark-btn-' + courseId);
+    const courseCsrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+
+    if (bookmarkBtn) {
+      bookmarkBtn.addEventListener('click', () => {
+        event.preventDefault(); // 폼의 기본 동작 중지
+        const mountainPk = bookmarkBtn.getAttribute('data-mountain-pk');
+        const coursePk = bookmarkBtn.getAttribute('data-course-pk');
+        fetch(`/mountains/${mountainPk}/course/${coursePk}/bookmark/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': courseCsrftoken
+          },
+          body: JSON.stringify({})
+        })
+          .then(response => response.json())
+          .then(data => {
+            const isBookmarked = data.is_bookmarked;
+            // 서버로부터의 응답을 처리
+            if (isBookmarked) {
+              // 북마크 추가 시 동작
+              bookmarkBtn.innerText = '북마크 제거';
+              alert('북마크가 추가되었습니다.');
+            } else {
+              // 북마크 제거 시 동작
+              bookmarkBtn.innerText = '북마크 추가';
+              alert('북마크가 제거되었습니다.');
+            }
+          })
+          .catch(error => {
+            // 에러 처리
+            console.error(error);
+          });
+      });
+    }
+  }
+
+  {% for course in bookmark_course %}
+    bookmark({{ course.pk }});
+  {% endfor %}
+</script>
 {% endblock javascript %}
