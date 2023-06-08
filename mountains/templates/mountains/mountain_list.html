@@ -1,25 +1,132 @@
 {% extends 'base.html' %}
+{% load static %}
+{% block style %}
+  <link rel="stylesheet" href="{% static 'css/mountains_course.css' %}">
+  <link rel="stylesheet" href="{% static 'css/mountains_list.css' %}">
+  <style>
+  </style>
+{% endblock style %}
 {% block content %}
 
-<form>
-  <label for="sort-select">정렬:</label>
-  <select name="sort" id="sort-select">
-      <option value="likes" {% if request.GET.sort == "likes" %}selected{% endif %}>좋아요순</option>
-      <option value="reviews" {% if request.GET.sort == "reviews" %}selected{% endif %}>리뷰 개수순</option>
-      <option value="id" {% if request.GET.sort == "id" %}selected{% endif %}>가나다순</option>
-      <option value="views" {% if request.GET.sort == "views" %}selected{% endif %}>조회순</option>
-      <option value="height" {% if request.GET.sort == "height" %}selected{% endif %}>고도순</option>
-  </select>
-  <input type="submit" value="정렬 적용">
-</form>
+<div class="mountains__warp">
+  <form id="sort-form" class="select__form">
+    <select name="sort" id="sort-select" class="select__box focus:outline-none mb-3">
+        <option value="id">가나다순</option>
+        <option value="likes">좋아요순</option>
+        <option value="reviews">리뷰 개수순</option>
+        <option value="views">조회순</option>
+        <option value="height">고도순</option>
+    </select>
+  </form>
 
-  {% for mountain in mountains %}
-    <ul>
-      <li>{{ mountain.pk }}</li>
-      <li><a href="{% url 'mountains:mountain_detail' mountain.pk %}">{{ mountain.name }}</a></li>
-      <li>{{ mountain.region }}</li>
-      <li>{{ mountain.height }}</li>
-    </ul>
+  <div id="results" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 mb-4">
+    {% for mountain in mountains %}
+    <div class="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+      <a href="{% url 'mountains:mountain_detail' mountain.pk %}"  class="position--relative ">
+        <div>
+          <img class="rounded-t-lg img--size"src="{% get_static_prefix %}img/mountains/{{ mountain.name }}.png" alt="{{ mountain.name }}">
+        </div>
+        {% comment %} 좋아요 {% endcomment %}
+        <div class="position--absolute like__btn">
+          <form class="like-form" data-mountain-id="{{ mountain.pk }}">
+            {% if request.user in mountain.likes.all %}
+              <button type="submit" class="bi bi-heart-fill like__btn--style" id="like-btn"></button>
+            {% else %}
+              <button type="submit" class="bi bi-heart like__btn--style" id="like-btn"></button>
+            {% endif %}
+          </form>
+        </div>
+      {% comment %} 태그 {% endcomment %}
+        <div class="display position--absolute" style="bottom: 39%;">
+          {% for tag in mountain.top_tags  %}
+            <span>#{{ tag }}</span>
+          {% endfor %}
+        </div>
+        <div class="p-4 flex--col flex__align--between" style="height: 180px;">
+          <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{ mountain.name }}</h5>      
+          {% comment %} <p class="mb-1 font-normal text-sm text-gray-700 dark:text-gray-400">{{mountain.review_set.tags.all}}</p> {% endcomment %}
+          <p class="mb-1 font-normal text-sm text-gray-700 dark:text-gray-400">{{ mountain.region }}</p>
+          <p class="mb-1 font-normal text-sm text-gray-700 dark:text-gray-400">{{ mountain.height }}m</p>
+          <div class="flex--row flex__align--end">
+            <div class="flex--row pe-3">
+              <i class="bi bi-heart-fill pe-1" style="color:var(--red-color)"></i>
+              <p id="like-count">{{mountain.likes.all.count}}</p>
+            </div>
+            <div class="flex--row pe-3">
+              <i class="bi bi-chat-dots-fill pe-1" style="color:var(--green-btn)"></i>
+              <p>{{mountain.reviews_count}}</p>
+            </div>
+            <div class="flex--row">
+              <i class="bi bi-signpost-2-fill pe-1" style="color: #5e3b34"></i>
+              <p>{{mountain.course_set.count}}</p>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+  <hr>
 
-  {% endfor %}
+<!-- 페이지네이션 -->
+  <div class="pagination mt-4">
+    <div class="mx-auto">
+      {% if is_paginated %}
+        {% if page_obj.has_previous %}
+          <a href="?page=1 {% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" class="page__btn ">&lt;&lt;</a>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+          {% if num == page_obj.number %}
+            <span class="page__btn pagination__link--active">{{ num }}</span>
+          {% else %}
+            <a href="?page={{ num }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" class="page__btn ">{{ num }}</a>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" class="page__btn ">&gt;&gt;</a>
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+
+</div>
 {% endblock content %}
+
+{% block javascript %}
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{% static 'js/mountains_likes.js' %}"></script>
+<script src="{% static 'js/list_order.js' %}"></script>
+<script>
+  {% comment %} $(document).ready(function() {
+    // 정렬 선택 폼의 변경 이벤트 리스너
+    $('#sort-select').change(function() {
+      // 선택한 정렬 기준
+      var sortValue = $(this).val();
+  
+      // 현재 URL에 선택한 정렬 기준 추가
+      var currentURL = window.location.href;
+      var newURL = currentURL + (currentURL.includes('?') ? '&' : '?') + 'sort=' + sortValue;
+  
+      // AJAX 요청으로 서버에 정렬 기준 전송
+      $.ajax({
+        url: newURL,
+        type: 'GET',
+        success: function(response) {
+          // 서버로부터 받은 JSON 데이터를 사용하여 결과를 업데이트
+          var html = response.html;  // 결과 데이터
+
+          // 결과를 페이지에 업데이트
+          $('#results').html(html);
+        },
+        error: function(xhr, status, error) {
+          // 에러 처리
+          console.log(error);
+        }
+      });
+    });
+  }); {% endcomment %}
+  </script>
+{% endblock javascript %}

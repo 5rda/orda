@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView, ListView, FormView
 from django.contrib.gis.serializers.geojson import Serializer
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
@@ -7,9 +7,11 @@ from .models import *
 import json, os, urllib.request, time, requests, datetime, math
 from datetime import date, datetime, timedelta
 from urllib.parse import urlencode, quote_plus, unquote
-from django.db.models import F, Count, When, Case
+from django.db.models import F, Count, When, Case, Q
 from django.conf import settings
-from .forms import ReviewCreationForm
+from django.http import HttpResponse
+from .forms import ReviewCreationForm, SearchForm
+from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 # Create your views here.
 
@@ -18,26 +20,60 @@ class MountainListView(ListView):
     template_name = 'mountains/mountain_list.html'
     context_object_name = 'mountains'
     model = Mountain
-    paginate_by = 10
+    paginate_by = 12
 
     def get_queryset(self):
-        sort_option = self.request.GET.get('sort', 'likes')  # 기본값으로 가나다순을 사용
+        queryset = super().get_queryset()
+        tags = self.request.GET.getlist('tags')
+        sido = self.request.GET.get('sido2')
+        gugun = self.request.GET.get('gugun2')
+        filter_condition = Q()
 
-        if sort_option == 'likes':
-            queryset = Mountain.objects.order_by('-likes')  # 좋아요순으로 정렬
-        elif sort_option == 'reviews':
-            queryset = Mountain.objects.order_by('-reviews_count')  # 리뷰 개수순으로 정렬
-        elif sort_option == 'id':
-            queryset = Mountain.objects.order_by('id')  # 가나다순으로 정렬
-        elif sort_option == 'views':
-            queryset = Mountain.objects.order_by('-views')  # 조회순으로 정렬
-        elif sort_option == 'height':
-            queryset = Mountain.objects.order_by('height') # 고도순으로 정렬
-        else:
-            queryset = Mountain.objects.all()  # 기본적으로 모든 데이터 조회
+        if sido and gugun:
+            if ('광역시' or '특별시') in sido:
+                filter_condition.add(Q(region__contains=sido), filter_condition.AND)
+            else:
+                filter_condition.add(Q(region__contains=sido) & Q(region__contains=gugun), filter_condition.AND)
 
+        if tags:
+            filter_condition.add(Q(review__tags__pk__in=tags), filter_condition.AND)
+            
+            queryset = queryset.filter(filter_condition).distinct()
+            
+            # 1
+            # queryset = queryset.annotate(
+            #     top_tags_count=Count('review__tags')
+            # ).filter(
+            #     review__tags__pk__in=tags
+            # ).order_by('-top_tags_count')
+
+            # top_3_tags = queryset.values_list('review__tags__name', flat=True)[:3]
+
+            # queryset = queryset.filter(review__tags__name__in=top_3_tags)
+
+        queryset = queryset.filter(filter_condition)
         return queryset
+    
+    def get(self, request, *args, **kwargs):
+        sort = request.GET.get('sort', None)
+        queryset = self.get_queryset()       
 
+        if sort== 'likes':
+            queryset = queryset.annotate(likes_count=Count('likes')).order_by('-likes')  # 좋아요순으로 정렬
+        elif sort == 'reviews':
+            queryset = queryset.annotate(reviews_count2=Count('review')).order_by('-reviews_count2') 
+        elif sort == 'id':
+            queryset = queryset.order_by('id')  # 가나다순으로 정렬
+        elif sort== 'views':
+            queryset = queryset.order_by('-views')  # 조회순으로 정렬
+        elif sort == 'height':
+            queryset = queryset.order_by('height') # 고도순으로 정렬
+
+        context = self.get_context_data(object_list=queryset)
+        html = render(request, self.template_name, context).content
+
+        return HttpResponse(html)
+        # return render(request, self.template_name, context)
 
 class MountainDetailView(DetailView):
     template_name = 'mountains/mountain_detail.html'
@@ -67,8 +103,6 @@ class MountainDetailView(DetailView):
 
         # 리뷰 관련
         reviews = Review.objects.filter(mountain=mountain)
-
-
 
         # 기타
         now_weather_data = self.get_weather_forecast()
@@ -440,10 +474,21 @@ class CourseAllListView(ListView):
     template_name = 'mountains/course_all_list.html'
     context_object_name = 'courses'
     model = Course
+    paginate_by = 10
 
     def get_queryset(self):
         queryset = super().get_queryset()
         sort_option = self.request.GET.get('sort', '')  # 기본값으로 전체
+        selected_sido = self.request.GET.get('sido1', '')  # 선택한 시/도 값 가져오기
+        selected_gugun = self.request.GET.get('gugun1', '')
+
+        if selected_sido and selected_gugun:
+            if ('광역시' or '특별시') in selected_sido:
+                queryset = Mountain.objects.filter(Q(region__contains=selected_sido))
+                queryset = queryset.filter(mntn_name__in=mountain)
+            else:
+                mountain = Mountain.objects.filter(Q(region__contains=selected_sido) & Q(region__contains=selected_gugun))
+                queryset = queryset.filter(mntn_name__in=mountain)
 
         if sort_option == 'bookmarks':
             queryset = queryset.annotate(bookmarks_count=Count('bookmarks'))
@@ -540,3 +585,9 @@ def review_update(request, pk, review_pk):
         'review': review,
     }
     return render(request, 'mountains/mountain_detail.html', context)
+
+
+class SearchView(FormView):
+    template_name = 'mountains/search.html'
+    form_class = SearchForm
+    success_url = 'mountains/mountain_list.html'
