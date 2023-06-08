@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block style %}
+  <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{% endblock style %}
+{% block content %}
+<div>
+  <ul>
+    {% for notification in notifications %}
+      <li>
+        {{ notification.message|safe }}
+        {% if not notification.is_read %}
+        <form action="{% url 'accounts:notification_check' notification_id=notification.id %}" method="POST" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit">읽지 않음</button>
+          </form>
+        {% else %}
+          <span>읽음</span>
+        {% endif %}
+        <form action="{% url 'accounts:notification_delete' notification_id=notification.id %}" method="POST" style="display: inline;">
+          {% csrf_token %}
+          <button type="submit">삭제</button>
+        </form>
+      </li>
+    {% empty %}
+      <li>알림이 없습니다.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock content %}
+{% block javascript %}
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script type="text/javascript" src="{% static 'js/profile.js' %}"></script>
+{% endblock javascript %}
