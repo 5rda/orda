@@ -18,8 +18,8 @@
     <form id="sort-form">
       <label for="sort-select" class="sr-only">정렬</label>
       <select name="sort" id="sort-select" class="select__box focus:outline-none focus:border-gray-200 peer">
-        <option value="" {% if request.GET.sort == "" %}selected{% endif %}>전체</option>
-        <option value="bookmarks" {% if request.GET.sort == "bookmarks" %}selected{% endif %}>북마크순</option>
+        <option value="">전체</option>
+        <option value="bookmarks">북마크순</option>
       </select>
       {% comment %} <input type="submit" class="align__btn rounded" value="정렬"> {% endcomment %}
     </form>

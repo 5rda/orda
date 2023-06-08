@@ -59,7 +59,7 @@ class MountainListView(ListView):
         queryset = self.get_queryset()       
 
         if sort== 'likes':
-            queryset = queryset.annotate(likes_count=Count('likes')).order_by('-likes')  # 좋아요순으로 정렬
+            queryset = queryset.annotate(likes_count=Count('likes')).order_by('-likes_count')  # 좋아요순으로 정렬
         elif sort == 'reviews':
             queryset = queryset.annotate(reviews_count2=Count('review')).order_by('-reviews_count2') 
         elif sort == 'id':
@@ -96,10 +96,10 @@ class MountainDetailView(DetailView):
         mountain = self.get_object()
         serializer = Serializer()
         courses = mountain.course_set.all()
-        course_details = {}
+        data = {}
         for course in courses:
-            geojson_data = serializer.serialize(CourseDetail.objects.filter(crs_name_detail=course), fields=('geom', 'is_waypoint', 'waypoint_name', 'crs_name_detail'))
-            course_details[course.pk] =geojson_data
+            geojson_data = serializer.serialize([course], geometry_field='geom')
+            data[course.pk] = geojson_data
 
         # 리뷰 관련
         reviews = Review.objects.filter(mountain=mountain)
@@ -119,6 +119,7 @@ class MountainDetailView(DetailView):
         moon = ['2000', '2100', '2200', '2300', '0000', '0100', '0200', '0300', '0400', '0500', '0600']
         
         air_data = self.get_air()
+
         def parse_data(data_str):
             parsed_data = {}
             entries = data_str.split(',')
@@ -179,7 +180,7 @@ class MountainDetailView(DetailView):
             # 산 관련
             'mountain': mountain,
             'courses': courses,
-            'course_details': course_details,
+            'courses_data': data,
 
             # 리뷰 관련
             'form': ReviewCreationForm(),
@@ -201,8 +202,8 @@ class MountainDetailView(DetailView):
             'fine_dust': fine_dust,
             'ozone': ozone,
         }
-        # json_data = json.dumps(course_details, indent=4, sort_keys=True, ensure_ascii=False)
-        # file_path = os.path.join(settings.STATICFILES_DIRS[0], 'course_details2.json')
+        # json_data = json.dumps(data, indent=4, sort_keys=True, ensure_ascii=False)
+        # file_path = os.path.join(settings.STATICFILES_DIRS[0], 'course.json')
         # with open(file_path, 'w', encoding='utf-8') as file:
         #     file.write(json_data)
         return context
@@ -480,19 +481,19 @@ class CourseAllListView(ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        sort_option = self.request.GET.get('sort', '')  # 기본값으로 전체
+        sort = self.request.GET.get('sort', '')  # 기본값으로 전체
         selected_sido = self.request.GET.get('sido1', '')  # 선택한 시/도 값 가져오기
         selected_gugun = self.request.GET.get('gugun1', '')
 
         if selected_sido and selected_gugun:
             if ('광역시' or '특별시') in selected_sido:
-                queryset = Mountain.objects.filter(Q(region__contains=selected_sido))
+                mountain = Mountain.objects.filter(Q(region__contains=selected_sido))
                 queryset = queryset.filter(mntn_name__in=mountain)
             else:
                 mountain = Mountain.objects.filter(Q(region__contains=selected_sido) & Q(region__contains=selected_gugun))
                 queryset = queryset.filter(mntn_name__in=mountain)
 
-        if sort_option == 'bookmarks':
+        if sort == 'bookmarks':
             queryset = queryset.annotate(bookmarks_count=Count('bookmarks'))
             queryset = queryset.order_by('-bookmarks_count')
 

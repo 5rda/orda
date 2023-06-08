@@ -48,6 +48,7 @@ class Course(models.Model):
     duration = models.CharField(max_length = 255, db_column='total_interval')
     hidden_time = models.FloatField(db_column='total_time')
     diff = models.CharField(max_length=30)
+    geom = models.GeometryField()
     bookmarks = models.ManyToManyField(settings.AUTH_USER_MODEL,  related_name='bookmarks',  db_table='mountains_course_bookmarks')
 
     class Meta:
