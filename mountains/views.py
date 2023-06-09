@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView, ListView, FormView
 from django.contrib.gis.serializers.geojson import Serializer
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
@@ -7,10 +7,13 @@ from .models import *
 import json, os, urllib.request, time, requests, datetime, math
 from datetime import date, datetime, timedelta
 from urllib.parse import urlencode, quote_plus, unquote
-from django.db.models import F, Count, When, Case
+from django.db.models import F, Count, When, Case, Q
 from django.conf import settings
-from .forms import ReviewCreationForm
+from django.http import HttpResponse
+from .forms import ReviewCreationForm, SearchForm
+from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 # Create your views here.
 
 
@@ -21,23 +24,57 @@ class MountainListView(ListView):
     paginate_by = 12
 
     def get_queryset(self):
-        sort_option = self.request.GET.get('sort', 'likes')  # 기본값으로 가나다순을 사용
+        queryset = super().get_queryset()
+        tags = self.request.GET.getlist('tags')
+        sido = self.request.GET.get('sido2')
+        gugun = self.request.GET.get('gugun2')
+        filter_condition = Q()
 
-        if sort_option == 'likes':
-            queryset = Mountain.objects.order_by('-likes')  # 좋아요순으로 정렬
-        elif sort_option == 'reviews':
-            queryset = Mountain.objects.order_by('-reviews_count')  # 리뷰 개수순으로 정렬
-        elif sort_option == 'id':
-            queryset = Mountain.objects.order_by('id')  # 가나다순으로 정렬
-        elif sort_option == 'views':
-            queryset = Mountain.objects.order_by('-views')  # 조회순으로 정렬
-        elif sort_option == 'height':
-            queryset = Mountain.objects.order_by('height') # 고도순으로 정렬
-        else:
-            queryset = Mountain.objects.all()  # 기본적으로 모든 데이터 조회
+        if sido and gugun:
+            if ('광역시' or '특별시') in sido:
+                filter_condition.add(Q(region__contains=sido), filter_condition.AND)
+            else:
+                filter_condition.add(Q(region__contains=sido) & Q(region__contains=gugun), filter_condition.AND)
 
+        if tags:
+            filter_condition.add(Q(review__tags__pk__in=tags), filter_condition.AND)
+            
+            queryset = queryset.filter(filter_condition).distinct()
+            
+            # 1
+            # queryset = queryset.annotate(
+            #     top_tags_count=Count('review__tags')
+            # ).filter(
+            #     review__tags__pk__in=tags
+            # ).order_by('-top_tags_count')
+
+            # top_3_tags = queryset.values_list('review__tags__name', flat=True)[:3]
+
+            # queryset = queryset.filter(review__tags__name__in=top_3_tags)
+
+        queryset = queryset.filter(filter_condition)
         return queryset
+    
+    def get(self, request, *args, **kwargs):
+        sort = request.GET.get('sort', None)
+        queryset = self.get_queryset()       
 
+        if sort== 'likes':
+            queryset = queryset.annotate(likes_count=Count('likes')).order_by('-likes_count')  # 좋아요순으로 정렬
+        elif sort == 'reviews':
+            queryset = queryset.annotate(reviews_count2=Count('review')).order_by('-reviews_count2') 
+        elif sort == 'id':
+            queryset = queryset.order_by('id')  # 가나다순으로 정렬
+        elif sort== 'views':
+            queryset = queryset.order_by('-views')  # 조회순으로 정렬
+        elif sort == 'height':
+            queryset = queryset.order_by('height') # 고도순으로 정렬
+
+        context = self.get_context_data(object_list=queryset)
+        html = render(request, self.template_name, context).content
+
+        return HttpResponse(html)
+        # return render(request, self.template_name, context)
 
 class MountainDetailView(DetailView):
     template_name = 'mountains/mountain_detail.html'
@@ -60,15 +97,13 @@ class MountainDetailView(DetailView):
         mountain = self.get_object()
         serializer = Serializer()
         courses = mountain.course_set.all()
-        course_details = {}
+        data = {}
         for course in courses:
-            geojson_data = serializer.serialize(CourseDetail.objects.filter(crs_name_detail=course), fields=('geom', 'is_waypoint', 'waypoint_name', 'crs_name_detail'))
-            course_details[course.pk] =geojson_data
+            geojson_data = serializer.serialize([course], geometry_field='geom')
+            data[course.pk] = geojson_data
 
         # 리뷰 관련
-        reviews = Review.objects.filter(mountain=mountain)
-
-
+        reviews = Review.objects.filter(mountain=mountain).order_by('-created_at')
 
         # 기타
         now_weather_data = self.get_weather_forecast()
@@ -85,6 +120,7 @@ class MountainDetailView(DetailView):
         moon = ['2000', '2100', '2200', '2300', '0000', '0100', '0200', '0300', '0400', '0500', '0600']
         
         air_data = self.get_air()
+
         def parse_data(data_str):
             parsed_data = {}
             entries = data_str.split(',')
@@ -145,7 +181,7 @@ class MountainDetailView(DetailView):
             # 산 관련
             'mountain': mountain,
             'courses': courses,
-            'course_details': course_details,
+            'courses_data': data,
 
             # 리뷰 관련
             'form': ReviewCreationForm(),
@@ -167,8 +203,8 @@ class MountainDetailView(DetailView):
             'fine_dust': fine_dust,
             'ozone': ozone,
         }
-        # json_data = json.dumps(course_details, indent=4, sort_keys=True, ensure_ascii=False)
-        # file_path = os.path.join(settings.STATICFILES_DIRS[0], 'course_details2.json')
+        # json_data = json.dumps(data, indent=4, sort_keys=True, ensure_ascii=False)
+        # file_path = os.path.join(settings.STATICFILES_DIRS[0], 'course.json')
         # with open(file_path, 'w', encoding='utf-8') as file:
         #     file.write(json_data)
         return context
@@ -199,8 +235,6 @@ class MountainDetailView(DetailView):
                     item['title'] = item['title'].replace('</b>', "")
                 result.extend(items)
                 # result_set.update(json.loads(response_body)["items"])
-
-            time.sleep(0.5)  # API 요청 간격을 조절하기 위해 0.5초 대기
         
         result = [dict(t) for t in {tuple(d.items()) for d in result}]
 
@@ -294,7 +328,7 @@ class MountainDetailView(DetailView):
 
         queryParams = '?' + urlencode({ 
               quote_plus('serviceKey') : serviceKeyDecoded,
-              quote_plus('base_date') : base_date, 
+              quote_plus('base_date') : base_date,
               quote_plus('base_time') : base_time,
               quote_plus('nx') : nx,
               quote_plus('ny') : ny,
@@ -305,9 +339,8 @@ class MountainDetailView(DetailView):
         # API 요청 보내기
         response = requests.get(url + queryParams, verify=False)
         items = response.json().get('response').get('body').get('items') #데이터들 아이템에 저장
-
         now_weather_data = dict()
-
+    
         for item in items['item']:
             # 기온
             if item['category'] == 'T1H' and item['fcstDate'] == today and item['fcstTime'] == now_time:
@@ -347,12 +380,13 @@ class MountainDetailView(DetailView):
             # 현재시각
             if item['fcstDate'] == today and item['fcstTime'] == now_time:
                 now_weather_data['현재시각'] = now_time
-
         return now_weather_data
 
     def get_air(self):
         mountain = self.get_object()
         today = datetime.today().strftime("%Y-%m-%d")
+        y = date.today() - timedelta(days=1)
+        yesterday = y.strftime("%Y-%m-%d")
         # API 요청을 위한 URL과 파라미터 설정
         url = "http://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getMinuDustFrcstDspth"
 
@@ -363,7 +397,7 @@ class MountainDetailView(DetailView):
               quote_plus('serviceKey') : serviceKeyDecoded,
               quote_plus('returnType') : 'json',
               quote_plus('numOfRows') : '100',
-              quote_plus('searchDate') : today,
+              quote_plus('searchDate') : yesterday,
               quote_plus('InformCode') : 'PM10',
               })
 
@@ -384,8 +418,7 @@ class MountainDetailView(DetailView):
 
         return air
 
-
-from django.core.paginator import Paginator
+      
 class CourseListView(ListView):
     template_name = 'mountains/course_list.html'
     context_object_name = 'courses'
@@ -395,17 +428,17 @@ class CourseListView(ListView):
     def get_queryset(self):
         mountain_pk = self.kwargs['mountain_pk']
         mountain = Mountain.objects.get(pk=mountain_pk)
-        sort_option = self.request.GET.get('sort', '')  # 정렬 옵션 가져오기
+        sort = self.request.GET.get('sort', '')  # 정렬 옵션 가져오기
 
         queryset = Course.objects.filter(mntn_name=mountain)
 
-        if sort_option == 'bookmarks':
+        if sort== 'bookmarks':
             queryset = queryset.annotate(num_bookmarks=Count('bookmarks')).order_by('-num_bookmarks')
-        elif sort_option == 'distance':
+        elif sort == 'distance':
             queryset = queryset.order_by('distance')
-        elif sort_option == 'hidden_time':
+        elif sort == 'hidden_time':
             queryset = queryset.order_by('hidden_time')
-        elif sort_option == 'diff':
+        elif sort == 'diff':
             # 난이도 정렬을 추가
             queryset = queryset.annotate(
                 diff_order=Case(
@@ -423,31 +456,29 @@ class CourseListView(ListView):
         context = super().get_context_data(**kwargs)
         mountain_pk = self.kwargs['mountain_pk']
         mountain = Mountain.objects.get(pk=mountain_pk)
-        sort_option = self.request.GET.get('sort', '')  # 정렬 옵션 가져오기
-
         queryset = self.get_queryset()  # get_queryset 메서드 호출
-
+            
         # 페이지네이션
         paginator = Paginator(queryset, self.paginate_by)
         page_number = self.request.GET.get('page')
         page_obj = paginator.get_page(page_number)
 
         serializer = Serializer()
-        course_details = {}
+        data = {}
         for course in page_obj:
-            geojson_data = serializer.serialize(CourseDetail.objects.filter(crs_name_detail=course), fields=('geom', 'is_waypoint', 'waypoint_name', 'crs_name_detail'))
-            course_details[course.pk] = geojson_data
+            geojson_data = serializer.serialize([course], geometry_field='geom')
+            data[course.pk] = geojson_d
 
         context.update({
             'mountain': mountain,
             'courses': page_obj,
-            'course_details': course_details,
+            'courses_data': data
             'is_paginated': page_obj.has_other_pages(),
             'page_obj': page_obj,
         })
         return context     
 
-
+      
 class CourseAllListView(ListView):
     template_name = 'mountains/course_all_list.html'
     context_object_name = 'courses'
@@ -456,9 +487,19 @@ class CourseAllListView(ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        sort_option = self.request.GET.get('sort', '')  # 기본값으로 전체
+        sort = self.request.GET.get('sort', '')  # 기본값으로 전체
+        selected_sido = self.request.GET.get('sido1', '')  # 선택한 시/도 값 가져오기
+        selected_gugun = self.request.GET.get('gugun1', '')
 
-        if sort_option == 'bookmarks':
+        if selected_sido and selected_gugun:
+            if ('광역시' or '특별시') in selected_sido:
+                mountain = Mountain.objects.filter(Q(region__contains=selected_sido))
+                queryset = queryset.filter(mntn_name__in=mountain)
+            else:
+                mountain = Mountain.objects.filter(Q(region__contains=selected_sido) & Q(region__contains=selected_gugun))
+                queryset = queryset.filter(mntn_name__in=mountain)
+
+        if sort == 'bookmarks':
             queryset = queryset.annotate(bookmarks_count=Count('bookmarks'))
             queryset = queryset.order_by('-bookmarks_count')
 
@@ -479,10 +520,10 @@ def mountain_likes(request, mountain_pk):
 
 
 def bookmark(request, mountain_pk, course_pk):
-    mountain = get_object_or_404(Mountain, pk=mountain_pk)
-    course = get_object_or_404(Course, pk=course_pk)
+    course = Course.objects.get(pk=course_pk)
     user = request.user
-    if course in user.bookmarks.all():
+    is_bookmarked = user.bookmarks.filter(pk=course_pk).exists()
+    if is_bookmarked:
         user.bookmarks.remove(course)
         is_bookmarked = False
     else:
@@ -520,11 +561,18 @@ def create_review(request, pk):
 @login_required
 def review_likes(request, pk, review_pk):
     review = Review.objects.get(pk=review_pk)
-    if request.user in review.like_users.all():
+    if review.like_users.filter(pk=request.user.pk).exists():
         review.like_users.remove(request.user)
+        rl_is_liked = False
     else:
         review.like_users.add(request.user)
-    return redirect('mountains:mountain_detail', pk)
+        rl_is_liked = True
+    rl_likes_count = review.like_users.all().count()
+    context = {
+        'rl_is_liked' : rl_is_liked,
+        'rl_likes_count' : rl_likes_count,
+    }
+    return JsonResponse(context)
 
 
 @login_required
@@ -553,3 +601,9 @@ def review_update(request, pk, review_pk):
         'review': review,
     }
     return render(request, 'mountains/mountain_detail.html', context)
+
+
+class SearchView(FormView):
+    template_name = 'mountains/search.html'
+    form_class = SearchForm
+    success_url = 'mountains/mountain_list.html'

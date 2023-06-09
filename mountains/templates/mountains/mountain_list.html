@@ -9,17 +9,17 @@
 {% block content %}
 
 <div class="mountains__warp">
-  <form  id="sort-form"  class="select__form">
+  <form id="sort-form" class="select__form">
     <select name="sort" id="sort-select" class="select__box focus:outline-none mb-3">
-        <option value="likes" {% if request.GET.sort == "likes" %}selected{% endif %}>좋아요순</option>
-        <option value="reviews" {% if request.GET.sort == "reviews" %}selected{% endif %}>리뷰 개수순</option>
-        <option value="id" {% if request.GET.sort == "id" %}selected{% endif %}>가나다순</option>
-        <option value="views" {% if request.GET.sort == "views" %}selected{% endif %}>조회순</option>
-        <option value="height" {% if request.GET.sort == "height" %}selected{% endif %}>고도순</option>
+        <option value="id">가나다순</option>
+        <option value="likes">좋아요순</option>
+        <option value="reviews">리뷰 개수순</option>
+        <option value="views">조회순</option>
+        <option value="height">고도순</option>
     </select>
   </form>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 mb-4">
+  <div id="results" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 mb-4">
     {% for mountain in mountains %}
     <div class="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
       <a href="{% url 'mountains:mountain_detail' mountain.pk %}"  class="position--relative ">
@@ -41,9 +41,6 @@
           {% for tag in mountain.top_tags  %}
             <span>#{{ tag }}</span>
           {% endfor %}
-          <p># tag</p>
-          <p># tag</p>
-          <p># tag</p>
         </div>
         <div class="p-4 flex--col flex__align--between" style="height: 180px;">
           <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{ mountain.name }}</h5>      
@@ -102,5 +99,33 @@
 <script src="{% static 'js/mountains_likes.js' %}"></script>
 <script src="{% static 'js/list_order.js' %}"></script>
 <script>
-</script>
+  {% comment %} $(document).ready(function() {
+    // 정렬 선택 폼의 변경 이벤트 리스너
+    $('#sort-select').change(function() {
+      // 선택한 정렬 기준
+      var sortValue = $(this).val();
+  
+      // 현재 URL에 선택한 정렬 기준 추가
+      var currentURL = window.location.href;
+      var newURL = currentURL + (currentURL.includes('?') ? '&' : '?') + 'sort=' + sortValue;
+  
+      // AJAX 요청으로 서버에 정렬 기준 전송
+      $.ajax({
+        url: newURL,
+        type: 'GET',
+        success: function(response) {
+          // 서버로부터 받은 JSON 데이터를 사용하여 결과를 업데이트
+          var html = response.html;  // 결과 데이터
+
+          // 결과를 페이지에 업데이트
+          $('#results').html(html);
+        },
+        error: function(xhr, status, error) {
+          // 에러 처리
+          console.log(error);
+        }
+      });
+    });
+  }); {% endcomment %}
+  </script>
 {% endblock javascript %}

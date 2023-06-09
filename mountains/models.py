@@ -1,6 +1,8 @@
 # from django.db import models
-from django.contrib.gis.db import models
+from .models import *
 from django.conf import settings
+from django.db.models import Count
+from django.contrib.gis.db import models
 
 # Create your models here.
 class Mountain(models.Model):
@@ -27,7 +29,12 @@ class Mountain(models.Model):
     @property
     def reviews_count(self):
         return self.review_set.count()    
-
+    
+    @property
+    def top_tags(self):
+        tags = self.review_set.values('tags__name').annotate(tag_count=Count('tags__name')).order_by('-tag_count')[:3]
+        return [tag['tags__name'] for tag in tags]
+    
     def __str__(self):
         return self.name
         
@@ -41,6 +48,7 @@ class Course(models.Model):
     duration = models.CharField(max_length = 255, db_column='total_interval')
     hidden_time = models.FloatField(db_column='total_time')
     diff = models.CharField(max_length=30)
+    geom = models.GeometryField()
     bookmarks = models.ManyToManyField(settings.AUTH_USER_MODEL,  related_name='bookmarks',  db_table='mountains_course_bookmarks')
 
     class Meta:

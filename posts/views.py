@@ -251,6 +251,7 @@ def search(request):
         'like_posts': like_posts,
         'posts': filtered_posts,
         'query': query,
+        'search_option': search_option,
     }
 
     return render(request, 'posts/search.html', context)

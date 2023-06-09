@@ -67,13 +67,15 @@ th {
 }
 
 .modal-body {
-  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-#mountain-map > div > div > div > img {
-  position: absolute;
-  left: 0;
-  top: 0;
+#mountain-map {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1/1;
 }
 
 /* section2 */
@@ -103,7 +105,6 @@ th {
 
 .weather--tem {
   display: flex;
-  width: 50%;
   justify-content: center;
   align-items: center;
   font-size: 4rem;
@@ -190,6 +191,183 @@ th {
   width: 100%;
 }
 
+.bookmark--style{
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  font-size: 40px;
+  color: var(--main-color)
+}
+
+.bookmark--style:hover{
+  color: var(--green-btn);
+}
+
+.btn--spot{
+  position: absolute;
+  right: 10px;
+  top: 5px;
+  font-size: 35px;
+  color: var(--red-color);
+  z-index: 10;
+}
+
+/* section4-리뷰작성 */
+.review__submit--btn {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.mountain__reviewcrt--contbox {
+  padding: 10px;
+}
+
+.mountain__reviewcrt--cont {
+  border: solid 1px #777777;
+  width: 100%;
+  padding: 10px;
+  height: 150px;
+}
+
+.mountain__reviewcrt--imgbox {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  border: dashed 2px #777777;
+  overflow: hidden;
+}
+
+.mountain__reviewcrt--imgbox input[type="file"] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.preview-image {
+  object-fit: cover;
+  width: 100%;
+}
+
+.img--plus{
+  position: absolute;
+  font-size: 3rem;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.mountain__reviewcrt--tagbox {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  padding: 0 10px;
+}
+
+.mountain__reviewcrt--tagbox > li > label{
+  display: flex;
+  flex-direction: row;
+  margin-left: 8px;
+}
+
+.mountain__reviewcrt--tagbox > li > label > input{
+  margin-right: 3px;
+}
+
+/* section5-리뷰 */
+.mountain__detail--reviewtitle {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.mountain__detail--reviewtitle2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+  margin-left: 10px;
+  color : var(--main-color)
+}
+
+.mountain__detail--reviewbox {
+  position: relative;
+  padding: 10px;
+}
+
+.mountain__detail--contentbox {
+  width: 70%;
+  padding: 10px;
+}
+
+.mountain__detail--reviewuser {
+  font-weight: bold;
+}
+
+.mountain__detail--reviewinfo {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 15px;
+}
+
+.mountain__detail--reviewuserstat {
+  margin-left: 10px;
+}
+
+.mountain__detail--reviewimgbox {
+  position: relative;
+  width: 45px;
+  height: 45px;
+}
+
+.mountain__detail--reviewimg {
+  object-fit: cover;
+  width: 100%;
+}
+
+.mountain__detail--reviewcontimgbox {
+  position: relative;
+  width: 160px;
+  height: 160px;
+}
+
+.mountain__detail--reviewcontimg {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+.mountain__detail--reviewbox {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+}
+
+.mountain__detail--reviewcrt {
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  top: 10px;
+  right: 10px;
+  color: #777777;
+}
+
+.mountain__detail--updatebox {
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  bottom: 10px;
+  right: 10px;
+}
+
+.mountain__detail--reviewtagbox{
+  display: flex;
+  flex-direction: row;
+  margin: 0 5px 0 5px;
+}
 
 /* side btn */
 .mountain__btn--style {
@@ -219,4 +397,12 @@ th {
 
 .heart--color {
   color: var(--red-color);
+}
+
+.icon--size {
+  font-size: 16px
+}
+
+.icon--size1 {
+  font-size: 20px
 }

@@ -43,6 +43,8 @@ INSTALLED_APPS = [
 
     'django.contrib.gis',
 
+    'debug_toolbar',
+
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -54,6 +56,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     'imagekit',
     'ckeditor',
     'ckeditor_uploader',
@@ -70,6 +73,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'pjt.urls'
@@ -179,3 +184,11 @@ CKEDITOR_CONFIGS = {
 
 CKEDITOR_UPLOAD_PATH = 'uploads/'
 CKEDITOR_IMAGE_BACKEND = 'pillow'
+
+
+# debug_toolbar 관련
+INTERNAL_IPS = [
+    # ...
+    "127.0.0.1",
+    # ...
+]

@@ -15,11 +15,11 @@
 
   <form  id="sort-form" class="select__form">
     <select name="sort" id="sort-select" class="select__box focus:outline-none">
-      <option value="" {% if request.GET.sort == "" %}selected{% endif %}>기본</option>
-      <option value="bookmarks" {% if request.GET.sort == "bookmarks" %}selected{% endif %}>북마크순</option>
-      <option value="distance" {% if request.GET.sort == "distance" %}selected{% endif %}>거리순</option>
-      <option value="hidden_time" {% if request.GET.sort == "hidden_time" %}selected{% endif %}>소요시간순</option>
-      <option value="diff" {% if request.GET.sort == "diff" %}selected{% endif %}>난이도순</option>
+      <option value="">기본</option>
+      <option value="bookmarks">북마크순</option>
+      <option value="distance">거리순</option>
+      <option value="hidden_time">소요시간순</option>
+      <option value="diff">난이도순</option>
     </select>
   </form>
 
@@ -107,32 +107,14 @@
 
 // 카카오맵 API 로드 후 초기화 함수 호출
 loadKakaoMapScript(function () {
+  var course_data = {{ courses_data|safe }};
   {% for course in courses %}
     var courseId = {{ course.pk }};
-    var courseDetails = {{ course_details|safe }};
-    var courseDetail = JSON.parse(courseDetails[courseId]);
-    initMap(courseId, courseDetail);
+    var courseInfo = JSON.parse(course_data[courseId]);
+    console.log(courseId, courseInfo)
+    initMap(courseId, courseInfo);
   {% endfor %}
 });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 {% endblock javascript %}
-
-
-{% comment %} // 출발지 마커에 인포윈도우 표시
-var startInfowindowContent = '<div style="padding:5px;">출발지</div>';
-var startInfowindow = new kakao.maps.InfoWindow({
-  content: startInfowindowContent,
-  position: startMarker.getPosition(),
-  offsetY: -40 // 인포윈도우를 마커 위로 40px 위로 이동
-});
-startInfowindow.open(map);
-
-// 도착지 마커에 인포윈도우 표시
-var endInfowindowContent = '<div style="padding:5px;">도착지</div>';
-var endInfowindow = new kakao.maps.InfoWindow({
-  content: endInfowindowContent,
-  position: endMarker.getPosition(),
-  offsetY: -40 // 인포윈도우를 마커 위로 40px 위로 이동
-});
-endInfowindow.open(map);  {% endcomment %}

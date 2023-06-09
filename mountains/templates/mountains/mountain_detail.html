@@ -1,10 +1,12 @@
 {% extends 'base.html' %}
+
 {% load static %}
+{% load humanize %}
 
 {% block style %}
 <link rel="stylesheet" href="{% static 'css/mountains_detail.css' %}">
 <style>
-  /* 모달 스타일 */
+  {% comment %} /* 모달 스타일 */
   .modal {
     display: none;
     position: fixed;
@@ -13,9 +15,9 @@
     height: 100%;
     overflow: auto;
     background-color: rgba(0, 0, 0, 0.4);
-  }
+  } {% endcomment %}
 
-  .modal-content {
+  {% comment %} .modal-content {
     background-color: #fefefe;
     margin: auto;
     margin-top: 100px;
@@ -29,7 +31,7 @@
 
   .modal-close { 
     text-align: right;
-  }
+  } {% endcomment %}
 </style>
 {% endblock style %}
 
@@ -56,9 +58,23 @@
             <td>{{ mountain.height }}m</td>
           </tr>
         </table>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <table>
+          <tr class="mountains__detail--stat">
+            <td>
+              {% for tag in mountain.top_tags  %}
+                <strong>#{{ tag }}</strong>
+              {% endfor %}
+            </td>
+          </tr>
+        </table>
         <!-- Button trigger modal -->
         <button type="button" class="mountain__detail--mapbtn" data-bs-toggle="modal" data-bs-target="#mountainMap">
-          지도 보기
+          지도보기
         </button>
       </div>
     </div>
@@ -67,9 +83,12 @@
     <div class="modal fade" id="mountainMap" tabindex="-1" aria-labelledby="mountainMapLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          <div class="modal-body" style="width: 500px; height: 400px;">
-            <div id="mountain-map" style="width: 100%; height: 100%;"></div>
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="mountainMapLabel">{{ mountain.name }}</h1>
+            <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div id="mountain-map"></div>            
           </div>
         </div>
       </div>
@@ -83,7 +102,7 @@
       <div class="mountains__detail--weather">
         <div class="d-flex flex-row justify-content-between">
           <div class="weather--wrap">
-            <div class="d-flex flex-row justify-content-between" style="height: 60%; margin-bottom: 14px;">
+            <div class="d-flex flex-row justify-content-center" style="height: 60%; margin-bottom: 14px;">
               <div class="weather--sky">
                 {% if now_time in sun %}
                   {% if sky == '1' %}
@@ -103,7 +122,10 @@
                   {% endif %}
                 {% endif %}
               </div>
-              <p class="weather--tem">{{ tem }}°</p>
+              <div class="d-flex flex-row">
+                <p class="weather--tem">{{ tem }}</p>
+                <p style="font-size: 2rem; line-height: 140px;">℃</p>
+              </div>
             </div>
             <div class="d-flex flex-row justify-content-between">
               <div class="weather--hvwr">
@@ -118,10 +140,10 @@
               <div style="border-right: 1px solid #DBDBDB;"></div>
               <div class="weather--hvwr">
                 <p>1시간강수량</p>
-                {% if rain == '강수없음' %}
+                {% if rain == '0' %}
                   <p>- mm</p>
                 {% else %}
-                  <p>{{ rain }} mm</p>
+                  <p>{{ rain }}</p>
                 {% endif %}
               </div>
             </div>
@@ -181,8 +203,8 @@
     <h1 class="mountain__detail--coursetitle">{{ mountain.name }} 코스목록</h1>
     <ul class="mountain__detail--courselist">
       {% for course in courses|slice:":3" %}
-        <li class="mountain__detail--course">
-          <a href="#" class="flex flex-col items-center bg-white border border-gray-200 rounded-lg shadow md:flex-row hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
+        <li class="mountain__detail--course" style="position: relative;">
+          <div href="#" class="flex flex-col items-center bg-white border border-gray-200 rounded-lg shadow md:flex-row hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
             {% comment %} <img class="object-cover w-full rounded-t-lg h-96 md:h-auto md:w-48 md:rounded-none md:rounded-l-lg" src="/docs/images/blog/image-4.jpg" alt=""> {% endcomment %}
             <div class="object-cover w-full rounded-t-lg h-96 md:h-auto md:w-48 md:rounded-none md:rounded-l-lg" id="map2-{{ course.pk }}" style="width: 76%; height: 300px;"></div>
             <div class="flex flex-col justify-between p-4 leading-normal" style="width: 24%;">
@@ -193,13 +215,15 @@
                 <li class="mb-3 font-normal text-gray-700 dark:text-gray-400">난이도: {{ course.diff }}</li>
                 <form>
                   {% csrf_token %}
-                  <button id="bookmark-btn-{{ course.pk }}" type="submit" data-mountain-pk="{{ mountain.pk }}" data-course-pk="{{ course.pk }}">
-                    <p>북마크 추가</p>
-                  </button>
+                  {% if request.user in course.bookmarks.all %}
+                  <button id="bookmark-btn-{{ course.pk }}" type="submit"  class="bi bi-bookmark-fill btn--spot" data-mountain-pk="{{ mountain.pk }}" data-course-pk="{{ course.pk }}"></button>
+                  {% else %}
+                  <button id="bookmark-btn-{{ course.pk }}" type="submit"  class="bi bi-bookmark btn--spot" data-mountain-pk="{{ mountain.pk }}" data-course-pk="{{ course.pk }}"></button>
+                  {% endif %}
                 </form>
               </ul>
             </div>
-          </a>
+          </div>
         </li>
         <br>
       {% empty %}
@@ -212,63 +236,132 @@
     {% endif %}
   </section>
 
-  <hr style="margin-bottom: 30px;">    
-  {% for review in reviews %}
-    <div>pk: {{ review.pk }}</div>
-    <div>작성자: {{ review.user }}</div>
-    <div>내용: {{ review.content }}</div>
-    <div>이미지:
-      {% if review.image %}
-        <img src="{{ review.image.url }}" alt="">
-      {% endif %}
-    </div>
-    <div>태그:
-      {% for tag in review.tags.all %}
-        {{ tag }}
-      {% endfor %}
-    </div>
-    <hr>
-    <form action="{% url 'mountains:review_delete' review.mountain.pk review.pk %}" method="POST">
-      {% csrf_token %}
-      <input type="submit" value="삭제">
-    </form>
-    <hr>
-    <form action="{% url 'mountains:review_likes' review.mountain.pk review.pk %}" method="POST">
-      {% csrf_token %}
-      {% if request.user in review.like_users.all %}
-        <input type="submit" value="좋아요 취소">
-      {% else %}
-        <input type="submit" value="좋아요">
-      {% endif %}
-    </form>
-    {{ review.like_users.count }}
-    <hr>
-    <!-- 수정 버튼 -->
-    <button id="editBtn">수정</button>
-
-    <!-- 모달창 -->
-    <div id="editModal" class="modal">
-      <div class="modal-content">
-        <button id="editModalClose" class="modal-close">X</button>
-        <form id="editForm" action="{% url 'mountains:review_update' review.mountain.pk review.pk %}" method="POST" enctype="multipart/form-data">
-          {% csrf_token %}
-          {{ form.as_p }}
-          <button type="submit" class="btn btn-outline-primary">수정</button>
-        </form>
-      </div>
-    </div>
-  {% endfor %}
-
-  <hr style="margin-bottom: 30px;">    
+  <hr style="margin-bottom: 30px;">
 
   <!-- 리뷰 생성 -->
-  <form action="{% url 'mountains:create_review' mountain.pk %}" method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    {{ form.non_field_errors }}
-    {{ form.tags.errors }}
-    <input type="submit" value="리뷰 작성">
-  </form>
+  <section>
+    <form action="{% url 'mountains:create_review' mountain.pk %}" method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="d-flex flex-row">
+        <div id="review-image" style="position: relative; height: 100%;">
+          <div class="mountain__reviewcrt--imgbox">
+            <i class="bi bi-plus-lg img--plus"></i>
+            {{ form.image }}
+            <img id="preview" class="preview-image" src="#" alt="Preview Image" style="display: none;">
+          </div>
+          <div class="review__submit--btn">
+            <button type="submit" class="btn btn-outline-success">등록하기</button>
+          </div>
+        </div>
+        <div>
+          <div id="review-tags">{{ form.tags }}</div>
+          <div id="review-content" class="mountain__reviewcrt--contbox">{{ form.content }}</div>
+        </div>
+      </div>
+    </form>
+  </section>
+
+  <hr style="margin-bottom: 30px;">
+
+  <section>
+    <h1 class="mountain__detail--reviewtitle">리뷰<span class="mountain__detail--reviewtitle2">{{ reviews|length }}</span></h1>
+    <ul>
+      {% for review in reviews %}
+      <li>
+        <div class="mountain__detail--reviewbox">
+            <div class="mountain__detail--reviewcontimgbox">
+              {% if review.image %}
+                <img class="mountain__detail--reviewcontimg" src="{{ review.image.url }}" alt="">
+              {% endif %}
+            </div>
+          <div class="mountain__detail--contentbox">
+            <div class="mountain__detail--reviewinfo">
+              <a href="{% url 'accounts:profile' review.user.pk %}">
+                <div class="mountain__detail--reviewimgbox">
+                  {% if review.user.profile_img %}
+                    <img class="mountain__detail--reviewimg" src="{% static 'img/profile_no_img.png' %}" alt="">
+                  {% else %}
+                    <img class="mountain__detail--reviewimg" src="{% static 'img/profile_no_img.png' %}" alt="">
+                  {% endif %}
+                </div>
+              </a>
+              <div class="mountain__detail--reviewuserstat">
+                <div class="d-flex flex-row">
+                  <a href="{% url 'accounts:profile' review.user.pk %}">
+                    <p class="mountain__detail--reviewuser">{{ review.user }}</p>
+                  </a>
+                  <form class="review-like-form mx-3" id="like-form-{{ review.pk }}" data-mountain-id="{{ mountain.pk }}" data-review-id="{{ review.pk }}">
+                    {% csrf_token %}
+                    {% if request.user in review.like_users.all %}
+                      <button type="submit" id="like-{{ review.pk }}"  class="bi bi-hand-thumbs-up-fill like__hover text-primary"></button>
+                    {% else %}
+                      <button type="submit" id="like-{{ review.pk }}" class="bi bi-hand-thumbs-up like__hover"></button>
+                    {% endif %}
+                    <span class="me-3" id="rl_likes_count_{{ review.pk }}">
+                      {{ review.like_users.count }}
+                    </span>
+                  </form>
+                </div>
+                <div class="mountain__detail--reviewtagbox">
+                  {% for tag in review.tags.all %}
+                    <p style="color: #777777; margin-right: 5px;">#{{tag}}</p>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+            <p style="padding: 0 16px;">{{ review.content }}</p>
+          </div>
+          <div class="mountain__detail--reviewcrt">
+            {% if review.created_at|date:"Y-m-d" >= now|date:"Y-m-d" %}
+              {{ review.created_at|naturaltime }}
+            {% else %}
+              {{ review.created_at|date:"Y-m-d" }}
+            {% endif %}
+          </div>
+          {% if review.user %}
+            <div class="mountain__detail--updatebox">
+              <!-- 수정 버튼 -->
+              <button class="editBtn">수정</button>
+              <span> · </span>
+              <form action="{% url 'mountains:review_delete' review.mountain.pk review.pk %}" method="POST">
+                {% csrf_token %}
+                <input type="submit" value="삭제">
+              </form>
+            </div>
+          {% endif %}
+        </div>
+      </li>
+      <!-- 모달창 -->
+      <div class="editModal modal">
+        <div class="modal-content">
+          <button id="editModalClose" class="modal-close">X</button>
+          <form id="editForm" action="{% url 'mountains:review_update' review.mountain.pk review.pk %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="d-flex flex-row">
+              <div id="review-image" style="position: relative; height: 100%;">
+                <div class="mountain__reviewcrt--imgbox">
+                  <i class="bi bi-plus-lg img--plus"></i>
+                  {{ form.image }}
+                  <img id="preview" class="preview-image" src="#" alt="Preview Image" style="display: none;">
+                </div>
+                <div class="review__submit--btn">
+                  <button type="submit" class="btn btn-outline-success">수정하기</button>
+                </div>
+              </div>
+              <div>
+                <div id="review-tags">{{ form.tags }}</div>
+                <div id="review-content" class="mountain__reviewcrt--contbox">{{ form.content }}</div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <hr>
+      {% endfor %}
+    </ul>
+  </section>
+    
+  <hr style="margin-bottom: 30px;">    
 </div>
 
 
@@ -276,135 +369,115 @@
 <p id="longitude" style="display: none;">{{ mountain.geom.x }}</p>
 
 <div class="mountain__btn__wrap">
+  <div class="flex--d-col flex--between">
+    <button type="submit" id="go-comment-section" class="mountain__btn--style icon--size1" title="조회수"><i class="bi bi-eye-fill like__hover"></i></button>
+    <div class="text-center">{{ mountain.views }}</div>
+  </div>
   <form class="like-form" data-mountain-id="{{ mountain.pk }}">
     {% csrf_token %}
     {% if request.user in mountain.likes.all %}
-    <button type="submit" class="mountain__btn--style bi bi-heart-fill heart--color like__hover icon--size" id="mountain-likes-btn"></button>
+      <button type="submit" class="mountain__btn--style bi bi-heart-fill heart--color like__hover icon--size" id="mountain-likes-btn" title="좋아요"></button>
     {% else %}
-    <button type="submit" class="mountain__btn--style bi bi-heart like__hover icon--size" id="mountain-likes-btn"></button>
+      <button type="submit" class="mountain__btn--style bi bi-heart like__hover icon--size" id="mountain-likes-btn" title="좋아요"></button>
     {% endif %}
     <div id="mountain-likes-count" class="text-center">{{ mountain.likes.count }}</div> 
   </form>   
   <div class="flex--d-col flex--between">
-    <button type="submit" id="go-comment-section" class="mountain__btn--style icon--size"><i class="bi bi-chat-square-dots like__hover"></i></button>
-    <div class="text-center"></div>
+    <button type="submit" id="go-review-section" class="mountain__btn--style icon--size" title="리뷰"><i class="bi bi-pencil like__hover"></i></button>
+    <div class="text-center">{{ reviews|length }}</div>
   </div>
-  </div>
-
-  <p>조회수: {{ mountain.views }}</p>
-  
+ </div>
 {% endblock content %}
 
 
 {% block javascript %}
-  <!-- 카카오맵 API 로드 -->
+<!-- 카카오맵 API 로드 -->
 <script>
   function loadKakaoMapScript(callback) {
-      if (window.kakao) {
-          // 이미 카카오맵 API가 로드되어 있는 경우
-          callback();
-      } else {
-          // 카카오맵 API 로드
-          var script = document.createElement("script");
-          script.type = "text/javascript";
-          script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=d39fcd60ffdc96ae99454337f5e45a16&libraries=services&autoload=false";
-          document.head.appendChild(script);
-          
-          script.onload = function () {
-              kakao.maps.load(function () {
-                  callback();
-              });
-            };
-          }
-        }
-    // 산 좌표를 찍는 카카오 MAP
-    function showMountainMarker(latitude, longitude) {
-      var container = document.getElementById('mountain-map');
-      var options = {
-        center: new kakao.maps.LatLng(latitude, longitude),
-        level: 10
+    if (window.kakao) {
+      // 이미 카카오맵 API가 로드되어 있는 경우
+      callback();
+    } else {
+      // 카카오맵 API 로드
+      var script = document.createElement("script");
+      script.type = "text/javascript";
+      script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=d39fcd60ffdc96ae99454337f5e45a16&libraries=services&autoload=false";
+      script.async = true;
+      script.onload = function() {
+        kakao.maps.load(callback);
       };
-      var map = new kakao.maps.Map(container, options);
-    
-      var markerPosition = new kakao.maps.LatLng(latitude, longitude);
-    
-      var marker = new kakao.maps.Marker({
-        position: markerPosition
-      });
-    
-      marker.setMap(map);
+      document.head.appendChild(script);
     }
-    
-    // 카카오맵 초기화 함수
-    function initMap(courseId, courseDetail) {
-      var container = document.getElementById('map2-' + courseId);
-      var options = {
-        center: new kakao.maps.LatLng(37.5665, 126.9780), 
-        level: 7
-      };
-      var map = new kakao.maps.Map(container, options);
-    
-      var linePath = [];
-      var waypointPositions = [];
-      var waypointNames = [];
-      // 해당 코스의 CourseDetail들에 대해 위치 표시 및 linePath에 좌표 추가
-      courseDetail.features.forEach(function(feature) {
-        var coordinates = feature.geometry.coordinates;
-        var x = coordinates[0];
-        var y = coordinates[1];
-        var excludedNames = ['국가지점', '쉼터', '자연경관', '갈림길', '이정표', '표시', '벤치', '화장실', '주의', '현위치', '조망점', '계곡', '비석'];
-        if (!feature.properties.is_waypoint) {
-          linePath.push(new kakao.maps.LatLng(y, x));
-        } else if (!excludedNames.some(name => feature.properties.waypoint_name.includes(name))) {
-          waypointPositions.push(new kakao.maps.LatLng(y, x));
-          waypointNames.push(feature.properties.waypoint_name)
-          // 마커를 표시합니다
-          
-          waypointPositions.forEach(function (position, index) {
-            
-            var marker = new kakao.maps.Marker({
-              position: position,
-              map: map,
-              title: waypointNames[index]
-            });
-          });
-        
-        }
-      });
-      // 출발 좌표에 마커 표시
-      var startMarkerPosition = linePath[0];
-      var startMarker = new kakao.maps.Marker({
-        position: startMarkerPosition,
-        map: map,
-        title: "출발지"
-      });
+  }
 
-      // 도착 좌표에 마커 표시
-      var endMarkerPosition = linePath[linePath.length - 1];
-      var endMarker = new kakao.maps.Marker({
-        position: endMarkerPosition,
-        map: map,
-        title: "도착지"
-      });
-          
-      // 중간 인덱스 계산
-      var middleIndex = Math.floor(linePath.length / 2);
-      var center = linePath[middleIndex];
+  // 산 좌표를 찍는 카카오 MAP
+  function showMountainMarker(latitude, longitude) {
+    var container = document.getElementById('mountain-map');
+    var options = {
+      center: new kakao.maps.LatLng(latitude, longitude),
+      level: 10
+    };
+    var map = new kakao.maps.Map(container, options);
+  
+    var markerPosition = new kakao.maps.LatLng(latitude, longitude);
+  
+    var marker = new kakao.maps.Marker({
+      position: markerPosition
+    });
+  
+    marker.setMap(map);
+  }
     
-      // Polyline을 이용하여 선 그리기
-      var polyline = new kakao.maps.Polyline({
-        path: linePath, // linePath에 저장된 좌표들로 설정
-        strokeWeight: 3,
-        strokeColor: '#FF0000',
-        strokeOpacity: 0.7,
-        strokeStyle: 'solid'
-      });
-      polyline.setMap(map);
-    
-      // 부드럽게 마커가 위치한 곳으로 이동합니다
-      map.panTo(center);
-    }
+// 카카오맵 초기화 함수
+function initMap(courseId, course) {
+  var container = document.querySelector('#map2-' + courseId);
+  var options = {
+    center: new kakao.maps.LatLng(37.5665, 126.9780), 
+    level: 7
+  };
+  var map = new kakao.maps.Map(container, options);
 
+  var linePath = [];
+
+  var linePath = course.features[0].geometry.coordinates.map(function(coordinate) {
+    var x = coordinate[0];
+    var y = coordinate[1];
+    return new kakao.maps.LatLng(y, x);
+  });
+
+  // 출발 좌표에 마커 표시
+  var startMarkerPosition = linePath[0];
+  var startMarker = new kakao.maps.Marker({
+    position: startMarkerPosition,
+    map: map,
+    title: "출발지"
+  });
+
+  // 도착 좌표에 마커 표시
+  var endMarkerPosition = linePath[linePath.length - 1];
+  var endMarker = new kakao.maps.Marker({
+    position: endMarkerPosition,
+    map: map,
+    title: "도착지"
+  });
+      
+  // 중간 인덱스 계산
+  var middleIndex = Math.floor(linePath.length / 2);
+  var center = linePath[middleIndex];
+
+  // Polyline을 이용하여 선 그리기
+  var polyline = new kakao.maps.Polyline({
+    path: linePath, // linePath에 저장된 좌표들로 설정
+    strokeWeight: 3,
+    strokeColor: '#FF0000',
+    strokeOpacity: 0.7,
+    strokeStyle: 'solid'
+  });
+  polyline.setMap(map);
+
+  // 부드럽게 마커가 위치한 곳으로 이동합니다
+  map.panTo(center);
+};
 
 
   // 카카오맵 API 로드 후 초기화 함수 호출
@@ -414,25 +487,45 @@
     var mountainLongitude = parseFloat(document.getElementById('longitude').textContent);
     showMountainMarker(mountainLatitude, mountainLongitude);
 
+    var course_data = {{ courses_data|safe }};
     {% for course in courses|slice:":3" %}
-      var courseId = {{ course.pk }};
-      var courseDetails = {{ course_details|safe }};
-      var courseDetail = JSON.parse(courseDetails[courseId]);
-      initMap(courseId, courseDetail);
+      var courseId = {{ course.pk }}
+      var course = JSON.parse(course_data[courseId]);
+      initMap(courseId, course);
     {% endfor %}
-
-
   });
 
+  var map;
+
+  function initializeMap() {
+    var container = document.getElementById('mountain-map');
+    var options = {
+      center: new kakao.maps.LatLng(37.5665, 126.9780),
+      level: 7
+    };
+    map = new kakao.maps.Map(container, options);
+  }
+
+  // 모달이 열릴 때 초기화 함수 호출
+  $('#mountainMap').on('shown.bs.modal', function (e) {
+    initializeMap();
+
+
+    var latitude = parseFloat(document.getElementById('latitude').textContent);
+    var longitude = parseFloat(document.getElementById('longitude').textContent);
+    showMountainMarker(latitude, longitude);
+  });
 </script>
 
 <script>
   function bookmark(courseId) {
     const bookmarkBtn = document.getElementById('bookmark-btn-' + courseId);
+    console.log(bookmarkBtn)
     const mountainCsrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
 
     if (bookmarkBtn) {
       bookmarkBtn.addEventListener('click', () => {
+        console.log('실행')
         event.preventDefault(); // 폼의 기본 동작 중지
         const mountainPk = bookmarkBtn.getAttribute('data-mountain-pk');
         const coursePk = bookmarkBtn.getAttribute('data-course-pk');
@@ -450,11 +543,11 @@
             // 서버로부터의 응답을 처리
             if (isBookmarked) {
               // 북마크 추가 시 동작
-              bookmarkBtn.innerText = '북마크 제거';
+              bookmarkBtn.className = 'bi bi-bookmark-fill btn--spot';
               alert('북마크가 추가되었습니다.');
             } else {
               // 북마크 제거 시 동작
-              bookmarkBtn.innerText = '북마크 추가';
+              bookmarkBtn.className = 'bi bi-bookmark btn--spot';
               alert('북마크가 제거되었습니다.');
             }
           })
@@ -472,39 +565,6 @@
 </script>
 
 <script>
-  {% comment %} document.addEventListener('DOMContentLoaded', () => {
-    const mountainLikesBtn = document.getElementById('mountain-likes-btn');
-    if (mountainLikesBtn) {
-      mountainLikesBtn.addEventListener('click', (event) => {
-        event.preventDefault();
-        const mountainPk2 = mountainLikesBtn.getAttribute('data-mountain-pk-2');
-        const csrfToken = document.getElementsByName('csrfmiddlewaretoken')[0].value;
-        axios.post(`/mountains/${mountainPk2}/likes/`, null, {
-          headers: {
-            'X-CSRFToken': csrfToken,
-          },
-        })
-          .then((response) => {
-            const isLiked = response.data.is_liked;
-            // 서버로부터의 응답을 처리
-            if (isLiked === true) {
-              // 팔로우 성공 시 동작
-              mountainLikesBtn.innerHTML = '<p>좋아요 제거</p>';
-              alert('좋아요가 추가되었습니다.');
-            } else {
-              // 언팔로우 성공 시 동작
-              mountainLikesBtn.innerHTML = '<p>좋아요 추가</p>';
-              alert('좋아요가 제거되었습니다.');
-            }
-          })
-          .catch((error) => {
-            // 에러 처리
-            console.error(error);
-          });
-      });
-    }
-  }); {% endcomment %}
-
   const forms = document.querySelectorAll(".like-form");
   const mountainCsrftokenLike = document.querySelector("[name=csrfmiddlewaretoken]").value;
 
@@ -537,27 +597,46 @@
 
 <script>
   // 수정 버튼 클릭 시 모달창 열기
-  document.getElementById("editBtn").addEventListener("click", function() {
-      document.getElementById("editModal").style.display = "block";
-  });
+  var editButtons = document.getElementsByClassName("editBtn");
+  var editModals = document.getElementsByClassName("editModal");
+
+  for (var i = 0; i < editButtons.length; i++) {
+      var editButton = editButtons[i];
+      var editModal = editModals[i];
+
+      editButton.addEventListener("click", function () {
+          editModal.style.display = "block";
+      });
+  }
 
   // 모달창 닫기 버튼 클릭 시 모달창 닫기
-  document.getElementById("editModalClose").addEventListener("click", function() {
-      document.getElementById("editModal").style.display = "none";
-  });
+  var editModalCloses = document.getElementsByClassName("modal-close");
+
+  for (var i = 0; i < editModalCloses.length; i++) {
+      var editModalClose = editModalCloses[i];
+
+      editModalClose.addEventListener("click", function () {
+          var modal = this.parentElement.parentElement;
+          modal.style.display = "none";
+      });
+  }
 
   // 모달창 영역 외의 클릭 이벤트 처리
-  window.addEventListener('click', function(event) {
-    var modal = document.getElementById('editModal');
-    if (event.target === modal) {
-      closeModal();
+  window.addEventListener("click", function (event) {
+    var modals = document.getElementsByClassName("modal");
+
+    for (var i = 0; i < modals.length; i++) {
+        var modal = modals[i];
+
+        if (event.target === modal) {
+            closeModal(modal);
+        }
     }
   });
 
   // 모달창 닫기 함수
-  function closeModal() {
-    var modal = document.getElementById('editModal');
-    modal.style.display = 'none';
+  function closeModal(modal) {
+      modal.style.display = "none";
   }
 </script>
 
@@ -582,26 +661,94 @@
       }
     }
   }
-  </script>
+</script>
+
+
+<script>
+  var imageInputs = document.querySelectorAll("#review-image input[type=file]");
+
+  // 이미지 파일 변경 시 미리보기 업데이트
+  imageInputs.forEach(function (input) {
+    input.addEventListener("change", function (event) {
+      var preview = input.parentNode.querySelector(".preview-image");
+      var file = event.target.files[0];
+
+      if (file) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          preview.src = e.target.result;
+          preview.style.display = "block";    
+        };
+        reader.readAsDataURL(file);
+      } else {
+        preview.src = "";
+        preview.style.display = "none";
+      }
+    });
+  });
+</script>
+
+<script>
+  document.getElementById('go-review-section').addEventListener('click', function() {
+    var element = document.querySelector('.mountain__detail--reviewtitle');
+    element.scrollIntoView({ behavior: 'smooth' });
+  });
+</script>
+
+<script>
+  // review 좋아요
+  const reviewLikeForms = document.querySelectorAll('.review-like-form');
+  const rlcsrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+  reviewLikeForms.forEach(form => {
+    form.addEventListener('submit', function (event) {
+      event.preventDefault()
+      const mountainId = event.target.dataset.mountainId;
+      const reviewId = event.target.dataset.reviewId;
+      axios({
+        method: 'post',
+        url: `/mountains/${mountainId}/review_likes/${reviewId}/`,
+        headers: {'X-CSRFToken': rlcsrfToken},
+      }).then((response) => {
+        const isLiked = response.data.rl_is_liked
+        const likeBtn = document.querySelector(`#like-${reviewId}`)
+        if (isLiked){
+          console.log('dd')
+          likeBtn.className = "bi bi-hand-thumbs-up-fill like__hover text-primary";
+        } else {
+          likeBtn.className = "bi bi-hand-thumbs-up like__hover";
+        }
+
+        const likesCountData = response.data.rl_likes_count
+        const likesCountTag = document.querySelector(`#rl_likes_count_${reviewId}`)
+        likesCountTag.textContent = likesCountData
+
+      })
+      .catch((error) => {
+        console.error(response.data);
+      });
+    });
+  });
+  ;
+</script>
+
+<script>
+  // JavaScript
+  var imageInput = document.getElementById('id_image');
+  var imgPreview = document.getElementById('preview');
+  var iplus = document.querySelector(".img--plus")
+
+  imageInput.addEventListener('change', function(event) {
+    if (event.target.files && event.target.files[0]) {
+      imgPreview.style.display = 'block';
+      iplus.style.display = "none";
+      document.querySelector('.mountain__reviewcrt--imgbox').style.border = 'none';
+    } else {
+      imgPreview.style.display = 'none';
+      iplus.style.display = "block";
+      document.querySelector('.mountain__reviewcrt--imgbox').style.border = '1px solid #ccc';
+    }
+  });
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 {% endblock javascript %}
-
-
-{% comment %} // 출발지 마커에 인포윈도우 표시
-var startInfowindowContent = '<div style="padding:5px;">출발지</div>';
-var startInfowindow = new kakao.maps.InfoWindow({
-  content: startInfowindowContent,
-  position: startMarker.getPosition(),
-  offsetY: -40 // 인포윈도우를 마커 위로 40px 위로 이동
-});
-startInfowindow.open(map);
-
-// 도착지 마커에 인포윈도우 표시
-var endInfowindowContent = '<div style="padding:5px;">도착지</div>';
-var endInfowindow = new kakao.maps.InfoWindow({
-  content: endInfowindowContent,
-  position: endMarker.getPosition(),
-  offsetY: -40 // 인포윈도우를 마커 위로 40px 위로 이동
-});
-endInfowindow.open(map);  {% endcomment %}

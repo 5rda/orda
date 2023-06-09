@@ -30,8 +30,9 @@
 
 .postindex__Content--title {
   margin: 16px 0 16px 90px;
-  font-size: 2rem;
+  font-size: 1.6rem;
   font-weight: bold;
+  font-family: sans-serif;
 }
 
 .postindex__Rankbox {
@@ -176,6 +177,30 @@
   margin: 16px 90px 16px 0;
 }
 
+.postindex__search--title {
+  margin: 16px 0 25px 90px;
+  font-size: 1.6rem;
+  font-weight: bold;
+  font-family: sans-serif;
+}
+
+.postindex__search--title2 {
+  color: var(--main-color);
+}
+
 .highlight {
   color: var(--main-color);
+}
+
+.postindex__searchbar {
+  width: 60%;
+  margin: 50px auto;
+}
+
+.postindex__nosearching {
+  display: flex;
+  justify-content: center;
+  padding: 100px 0;
+  font-size: 1.2rem;
+  font-family: sans-serif;
 }
