@@ -13,6 +13,7 @@ from django.http import HttpResponse
 from .forms import ReviewCreationForm, SearchForm
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 # Create your views here.
 
 
@@ -417,7 +418,7 @@ class MountainDetailView(DetailView):
 
         return air
 
-
+      
 class CourseListView(ListView):
     template_name = 'mountains/course_list.html'
     context_object_name = 'courses'
@@ -450,26 +451,34 @@ class CourseListView(ListView):
 
         return queryset
 
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         mountain_pk = self.kwargs['mountain_pk']
-        courses = self.get_queryset()
         mountain = Mountain.objects.get(pk=mountain_pk)
+        queryset = self.get_queryset()  # get_queryset 메서드 호출
+            
+        # 페이지네이션
+        paginator = Paginator(queryset, self.paginate_by)
+        page_number = self.request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
         serializer = Serializer()
         data = {}
-        for course in courses:
+        for course in page_obj:
             geojson_data = serializer.serialize([course], geometry_field='geom')
-            data[course.pk] = geojson_data
+            data[course.pk] = geojson_d
 
-
-        context = {
+        context.update({
             'mountain': mountain,
-            'courses': courses,
+            'courses': page_obj,
             'courses_data': data
-        }        
-        return context        
+            'is_paginated': page_obj.has_other_pages(),
+            'page_obj': page_obj,
+        })
+        return context     
 
-
+      
 class CourseAllListView(ListView):
     template_name = 'mountains/course_all_list.html'
     context_object_name = 'courses'
