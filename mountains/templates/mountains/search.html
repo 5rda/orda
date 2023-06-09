@@ -3,7 +3,8 @@
 <h1>탐색</h1>
 <br>
 <hr>
-<form method="GET" action="{% url 'mountains:mountain_list' %}">
+<form method="Post" action="{% url 'mountains:mountain_list' %}">
+  {% csrf_token %}
   {{ form.as_p }}
   <hr>
   <br>
