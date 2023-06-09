@@ -2,79 +2,72 @@ from django.shortcuts import render, redirect
 from django.views.generic import DetailView, ListView, FormView
 from django.contrib.gis.serializers.geojson import Serializer
 from django.shortcuts import get_object_or_404
+from django.urls import reverse
 from django.http import JsonResponse
 from .models import *
 import json, os, urllib.request, time, requests, datetime, math
 from datetime import date, datetime, timedelta
 from urllib.parse import urlencode, quote_plus, unquote
 from django.db.models import F, Count, When, Case, Q
-from django.conf import settings
-from django.http import HttpResponse
 from .forms import ReviewCreationForm, SearchForm
-from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-# Create your views here.
 
 
-class MountainListView(ListView):
-    template_name = 'mountains/mountain_list.html'
-    context_object_name = 'mountains'
-    model = Mountain
-    paginate_by = 12
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        tags = self.request.GET.getlist('tags')
-        sido = self.request.GET.get('sido2')
-        gugun = self.request.GET.get('gugun2')
+def mountain_list(request):
+    mountains = Mountain.objects.all()
+    if request.method == 'POST':
+        tags = request.POST.getlist('tags')
+        sido = request.POST.get('sido2')
+        gugun = request.POST.get('gugun2')
         filter_condition = Q()
 
         if sido and gugun:
-            if ('광역시' or '특별시') in sido:
+            if ('광역시' in sido) or ('특별시' in sido):
                 filter_condition.add(Q(region__contains=sido), filter_condition.AND)
             else:
                 filter_condition.add(Q(region__contains=sido) & Q(region__contains=gugun), filter_condition.AND)
 
         if tags:
-            filter_condition.add(Q(review__tags__pk__in=tags), filter_condition.AND)
-            
-            queryset = queryset.filter(filter_condition).distinct()
-            
-            # 1
-            # queryset = queryset.annotate(
-            #     top_tags_count=Count('review__tags')
-            # ).filter(
-            #     review__tags__pk__in=tags
-            # ).order_by('-top_tags_count')
+            filtered_mountains = mountains.filter(review__tags__pk__in=tags).annotate(tag_count=Count('review__tags__pk')).order_by('-tag_count')[:3]
+            filtered_pks = filtered_mountains.values_list('pk', flat=True)
+            mountains = mountains.filter(pk__in=filtered_pks)
 
-            # top_3_tags = queryset.values_list('review__tags__name', flat=True)[:3]
+        mountains = mountains.filter(filter_condition)
 
-            # queryset = queryset.filter(review__tags__name__in=top_3_tags)
+        # 필터링된 객체를 세션에 저장
+        request.session['filtered_mountains'] = list(mountains.values_list('pk', flat=True))
 
-        queryset = queryset.filter(filter_condition)
-        return queryset
-    
-    def get(self, request, *args, **kwargs):
+    elif request.method == 'GET':
+        # GET 요청 처리
+        filtered_pks = request.session.get('filtered_mountains', [])
+        print(filtered_pks)
+        if filtered_pks:
+            mountains = Mountain.objects.filter(pk__in=filtered_pks)
+        else:
+            mountains = Mountain.objects.all()
         sort = request.GET.get('sort', None)
-        queryset = self.get_queryset()       
-
+            
         if sort== 'likes':
-            queryset = queryset.annotate(likes_count=Count('likes')).order_by('-likes_count')  # 좋아요순으로 정렬
+            mountains = mountains.annotate(likes_count=Count('likes')).order_by('-likes_count')  # 좋아요순으로 정렬
         elif sort == 'reviews':
-            queryset = queryset.annotate(reviews_count2=Count('review')).order_by('-reviews_count2') 
+            mountains = mountains.annotate(reviews_count2=Count('review')).order_by('-reviews_count2') 
         elif sort == 'id':
-            queryset = queryset.order_by('id')  # 가나다순으로 정렬
+            mountains = mountains.order_by('id')  # 가나다순으로 정렬
         elif sort== 'views':
-            queryset = queryset.order_by('-views')  # 조회순으로 정렬
+            mountains = mountains.order_by('-views')  # 조회순으로 정렬
         elif sort == 'height':
-            queryset = queryset.order_by('height') # 고도순으로 정렬
+            mountains = mountains.order_by('height') # 고도순으로 정렬
 
-        context = self.get_context_data(object_list=queryset)
-        html = render(request, self.template_name, context).content
+    page= request.GET.get('page', '1')
+    per_page = 12
+    paginator = Paginator(mountains, per_page)
+    page_obj = paginator.get_page(page)        
+    context = {
+        'page_obj': page_obj,
+    }
+    return render(request, 'mountains/mountain_list.html', context)
 
-        return HttpResponse(html)
-        # return render(request, self.template_name, context)
 
 class MountainDetailView(DetailView):
     template_name = 'mountains/mountain_detail.html'
@@ -607,3 +600,32 @@ class SearchView(FormView):
     template_name = 'mountains/search.html'
     form_class = SearchForm
     success_url = 'mountains/mountain_list.html'
+
+
+# class MountainListView(ListView):
+#     template_name = 'mountains/mountain_list.html'
+#     context_object_name = 'mountains'
+#     model = Mountain
+#     paginate_by = 12
+
+#     def get_queryset(self):
+#         queryset = super().get_queryset()
+#         tags = self.request.GET.getlist('tags')
+#         sido = self.request.GET.get('sido2')
+#         gugun = self.request.GET.get('gugun2')
+#         filter_condition = Q()
+
+#         if sido and gugun:
+#             if ('광역시' in sido) or ('특별시' in sido):
+#                 filter_condition.add(Q(region__contains=sido), filter_condition.AND)
+#             else:
+#                 filter_condition.add(Q(region__contains=sido) & Q(region__contains=gugun), filter_condition.AND)
+
+#         if tags:
+#             filtered_mountains = queryset.filter(review__tags__pk__in=tags).annotate(tag_count=Count('review__tags__pk')).order_by('-tag_count')[:3]
+#             filtered_pks = filtered_mountains.values_list('pk', flat=True)
+#             queryset = queryset.filter(pk__in=filtered_pks)
+
+#         queryset = queryset.filter(filter_condition)
+
+#         return queryset

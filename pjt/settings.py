@@ -75,6 +75,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+
+    'posts.notification_middleware.NotificationMiddleware',
+    'accounts.notification_middleware.NotificationMiddleware',
+    'mountains.notification_middleware.NotificationMiddleware',
 ]
 
 ROOT_URLCONF = 'pjt.urls'
