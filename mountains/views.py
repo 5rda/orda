@@ -466,13 +466,13 @@ class CourseListView(ListView):
         serializer = Serializer()
         data = {}
         for course in page_obj:
-            geojson_data = serializer.serialize([course], geometry_field='geom')
-            data[course.pk] = geojson_d
+            geojson_data = serializer.serialize(CourseDetail.objects.filter(crs_name_detail=course), fields=('geom', 'is_waypoint', 'waypoint_name', 'crs_name_detail'))
+            data[course.pk] = geojson_data
 
         context.update({
             'mountain': mountain,
             'courses': page_obj,
-            'courses_data': data
+            'courses_data': data,
             'is_paginated': page_obj.has_other_pages(),
             'page_obj': page_obj,
         })
