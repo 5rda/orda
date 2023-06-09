@@ -9,6 +9,7 @@ from django.dispatch import receiver
 from accounts.models import Notification
 from django.urls import reverse
 from django.utils.html import format_html
+from mountains.models import Mountain
 
 # Create your models here.
 
@@ -16,10 +17,12 @@ class Post(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
     content = RichTextUploadingField(blank=True,null=True)
+    mountain = models.ForeignKey(Mountain, on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     view_count = models.PositiveIntegerField(default=0)
     like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='like_posts')
+
 
 class PostComment(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
