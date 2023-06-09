@@ -13,7 +13,6 @@ from .forms import ReviewCreationForm, SearchForm
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 
-# Create your views here.
 
 def mountain_list(request):
     mountains = Mountain.objects.all()
@@ -97,7 +96,7 @@ class MountainDetailView(DetailView):
             data[course.pk] = geojson_data
 
         # 리뷰 관련
-        reviews = Review.objects.filter(mountain=mountain)
+        reviews = Review.objects.filter(mountain=mountain).order_by('-created_at')
 
         # 기타
         now_weather_data = self.get_weather_forecast()
@@ -322,7 +321,7 @@ class MountainDetailView(DetailView):
 
         queryParams = '?' + urlencode({ 
               quote_plus('serviceKey') : serviceKeyDecoded,
-              quote_plus('base_date') : base_date, 
+              quote_plus('base_date') : base_date,
               quote_plus('base_time') : base_time,
               quote_plus('nx') : nx,
               quote_plus('ny') : ny,
@@ -334,7 +333,7 @@ class MountainDetailView(DetailView):
         response = requests.get(url + queryParams, verify=False)
         items = response.json().get('response').get('body').get('items') #데이터들 아이템에 저장
         now_weather_data = dict()
-
+    
         for item in items['item']:
             # 기온
             if item['category'] == 'T1H' and item['fcstDate'] == today and item['fcstTime'] == now_time:
@@ -374,12 +373,13 @@ class MountainDetailView(DetailView):
             # 현재시각
             if item['fcstDate'] == today and item['fcstTime'] == now_time:
                 now_weather_data['현재시각'] = now_time
-
         return now_weather_data
 
     def get_air(self):
         mountain = self.get_object()
         today = datetime.today().strftime("%Y-%m-%d")
+        y = date.today() - timedelta(days=1)
+        yesterday = y.strftime("%Y-%m-%d")
         # API 요청을 위한 URL과 파라미터 설정
         url = "http://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getMinuDustFrcstDspth"
 
@@ -390,7 +390,7 @@ class MountainDetailView(DetailView):
               quote_plus('serviceKey') : serviceKeyDecoded,
               quote_plus('returnType') : 'json',
               quote_plus('numOfRows') : '100',
-              quote_plus('searchDate') : today,
+              quote_plus('searchDate') : yesterday,
               quote_plus('InformCode') : 'PM10',
               })
 
@@ -411,7 +411,7 @@ class MountainDetailView(DetailView):
 
         return air
 
-
+      
 class CourseListView(ListView):
     template_name = 'mountains/course_list.html'
     context_object_name = 'courses'
@@ -444,26 +444,34 @@ class CourseListView(ListView):
 
         return queryset
 
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         mountain_pk = self.kwargs['mountain_pk']
-        courses = self.get_queryset()
         mountain = Mountain.objects.get(pk=mountain_pk)
+        queryset = self.get_queryset()  # get_queryset 메서드 호출
+            
+        # 페이지네이션
+        paginator = Paginator(queryset, self.paginate_by)
+        page_number = self.request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
         serializer = Serializer()
         data = {}
-        for course in courses:
+        for course in page_obj:
             geojson_data = serializer.serialize([course], geometry_field='geom')
             data[course.pk] = geojson_data
 
-
-        context = {
+        context.update({
             'mountain': mountain,
-            'courses': courses,
-            'courses_data': data
-        }        
-        return context        
+            'courses': page_obj,
+            'courses_data': data,
+            'is_paginated': page_obj.has_other_pages(),
+            'page_obj': page_obj,
+        })
+        return context     
 
-
+      
 class CourseAllListView(ListView):
     template_name = 'mountains/course_all_list.html'
     context_object_name = 'courses'
@@ -546,11 +554,18 @@ def create_review(request, pk):
 @login_required
 def review_likes(request, pk, review_pk):
     review = Review.objects.get(pk=review_pk)
-    if request.user in review.like_users.all():
+    if review.like_users.filter(pk=request.user.pk).exists():
         review.like_users.remove(request.user)
+        rl_is_liked = False
     else:
         review.like_users.add(request.user)
-    return redirect('mountains:mountain_detail', pk)
+        rl_is_liked = True
+    rl_likes_count = review.like_users.all().count()
+    context = {
+        'rl_is_liked' : rl_is_liked,
+        'rl_likes_count' : rl_likes_count,
+    }
+    return JsonResponse(context)
 
 
 @login_required

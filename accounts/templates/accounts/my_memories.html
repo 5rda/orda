@@ -1,8 +1,25 @@
-{% extends 'base.html' %}
+{% extends 'base2.html' %}
 {% load static %}
-
 {% block style %}
 <style>
+  a {
+    color: black;
+    text-decoration: none;
+  }
+
+  button {
+    border: white;
+    background-color: transparent;
+  }
+
+  li {
+    list-style : none;<div>…</div>
+  }
+
+  p{
+    margin: 0px;
+  }
+
   .marker-title {
     background-color: white;
     color: black;
@@ -14,37 +31,105 @@
   }
   .info-window {
     position: relative;
-    width: 150px; /* Set the desired width */
+    width: 200x; /* Set the desired width */
   }
   .visited {
     color: black;
+    font-weight: bold; 
   }
+
   .unvisited {
     color: gray;
   }
+
+  .visited,
+  .unvisited {
+    font-size: 16px;
+    padding: 5px 10px;
+  }
+
+  .memories__warp {
+    margin: 30px 8%;
+    padding: 0px 16px;
+    min-width: 430px;
+    position: relative;
+  }
+
+  .map__style {
+    border: 10px double var(--sub-color2);
+    width:100%;
+    height:500px;
+    margin: 30px 0px;
+  }
+
+  .flex--row {
+    display: flex;
+    justify-content: space-around; 
+  }
+
+  .flex--col {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .color--red {
+    color: var(--red-color)
+  }
+
+  .color--green {
+    color: var(--green-btn)
+  }
+
+  .unvisited:hover,
+  .visited:hover{
+    background-color: #fffaed;
+  }
+
+  @media (max-width:1080px) {
+    .memories__warp {
+      margin: 30px 0px;
+      padding: 0px;
+    }
+  }
+  
 </style>
 {% endblock style %}
 
 {% block content %}
+<div class="memories__warp">
+  <h1> 오른기억 </h1>
 <!-- 지도를 표시하는 div -->
-<div id="map" style="width:100%;height:500px;"></div>
+  <div id="map" class="map__style"></div>
 
-<div>
-  <h1>다녀온 산</h1>
-  {% for mountain in mountains %}
+
+   <h2>다녀온 산</h2>
+   {% for mountain in mountains %}
     {% if mountain.name in visited_mountains %}
-      {{ mountain.name }}
-      <ul>
-        {% for course in mountain.course_set.all %}
-          {% if course in visited_courses %}
-            <li class='visited'>{{ course.crs_name_detail }}</li>
-          {% else %}
-            <li class='unvisited'>{{ course.crs_name_detail }}</li>
-          {% endif %}
-        {% endfor %}
-      </ul>
-      <hr>
-    {% endif %}
+     <div class="accordion tw-class mb-3 w-100" id="accordion{{ mountain.pk }}">
+       <div class="accordion-item">
+         <h2 class="accordion-header">
+           <button class="accordion-button w-100" style="background: var(--background-color)" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ mountain.pk }}" aria-expanded="true" aria-controls="collapse{{ mountain.pk }}">
+             <p class="fs-3">{{ mountain.name }}</p>
+             <p class="ps-3 mt-2">총 {{ mountain.course_set.count }}코스</p>
+           </button>
+         </h2>
+          <div id="collapse{{ mountain.pk }}" class="accordion-collapse collapse show container" data-bs-parent="#accordion{{ mountain.pk }}">
+            <div class="row">
+            {% for course in mountain.course_set.all %}
+              {% if course in visited_courses %}
+                <a href="{% url 'posts:create'%}" onclick="return confirm('마이코스를 쓰러  가시겠습니까?')" class="visited col-6 col-md-3 col-xxl-2">{{ course.crs_name_detail }}
+                <i class="bi bi-flag-fill color--red"></i>
+              {% else %}
+                <a href="{% url 'mountains:course_list' mountain.pk %}" class="unvisited col-6 col-md-3 col-xxl-2">{{ course.crs_name_detail }}
+                <i class="bi bi-flag color--red"></i>
+              {% endif %}
+              </a>
+            {% endfor %}
+            </div>
+          </div>
+        </div> 
+      </div>
+      {% endif %}
   {% endfor %}
 </div>
 
@@ -65,31 +150,40 @@
   var positions = [];
 
   {% for mountain in mountains %}
-    var content = '<strong>{{ mountain.name }}</strong><br>';
+    var content = '<div class="fs-4 text-center fw-bolder" style="width: 200x; z-index:1;">{{ mountain.name }}</div><br>';
+    var mountainCourses = [];
     {% for course in mountain.course_set.all %}
-    content += '<div>{{ course.crs_name_detail }} <form action="{% url "accounts:my_memories" %}" method="POST">{% csrf_token %}<input type="hidden" name="course_id" value="{{ course.id }}"><input type="submit" {% if course in visited_courses %}value="갔음"{% else %}value="안갔음"{% endif %} class="btn btn-outline-primary"></form></div>';
+      var visitedCourse = {% if course in visited_courses %}true{% else %}false{% endif %};
+      content += '<div class="flex--row m-1" style="width: 200x;">{{ course.crs_name_detail }} <form action="{% url "accounts:my_memories" %}" method="POST"> {% csrf_token %}<input type="hidden" name="course_id" value="{{ course.id }}"> {% if course in visited_courses %} <button type="submit" class="bi bi-flag-fill color--red"></button> {% else %} <button type="submit" class="bi bi-flag color--green"></button>{% endif %}</form></div>';
+      mountainCourses.push(visitedCourse);
     {% endfor %}
 
     var position = {
       title: "{{ mountain.name }}",
       latlng: new kakao.maps.LatLng({{ mountain.geom.y }}, {{ mountain.geom.x }}),
-      content: content
+      content: content,
+      style: "padding: 30px;",
+      courses: mountainCourses,
     };
     positions.push(position);
   {% endfor %}
-  
+
   // 마커 이미지 및 크기 커스텀
-  var imageSrc = "{% static 'img/mountain.png' %}";
+  var imageSrc = "{% static 'img/icons/mountain.png' %}";
   var imageSize = new kakao.maps.Size(25, 25);
   var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
+
+  var imageSrc2 = "{% static 'img/icons/mountain_goal.png' %}";
+  var markerImage2 = new kakao.maps.MarkerImage(imageSrc2, imageSize);
 
   var markers = [];
 
   for (var i = 0; i < positions.length; i++) {
+    var markerImageToUse = positions[i].courses.includes(true) ? markerImage2 : markerImage;
     var marker = new kakao.maps.Marker({
       position: positions[i].latlng,
       title: positions[i].title,
-      image: markerImage
+      image: markerImageToUse,
     });
     markers.push(marker);
   }
@@ -111,7 +205,7 @@
 
   for (var i = 0; i < positions.length; i++) {
     var infowindow = new kakao.maps.InfoWindow({
-      content: '<div class="info-content">' + positions[i].content + '</div>'
+      content: '<div class="" style="width:200px; overflow: overlay; max-height:300px; z-index: 1;">' + positions[i].content + '</div>'
     });
 
     infowindows.push(infowindow);
@@ -174,4 +268,5 @@
   });
 
 </script>
+
 {% endblock javascript %}
