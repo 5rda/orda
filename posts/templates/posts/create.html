@@ -17,6 +17,15 @@
       <div>
         {{ form.content }}
       </div>
+      <div>
+        <label for="mountain">다녀온 산:</label>
+        <select name="mountain" id="mountain">
+            <option value="" selected></option>
+            {% for mountain in mountains %}
+                <option value="{{ mountain.pk }}">{{ mountain.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
       <div class="btn__wrap">
         <input type="submit" value="뒤로가기" class="btn--back rounded"  onclick=window.history.back()>
         <input type="submit" value='작성' class="btn--submit rounded">
