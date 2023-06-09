@@ -109,14 +109,14 @@ class MountainDetailView(DetailView):
         print(now_weather_data)
         tem = now_weather_data['기온']
         hum = now_weather_data['습도']
-        # sky = now_weather_data['하늘상태']
+        sky = now_weather_data['하늘상태']
         rain = now_weather_data['강수량']
         vec = now_weather_data['풍향']
         wsd = now_weather_data['풍속']
         now_time = now_weather_data['현재시각']
 
-        # sun = ['0700', '0800', '0900', '1000', '1100', '1200', '1300', '1400', '1500', '1600', '1700', '1800', '1900']
-        # moon = ['2000', '2100', '2200', '2300', '0000', '0100', '0200', '0300', '0400', '0500', '0600']
+        sun = ['0700', '0800', '0900', '1000', '1100', '1200', '1300', '1400', '1500', '1600', '1700', '1800', '1900']
+        moon = ['2000', '2100', '2200', '2300', '0000', '0100', '0200', '0300', '0400', '0500', '0600']
         
         air_data = self.get_air()
 
@@ -189,13 +189,13 @@ class MountainDetailView(DetailView):
             # 날씨
             'tem': tem,
             'hum': hum,
-            # 'sky': sky,
+            'sky': sky,
             'rain': rain,
             'vec': vec,
             'wsd': wsd,
             'now_time': now_time,
-            # 'sun': sun,
-            # 'moon': moon,
+            'sun': sun,
+            'moon': moon,
 
             # 미세먼지, 오존
             'region': region,
@@ -234,8 +234,6 @@ class MountainDetailView(DetailView):
                     item['title'] = item['title'].replace('</b>', "")
                 result.extend(items)
                 # result_set.update(json.loads(response_body)["items"])
-
-            time.sleep(0.5)  # API 요청 간격을 조절하기 위해 0.5초 대기
         
         result = [dict(t) for t in {tuple(d.items()) for d in result}]
 
@@ -246,15 +244,15 @@ class MountainDetailView(DetailView):
     def get_weather_forecast(self):
         mountain = self.get_object()
         # API 요청을 위한 URL과 파라미터 설정
-        url = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst"
+        url = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst"
 
         serviceKey = "pY3s%2Fd1LhFkVDzZcyCuSavULc%2FJZVnzLRpdbmNUk6lD6Akcsw40HeR%2Bjop2DicS0L3UilYgnHE%2F8MKqMDTs2NQ%3D%3D"
         serviceKeyDecoded = unquote(serviceKey, 'UTF-8')
 
         now = datetime.now()
         today = datetime.today().strftime("%Y%m%d")
-        # y = date.today() - timedelta(days=1)
-        # yesterday = y.strftime("%Y%m%d")
+        y = date.today() - timedelta(days=1)
+        yesterday = y.strftime("%Y%m%d")
 
         NX = 149            ## X축 격자점 수
         NY = 253            ## Y축 격자점 수
@@ -304,33 +302,33 @@ class MountainDetailView(DetailView):
         
         nx, ny = mapToGrid(mountain.geom.y, mountain.geom.x)
 
-        # if 0 < now.minute <= 59: # base_time와 base_date 구하는 함수
-        #     if now.hour==0:
-        #         base_time = "0000"
-        #         base_date = yesterday
-        #     else:
-        #         pre_hour = now.hour-1
-        #         if pre_hour < 10:
-        #             base_time = "0" + str(pre_hour) + "30"
-        #         else:
-        #             base_time = str(pre_hour) + "30"
-        #         base_date = today
-        # else:
-        #     if now.hour < 10:
-        #         base_time = "0" + str(now.hour-1) + "30"
-        #     else:
-        #         base_time = str(now.hour-1) + "30"
-        #     base_date = today
-
-        if now.hour - 1 < 10:
-            now_time = '0'+str(now.hour-1)+'0'+'0'
+        if 0 < now.minute <= 59: # base_time와 base_date 구하는 함수
+            if now.hour==0:
+                base_time = "2330"
+                base_date = yesterday
+            else:
+                pre_hour = now.hour-1
+                if pre_hour < 10:
+                    base_time = "0" + str(pre_hour) + "30"
+                else:
+                    base_time = str(pre_hour) + "30"
+                base_date = today
         else:
-            now_time = str(now.hour-1)+'0'+'0'
+            if now.hour < 10:
+                base_time = "0" + str(now.hour-1) + "30"
+            else:
+                base_time = str(now.hour-1) + "30"
+            base_date = today
+
+        if now.hour < 10:
+            now_time = '0'+str(now.hour)+'0'+'0'
+        else:
+            now_time = str(now.hour)+'0'+'0'
 
         queryParams = '?' + urlencode({ 
               quote_plus('serviceKey') : serviceKeyDecoded,
-              quote_plus('base_date') : today,
-              quote_plus('base_time') : now_time,
+              quote_plus('base_date') : base_date,
+              quote_plus('base_time') : base_time,
               quote_plus('nx') : nx,
               quote_plus('ny') : ny,
               quote_plus('dataType') : 'json',
@@ -341,22 +339,22 @@ class MountainDetailView(DetailView):
         response = requests.get(url + queryParams, verify=False)
         items = response.json().get('response').get('body').get('items') #데이터들 아이템에 저장
         now_weather_data = dict()
-
+    
         for item in items['item']:
             # 기온
-            if item['category'] == 'T1H':
-                now_weather_data['기온'] = item['obsrValue']
+            if item['category'] == 'T1H' and item['fcstDate'] == today and item['fcstTime'] == now_time:
+                now_weather_data['기온'] = item['fcstValue']
             # 습도
-            if item['category'] == 'REH':
-                now_weather_data['습도'] = item['obsrValue']
+            if item['category'] == 'REH' and item['fcstDate'] == today and item['fcstTime'] == now_time:
+                now_weather_data['습도'] = item['fcstValue']
             # 하늘상태: 맑음(1) 구름많은(3) 흐림(4)
-            # if item['category'] == 'SKY':
-            #     now_weather_data['하늘상태'] = item['obsrValue']
+            if item['category'] == 'SKY' and item['fcstDate'] == today and item['fcstTime'] == now_time:
+                now_weather_data['하늘상태'] = item['fcstValue']
             # 1시간 동안 강수량
-            if item['category'] == 'RN1':
-                now_weather_data['강수량'] = item['obsrValue']
+            if item['category'] == 'RN1' and item['fcstDate'] == today and item['fcstTime'] == now_time:
+                now_weather_data['강수량'] = item['fcstValue']
             # 풍향
-            if item['category'] == 'VEC':
+            if item['category'] == 'VEC' and item['fcstDate'] == today and item['fcstTime'] == now_time:
                 def get_direction(deg):
                     if '22.5' <= deg < '67.5':
                         return '북동'
@@ -374,13 +372,13 @@ class MountainDetailView(DetailView):
                         return '북서'
                     else:
                         return '북'
-                now_weather_data['풍향'] = get_direction(item['obsrValue'])
+                now_weather_data['풍향'] = get_direction(item['fcstValue'])
             # 풍속
-            if item['category'] == 'WSD':
-                now_weather_data['풍속'] = item['obsrValue']
+            if item['category'] == 'WSD' and item['fcstDate'] == today and item['fcstTime'] == now_time:
+                now_weather_data['풍속'] = item['fcstValue']
             # 현재시각
-            now_weather_data['현재시각'] = now_time
-
+            if item['fcstDate'] == today and item['fcstTime'] == now_time:
+                now_weather_data['현재시각'] = now_time
         return now_weather_data
 
     def get_air(self):

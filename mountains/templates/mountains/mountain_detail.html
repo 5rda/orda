@@ -103,7 +103,7 @@
         <div class="d-flex flex-row justify-content-between">
           <div class="weather--wrap">
             <div class="d-flex flex-row justify-content-center" style="height: 60%; margin-bottom: 14px;">
-              {% comment %} <div class="weather--sky">
+              <div class="weather--sky">
                 {% if now_time in sun %}
                   {% if sky == '1' %}
                     <img class="weather--skyimg" src="{% static 'img/weather/sunny.png' %}" alt="아침맑음" title="맑음">
@@ -121,7 +121,7 @@
                     <img class="weather--skyimg" src="{% static 'img/weather/overcast.png' %}" alt="흐림" title="흐림">
                   {% endif %}
                 {% endif %}
-              </div> {% endcomment %}
+              </div>
               <div class="d-flex flex-row">
                 <p class="weather--tem">{{ tem }}</p>
                 <p style="font-size: 2rem; line-height: 140px;">℃</p>
