@@ -60,6 +60,21 @@
   z-index: 10;
 }
 
+.page__btn {
+  font-weight: bold; 
+  padding: 3px;
+  font-size: 20px;
+}
+
+.page__btn:hover {
+  color: var(--background-color);
+}
+
+.pagination__link--active{
+  color: var(--green-btn);
+}
+
+
 
 @media (max-width:1080px) {
   .course__wrap {

@@ -385,7 +385,7 @@ class MountainDetailView(DetailView):
         return air
 
 
-
+from django.core.paginator import Paginator
 class CourseListView(ListView):
     template_name = 'mountains/course_list.html'
     context_object_name = 'courses'
@@ -418,30 +418,41 @@ class CourseListView(ListView):
 
         return queryset
 
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         mountain_pk = self.kwargs['mountain_pk']
-        courses = self.get_queryset()
         mountain = Mountain.objects.get(pk=mountain_pk)
         sort_option = self.request.GET.get('sort', '')  # 정렬 옵션 가져오기
 
+        queryset = self.get_queryset()  # get_queryset 메서드 호출
+
+        # 페이지네이션
+        paginator = Paginator(queryset, self.paginate_by)
+        page_number = self.request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
         serializer = Serializer()
         course_details = {}
-        for course in courses:
+        for course in page_obj:
             geojson_data = serializer.serialize(CourseDetail.objects.filter(crs_name_detail=course), fields=('geom', 'is_waypoint', 'waypoint_name', 'crs_name_detail'))
-            course_details[course.pk] =geojson_data
-        context = {
+            course_details[course.pk] = geojson_data
+
+        context.update({
             'mountain': mountain,
-            'courses': courses,
-            'course_details': course_details
-        }        
-        return context        
+            'courses': page_obj,
+            'course_details': course_details,
+            'is_paginated': page_obj.has_other_pages(),
+            'page_obj': page_obj,
+        })
+        return context     
 
 
 class CourseAllListView(ListView):
     template_name = 'mountains/course_all_list.html'
     context_object_name = 'courses'
     model = Course
+    paginate_by = 10
 
     def get_queryset(self):
         queryset = super().get_queryset()

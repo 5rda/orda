@@ -59,6 +59,31 @@
     </li>
     {% endfor %}
   </ul>
+<!-- 페이지네이션 -->
+<div class="pagination mt-4">
+  <div class="mx-auto">
+    {% if is_paginated %}
+      {% if page_obj.has_previous %}
+        <a href="?page=1{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" class="page__btn ">&lt;&lt;</a>
+      {% endif %}
+
+      {% for num in page_obj.paginator.page_range %}
+        {% if num > page_obj.number|add:'-5' and num < page_obj.number|add:'5' %}
+          {% if num == page_obj.number %}
+            <span class="page__btn pagination__link--active">{{ num }}</span>
+          {% else %}
+            <a href="?page={{ num }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" class="page__btn ">{{ num }}</a>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+
+
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" class="page__btn ">&gt;&gt;</a>
+      {% endif %}
+    {% endif %}
+  </div>
+</div>
 </div>
 {% endblock content %}
 
