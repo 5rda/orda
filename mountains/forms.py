@@ -3,20 +3,31 @@ from .models import *
 
 class ReviewCreationForm(forms.ModelForm):
     content = forms.CharField(
-        widget=forms.Textarea(),
+        widget=forms.Textarea(
+            attrs={
+                'class': "mountain__reviewcrt--cont",
+                'placeholder': "내용를 입력하세요."
+            }
+        ),
     )
 
     image = forms.ImageField(
         widget=forms.ClearableFileInput(
             attrs={
-                'onchange': "previewImage(event)"
+                'onchange': "previewImage(event)",
+                'class': "mountain__reviewcrt--imgbox",
+                'id': "id_image"
             }
         ),
     )
 
     tags = forms.ModelMultipleChoiceField(
         queryset=Tag.objects.all(),
-        widget=forms.CheckboxSelectMultiple,
+        widget=forms.CheckboxSelectMultiple(
+            attrs={
+                'class': "mountain__reviewcrt--tagbox"
+            }
+        ),
         label='태그 선택',
     )
 
