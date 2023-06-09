@@ -21,6 +21,7 @@ def mountain_list(request):
         tags = request.POST.getlist('tags')
         sido = request.POST.get('sido2')
         gugun = request.POST.get('gugun2')
+        search_query = request.POST.get('search_query')
         filter_condition = Q()
 
         if sido and gugun:
@@ -37,10 +38,13 @@ def mountain_list(request):
             filtered_pks = filtered_mountains.values_list('pk', flat=True)
             mountains = mountains.filter(pk__in=filtered_pks)
 
+        if search_query:
+            mountains = mountains.filter(name__icontains=search_query)
+
         mountains = mountains.filter(filter_condition)
 
         # 필터링된 객체를 세션에 저장
-        request.session['filtered_mountains'] = list(mountains.values_list('pk', flat=True))
+        request.session['filtered_mountains'] = list(mountains.values_list('pk', flat=True))            
 
     elif request.method == 'GET':
         # GET 요청 처리
