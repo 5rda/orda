@@ -98,8 +98,9 @@ body {
 }
 
 .header__search--text {
-  color: #B2B2B2;
-  padding-left: 10px;
+  padding-left:10px;
+  background-color: #F2F2F2;
+  width:100%;
 }
 
 .header__user--list {

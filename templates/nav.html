@@ -8,13 +8,13 @@
         <div class="header__navbox1">
           <ul class="header__nav--list">
             <li class="header__nav--item">
-              <button id="탐색" class="{% if active_button_id == '탐색' %}active-button{% endif %}">탐색</button>
+              <a id="탐색" class="{% if active_button_id == '탐색' %}active-button{% endif %}" href="{% url 'mountains:search' %}">탐색</a>
             </li>
             <li class="header__nav--item">
               <a id="마이코스" class="{% if active_button_id == '마이코스' %}active-button{% endif %}" href="{% url 'posts:index' %}">마이코스</a>
             </li>
             <li class="header__nav--item">
-              <button id="등산로" class="{% if active_button_id == '등산로' %}active-button{% endif %}">등산로</button>
+              <a id="등산로" class="{% if active_button_id == '등산로' %}active-button{% endif %}" href="{% url 'mountains:course_all_list' %}">등산로</a>
             </li>
             <li class="header__nav--item">
               <a id="인증샷" class="{% if active_button_id == '인증샷' %}active-button{% endif %}" href="{% url 'posts:proofshot' %}">인증샷</a>
@@ -24,11 +24,17 @@
         <div class="header__navbox2">
           <div class="header__search">
             <div class="header__search--list">
-              <svg id="i-search" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="18" height="18" fill="none" stroke="#B2B2B2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                <circle cx="14" cy="14" r="12" />
-                <path d="M23 23 L30 30"  />
-              </svg>
-              <span class="header__search--text">무엇을 찾으시나요?</span>
+              <div>
+                <svg id="i-search" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="18" height="18" fill="none" stroke="#B2B2B2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                  <circle cx="14" cy="14" r="12" />
+                  <path d="M23 23 L30 30"  />
+                </svg>
+              </div>
+              <form action="{% url 'mountains:mountain_list' %}" method="POST">
+                {% csrf_token %}
+                <input class="header__search--text" type="text" name="search_query" placeholder="무엇을 찾으시나요?">
+                <button type="submit" hidden></button>
+              </form>
             </div>
           </div>
           <div class="header__user--list">

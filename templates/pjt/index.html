@@ -38,7 +38,7 @@
       <p class='article__p'>나에게 딱 맞는 산을 찾고있다면?</p>
       <img class='article__icon' src="{% static 'img/icon/search.png' %}" alt="">
       <P class='article__p--strong'>키워드 검색으로 찾으로 가기!</P>
-      <a href="#"><button class='rounded-full article__btn'>탐색</button></a>
+      <a href="{% url 'mountains:search' %}"><button class='rounded-full article__btn'>탐색</button></a>
       {% comment %}  {% url 'mountains:search' %}  {% endcomment %}
     </div>
   
@@ -61,7 +61,7 @@
       <P class='article__p'>인증샷을 찍었다면?</P>
       <img class='article__icon header__div__img' src="{% static 'img/icon/selfie.png' %}" alt="">
       <P class='article__p--strong'>추억을 공유해보세요</P>
-      <a href="#"><button class='rounded-full article__btn2'>인증샷</button></a>
+      <a href="{% url 'posts:proofshot' %}"><button class='rounded-full article__btn2'>인증샷</button></a>
       {% comment %} {% url 'mountains:photo?' %} {% endcomment %}
     </div>
   </article>
