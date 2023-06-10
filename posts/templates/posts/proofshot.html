@@ -7,7 +7,7 @@
 {% block content %}
   <div class="container my-12 mx-auto px-4 md:px-12">
     <div class="flex flex-wrap -mx-1 lg:-mx-4">
-      {% for post in view_posts %}
+      {% for post in image_posts %}
         <!-- Column -->
         <div class="my-1 px-1 w-full md:w-1/2 lg:my-4 lg:px-4 lg:w-1/3 xl:my-4 xl:px-4 xl:w-1/6">
           <!-- Article -->
@@ -17,8 +17,6 @@
                   {% with first_image_url=post.content|get_first_image_from_content %}
                     {% if first_image_url %}
                       <img class="block h-[300px] w-full object-cover"  src="{{ first_image_url }}" alt="썸네일">
-                    {% else %}
-                      <img class="block h-[300px] w-full object-cover" src="{% static 'img/nav_logo.png' %}" alt="대체이미지">
                     {% endif %}
                   {% endwith %}
                 </a>

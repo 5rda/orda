@@ -263,12 +263,10 @@ def search(request):
 
 
 def proofshot(request):
-    posts = Post.objects.order_by('-created_at')
-    view_posts = Post.objects.order_by('-view_count')
+    image_posts = Post.objects.filter(content__icontains='<img').order_by('-created_at')
     
     context = {
-        'posts': posts,
-        'view_posts': view_posts,
+        'image_posts': image_posts,
     }
 
     return render(request, 'posts/proofshot.html', context)
