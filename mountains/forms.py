@@ -1,5 +1,48 @@
 from django import forms
 from .models import *
+from django.utils.html import format_html
+from django.forms.utils import flatatt
+from django.utils.safestring import mark_safe
+from django.forms.widgets import CheckboxSelectMultiple
+
+
+        
+class ButtonSelectMultiple(CheckboxSelectMultiple):
+    def __init__(self, queryset=None, *args, **kwargs):
+        self.queryset = queryset
+        super().__init__(*args, **kwargs)
+        
+    def render(self, name, value, attrs=None, renderer=None):
+        if value is None:
+            value = []
+
+        has_id = attrs and 'id' in attrs
+        final_attrs = self.build_attrs(self.attrs, attrs) if attrs else self.attrs
+
+        output = []
+        for tag in self.queryset:
+            option_value = str(tag.pk)
+            option_label = str(tag)
+            is_checked = option_value in value
+
+            button_attrs = final_attrs.copy()
+            button_attrs['type'] = 'checkbox'
+            button_attrs['name'] = name
+            button_attrs['value'] = option_value
+            button_attrs['data-tag-name'] = option_label
+
+            if is_checked:
+                button_attrs['class'] += ' selected'
+
+            output.append(format_html(
+                '<label class="mountain__reviewcrt--tag"><input{0} /> # {1}</label>',
+                flatatt(button_attrs),
+                option_label,
+            ))
+
+        return mark_safe('\n'.join(output))
+
+
 
 class ReviewCreationForm(forms.ModelForm):
     content = forms.CharField(
@@ -23,9 +66,10 @@ class ReviewCreationForm(forms.ModelForm):
 
     tags = forms.ModelMultipleChoiceField(
         queryset=Tag.objects.all(),
-        widget=forms.CheckboxSelectMultiple(
+        widget=ButtonSelectMultiple(
+            queryset=Tag.objects.all(),
             attrs={
-                'class': "mountain__reviewcrt--tagbox"
+                'class': "visually-hidden"
             }
         ),
         label='태그 선택',

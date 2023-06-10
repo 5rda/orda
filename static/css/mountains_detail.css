@@ -261,24 +261,64 @@ th {
   transform: translate(-50%, -50%);
 }
 
+.mountain__reviewcrt--tag {
+  padding: 0 10px;
+  border: 1px solid #198754;
+  color: #198754;
+  border-radius: 8px;
+  cursor: pointer;
+  position:relative;
+  font-size: 14px;
+  text-align: center;
+  margin-right: 5px;
+  margin-bottom: 5px;
+}
+
+.mountain__reviewcrt--tag:hover {
+  background-color: #198754;
+  color: white;
+}
+
 .mountain__reviewcrt--tagbox {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  padding: 0 10px;
+  position:relative;
+  height: 120px;
+  margin: 0 10px 10px 10px;
+  padding: 10px;
+  border: solid 1px #777777;
+  overflow-y: scroll;
 }
 
-.mountain__reviewcrt--tagbox > li > label{
+.visually-hidden {
+  position: absolute;
+  left: -9999px;
+  opacity: 0;
+}
+
+.selected {
+  background-color: #198754;
+  color: white;
+}
+
+.selected-tags {
   display: flex;
-  flex-direction: row;
-  margin-left: 8px;
-}
-
-.mountain__reviewcrt--tagbox > li > label > input{
-  margin-right: 3px;
+  flex-wrap: wrap;
+  height: 30px;
+  margin: 0 10px;
+  border-bottom: solid 1px #777777;
 }
 
 /* section5-리뷰 */
+.mointain__review {
+  margin-bottom: 30px;
+}
+
+.mointain__review:hover {
+  background-color: #DBDBDB;
+}
+
 .mountain__detail--reviewtitle {
   font-size: 1.5rem;
   font-weight: bold;
@@ -331,7 +371,11 @@ th {
 .mountain__detail--reviewcontimgbox {
   position: relative;
   width: 160px;
-  height: 160px;
+}
+
+.mountain__detail--reviewmodalimgbox {
+  position: relative;
+  width: 100%;
 }
 
 .mountain__detail--reviewcontimg {
@@ -367,6 +411,24 @@ th {
   display: flex;
   flex-direction: row;
   margin: 0 5px 0 5px;
+}
+
+.reviewBtnbox {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.reviewloadMoreBtn {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #198754
+}
+
+.reviewCloseBtn {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #198754
 }
 
 /* side btn */
