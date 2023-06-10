@@ -152,9 +152,11 @@ def update(request):
 
 @login_required
 def delete(request):
-    request.user.delete()
-    auth_logout(request)
-    return render(request, 'pjt/index.html')
+    if request.method == 'POST':
+        request.user.delete()
+        auth_logout(request)
+        return render(request, 'pjt/index.html')
+    return render(request, 'accounts/delete.html')
 
 
 @login_required
