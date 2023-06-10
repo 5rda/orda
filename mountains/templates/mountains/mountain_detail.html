@@ -240,7 +240,7 @@
 
   <!-- 리뷰 생성 -->
   <section>
-    <form action="{% url 'mountains:create_review' mountain.pk %}" method="POST" enctype="multipart/form-data">
+    <form id="review-form" action="{% url 'mountains:create_review' mountain.pk %}" method="POST" enctype="multipart/form-data">
       {% csrf_token %}
       <div class="d-flex flex-row">
         <div id="review-image" style="position: relative; height: 100%;">
@@ -250,12 +250,17 @@
             <img id="preview" class="preview-image" src="#" alt="Preview Image" style="display: none;">
           </div>
           <div class="review__submit--btn">
-            <button type="submit" class="btn btn-outline-success">등록하기</button>
+            <button type="submit" id="submit-button" class="btn btn-outline-success">등록하기</button>
           </div>
         </div>
         <div>
-          <div id="review-tags">{{ form.tags }}</div>
-          <div id="review-content" class="mountain__reviewcrt--contbox">{{ form.content }}</div>
+          <div id="review-tags" class="mountain__reviewcrt--tagbox">
+            {{ form.tags|safe }}
+          </div>
+          <div id="selected-tags" class="selected-tags"></div>
+          <div id="review-content" class="mountain__reviewcrt--contbox">
+            {{ form.content }}
+          </div>
         </div>
       </div>
     </form>
@@ -265,15 +270,37 @@
 
   <section>
     <h1 class="mountain__detail--reviewtitle">리뷰<span class="mountain__detail--reviewtitle2">{{ reviews|length }}</span></h1>
-    <ul>
+    <ul id="reviewList">
       {% for review in reviews %}
-      <li>
+      <li {% if forloop.counter > 5 %}style="display: none;"{% endif %} class="mointain__review">
         <div class="mountain__detail--reviewbox">
+          <!-- Button trigger modal -->
+          <button type="button" class="" data-bs-toggle="modal" data-bs-target="#reviewImg-{{ review.pk }}">
             <div class="mountain__detail--reviewcontimgbox">
               {% if review.image %}
                 <img class="mountain__detail--reviewcontimg" src="{{ review.image.url }}" alt="">
               {% endif %}
             </div>
+          </button> 
+    
+          <!-- Modal -->
+          <div class="modal fade" id="reviewImg-{{ review.pk }}" tabindex="-1" aria-labelledby="reviewImgLabel-{{ review.pk }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <div class="mountain__detail--reviewmodalimgbox">
+                    {% if review.image %}
+                      <img class="mountain__detail--reviewcontimg" src="{{ review.image.url }}" alt="">
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="mountain__detail--contentbox">
             <div class="mountain__detail--reviewinfo">
               <a href="{% url 'accounts:profile' review.user.pk %}">
@@ -356,9 +383,13 @@
           </form>
         </div>
       </div>
-      <hr>
       {% endfor %}
     </ul>
+    <hr>
+    <div class="reviewBtnbox">
+      <button id="reviewloadMoreBtn" class="reviewloadMoreBtn" {% if reviews|length <= 5 %}style="display: none;"{% endif %}>더보기</button>
+      <button id="reviewCloseBtn" class="reviewCloseBtn" style="display: none;">닫 기</button>
+    </div>
   </section>
     
   <hr style="margin-bottom: 30px;">    
@@ -520,12 +551,10 @@ function initMap(courseId, course) {
 <script>
   function bookmark(courseId) {
     const bookmarkBtn = document.getElementById('bookmark-btn-' + courseId);
-    console.log(bookmarkBtn)
     const mountainCsrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
 
     if (bookmarkBtn) {
       bookmarkBtn.addEventListener('click', () => {
-        console.log('실행')
         event.preventDefault(); // 폼의 기본 동작 중지
         const mountainPk = bookmarkBtn.getAttribute('data-mountain-pk');
         const coursePk = bookmarkBtn.getAttribute('data-course-pk');
@@ -596,6 +625,33 @@ function initMap(courseId, course) {
 </script>
 
 <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var tagButtons = document.querySelectorAll('#review-tags label input');
+    var selectedTagsContainer = document.getElementById('selected-tags');
+  
+    tagButtons.forEach(function(tagButton) {
+      tagButton.addEventListener('click', function(event) {
+        var label = this.parentElement;
+        label.classList.toggle('selected');
+
+        // 선택한 태그 목록 업데이트
+        var selectedTags = document.querySelectorAll('#review-tags label.selected input');
+        console.log(selectedTags)
+
+        // 선택된 태그 목록 표시
+        var selectedTagsArray = Array.from(selectedTags).map(function(input) {
+          var inputName = '# ' + input.getAttribute('data-tag-name');
+          return '<div class="mountain__reviewcrt--tag selected">' + inputName + '</div>';
+        });
+
+        // 선택된 태그들을 쉼표로 구분한 문자열로 설정하여 selectedTagsContainer 내에 업데이트
+        selectedTagsContainer.innerHTML = selectedTagsArray.join(' ');
+      });
+    });
+  });
+</script>
+  
+<script>
   // 수정 버튼 클릭 시 모달창 열기
   var editButtons = document.getElementsByClassName("editBtn");
   var editModals = document.getElementsByClassName("editModal");
@@ -638,6 +694,42 @@ function initMap(courseId, course) {
   function closeModal(modal) {
       modal.style.display = "none";
   }
+</script>
+
+<script>
+  
+  document.getElementById('reviewloadMoreBtn').addEventListener('click', function() {
+    var reviewList = document.getElementById('reviewList');    
+    var hiddenItems = reviewList.querySelectorAll('li[style="display: none;"]');
+    var visibleItems = reviewList.querySelectorAll('li:not([style="display: none;"])');
+    console.log(hiddenItems)
+  
+    if (visibleItems.length < reviewList.children.length) {
+      for (var i = 0; i < hiddenItems.length && i < 5; i++) {
+        hiddenItems[i].style.display = 'block';
+      }    
+    }
+
+    var NewhiddenItems = reviewList.querySelectorAll('li[style="display: none;"]');
+
+    if (NewhiddenItems.length === 0) {
+      document.getElementById('reviewloadMoreBtn').style.display = 'none';
+      document.getElementById('reviewCloseBtn').style.display = 'inline-block';
+    }
+  });
+
+  
+  document.getElementById('reviewCloseBtn').addEventListener('click', function() {
+    var reviewList = document.getElementById('reviewList');
+    var items = reviewList.querySelectorAll('li');
+  
+    for (var i = 5; i < items.length; i++) {
+      items[i].style.display = 'none';
+    }
+  
+    this.style.display = 'none';
+    document.getElementById('reviewloadMoreBtn').style.display = 'inline-block';
+  });  
 </script>
 
 <script>
