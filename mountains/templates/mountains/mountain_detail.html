@@ -57,10 +57,37 @@
             <th>고 도</th>
             <td>{{ mountain.height }}m</td>
           </tr>
+          <tr class="mountains__detail--stat">
+            <th>정 보</th>
+            <td>
+              <div class="overflow-hidden">
+                <p class="text-ellipsis line-clamp-3">
+                  {{ mountain.info }}
+                </p>
+                <button class="mt-2 text-gray-500 underline show-info-modal">더보기</button>
+              </div>
+
+              <!-- 모달 -->
+              <div id="info-modal" class="hidden fixed top-0 left-0 w-screen h-screen flex justify-center items-center bg-gray-900 bg-opacity-75" style="z-index: 9999;">
+                <div class="bg-white p-4">
+                  <p>{{ mountain.info }}</p>
+                  <button class="mt-2 text-gray-500 underline close-info-modal">닫기</button>
+                </div>
+              </div>
+            </td>
+          </tr>
         </table>
         <br>
-        <br>
-        <br>
+        
+        <!-- 베스트 댓글 -->
+        <div class="flex justify-center items-center">
+          <p id="bestReview" class="text-ellipsis line-clamp-2">
+            <span class="text-2xl text-gray-500">"</span>
+            {{ most_liked_review.content }}
+            <span class="text-2xl text-gray-500">"</span>
+          </p>
+        </div>
+        <button id="viewCommentButton" class="ml-2 text-md text-gray-500 underline" onclick="scrollToComment()">보기</button>
         <br>
         <br>
         <table>
@@ -72,6 +99,8 @@
             </td>
           </tr>
         </table>
+        <br>
+        <br>
         <!-- Button trigger modal -->
         <button type="button" class="mountain__detail--mapbtn" data-bs-toggle="modal" data-bs-target="#mountainMap">
           지도보기
@@ -272,7 +301,7 @@
     <h1 class="mountain__detail--reviewtitle">리뷰<span class="mountain__detail--reviewtitle2">{{ reviews|length }}</span></h1>
     <ul id="reviewList">
       {% for review in reviews %}
-      <li {% if forloop.counter > 5 %}style="display: none;"{% endif %} class="mointain__review">
+      <li id="best-{{ review.pk }}" {% if forloop.counter > 5 %}style="display: none;"{% endif %} class="mointain__review">
         <div class="mountain__detail--reviewbox">
           <!-- Button trigger modal -->
           <button type="button" class="" data-bs-toggle="modal" data-bs-target="#reviewImg-{{ review.pk }}">
@@ -841,6 +870,35 @@ function initMap(courseId, course) {
     }
   });
 </script>
+<script>
+  // mountain info 모달
+  // 더보기 버튼 클릭 시 모달 열기
+  document.querySelector('.show-info-modal').addEventListener('click', function() {
+    document.getElementById('info-modal').classList.remove('hidden');
+  });
 
+  // 모달 닫기 버튼 클릭 시 모달 닫기
+  document.querySelector('.close-info-modal').addEventListener('click', function() {
+    document.getElementById('info-modal').classList.add('hidden');
+  });
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const commentElement = document.getElementById('bestReview');
+    const viewCommentButton = document.getElementById('viewCommentButton');
+  
+    if (commentElement.scrollHeight > commentElement.clientHeight) {
+      commentElement.classList.add('clamp'); // 텍스트 클램핑을 위한 클래스 추가
+      viewCommentButton.classList.remove('hidden'); // 버튼을 보이도록 클래스 제거
+    }
+  });  
+
+
+  function scrollToComment() {
+    const bestReviewId = "{{ most_liked_review.pk }}"; // 해당 리뷰의 고유 식별자 가져오기
+    const bestReviewElement = document.getElementById(`best-${bestReviewId}`);
+    bestReviewElement.scrollIntoView({ behavior: 'smooth' }); // 해당 리뷰로 스크롤 이동
+  }
+</script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 {% endblock javascript %}

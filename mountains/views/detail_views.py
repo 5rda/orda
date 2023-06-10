@@ -36,6 +36,7 @@ class MountainDetailView(DetailView):
 
         # 리뷰 관련
         reviews = Review.objects.filter(mountain=mountain).order_by('-created_at')
+        most_liked_review = reviews.annotate(num_likes=Count('like_users')).order_by('-num_likes').first()
 
         # 기타
         now_weather_data = self.get_weather_forecast()
@@ -118,6 +119,7 @@ class MountainDetailView(DetailView):
             # 리뷰 관련
             'form': ReviewCreationForm(),
             'reviews': reviews,
+            'most_liked_review': most_liked_review,
 
             # 날씨
             'tem': tem,
