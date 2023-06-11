@@ -235,8 +235,14 @@ def kakao_callback(request):
             user_info = response.json()
 
             kakao_user_id = user_info['id']
-            email = user_info['kakao_account']['email']
-            profile_img = user_info['properties']['profile_image']
+            if 'email' in user_info['kakao_account']:
+                email = user_info['kakao_account']['email']
+            else:
+                email = None
+            if 'profile_image' in user_info['properties']:
+                profile_img = user_info['properties']['profile_image']
+            else:
+                profile_img = None
 
             user, created = User.objects.get_or_create(kakao_user_id=kakao_user_id)
 
