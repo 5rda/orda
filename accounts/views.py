@@ -334,21 +334,28 @@ def my_memories(request):
         .values_list('mountain_name', flat=True)
         .distinct()
     )
-
-    if request.method == 'POST':
+    if request.method == 'POST': # and request.is_ajax():
         course_id = request.POST.get('course_id')
         course = Course.objects.get(id=course_id)
 
         if course in visited_courses:
             request.user.visited_courses.remove(course)
+            is_visited = False
+
         else:
             VisitedCourse.objects.create(
                 user=request.user,
                 course=course,
                 mountain_name=course.mntn_name,
-                mountain_id=course.mntn_name.id
+                mountain_id=course.mntn_name.id,
             )
-        return redirect('accounts:my_memories')
+            is_visited = True
+        context = {
+            'is_visited' : is_visited,
+            'message': 'Visited course toggled successfully.',
+        }
+        return JsonResponse(context)
+        # return redirect('accounts:my_memories')
 
     context = {
         'mountains': mountains,
