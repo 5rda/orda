@@ -40,6 +40,7 @@
 
   .unvisited {
     color: gray;
+    font-weight: normal; 
   }
 
   .visited,
@@ -64,7 +65,6 @@
 
   .flex--row {
     display: flex;
-    justify-content: space-around; 
   }
 
   .flex--col {
@@ -73,11 +73,12 @@
   }
 
   .color--red {
-    color: var(--red-color)
+    color: var(--red-color);
+    z-index: 10;
   }
 
   .color--green {
-    color: var(--green-btn)
+    color: var(--green-btn);
   }
 
   .unvisited:hover,
@@ -97,7 +98,10 @@
 
 {% block content %}
 <div class="memories__warp">
-  <h1> 오른기억 </h1>
+  <div class="flex--row">
+    <h1> 오른기억 </h1>
+    <h1> <a href="{% url 'posts:create'%}" onclick="return confirm('마이코스를 쓰러  가시겠습니까?')" class="visited">마이코스</a></h1>
+  </div>
 <!-- 지도를 표시하는 div -->
   <div id="map" class="map__style"></div>
 
@@ -116,14 +120,24 @@
           <div id="collapse{{ mountain.pk }}" class="accordion-collapse collapse show container" data-bs-parent="#accordion{{ mountain.pk }}">
             <div class="row">
             {% for course in mountain.course_set.all %}
+            <div class="col-6 col-md-3 col-xxl-2 flex--row">
               {% if course in visited_courses %}
-                <a href="{% url 'posts:create'%}" onclick="return confirm('마이코스를 쓰러  가시겠습니까?')" class="visited col-6 col-md-3 col-xxl-2">{{ course.crs_name_detail }}
-                <i class="bi bi-flag-fill color--red"></i>
+                <a href="{% url 'posts:create'%}" onclick="return confirm('마이코스를 쓰러  가시겠습니까?')" class="visited ">{{ course.crs_name_detail }}
               {% else %}
-                <a href="{% url 'mountains:course_list' mountain.pk %}" class="unvisited col-6 col-md-3 col-xxl-2">{{ course.crs_name_detail }}
-                <i class="bi bi-flag color--red"></i>
+                <a href="{% url 'mountains:course_list' mountain.pk %}" class="unvisited">{{ course.crs_name_detail }}
               {% endif %}
               </a>
+              {% comment %} <form action="{% url "accounts:my_memories" %}" method="POST">  {% endcomment %}
+                <form class="flag-toggle-form" action="{% url 'accounts:my_memories' %}" method="post">
+                  {% csrf_token %}
+                  <input type="hidden" name="course_id" value="{{ course.id }}">
+                  {% if course in visited_courses %}
+                    <button type="submit" class="flag-toggle-btn bi bi-flag-fill color--red m-1" data-course-id="{{ course.id }}"></button>
+                  {% else %}
+                    <button type="submit" class="flag-toggle-btn bi bi-flag color--green m-1" data-course-id="{{ course.id }}"></button>
+                  {% endif %}
+                </form>
+            </div>
             {% endfor %}
             </div>
           </div>
@@ -137,6 +151,9 @@
 
 {% block javascript %}
 <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=d39fcd60ffdc96ae99454337f5e45a16&libraries=services,clusterer"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
   // 지도를 표시할 div와  지도 옵션으로  지도를 생성
   var mapContainer = document.getElementById('map');
@@ -149,26 +166,39 @@
   // 마커를 표시할 위치와 산 이름, 코스명 객체 배열
   var positions = [];
 
-  {% for mountain in mountains %}
-    var content = '<div class="fs-4 text-center fw-bolder" style="width: 200x; z-index:1;">{{ mountain.name }}</div><br>';
-    var mountainCourses = [];
-    {% for course in mountain.course_set.all %}
-      var visitedCourse = {% if course in visited_courses %}true{% else %}false{% endif %};
-      content += '<div class="flex--row m-1" style="width: 200x;">{{ course.crs_name_detail }} <form action="{% url "accounts:my_memories" %}" method="POST"> {% csrf_token %}<input type="hidden" name="course_id" value="{{ course.id }}"> {% if course in visited_courses %} <button type="submit" class="bi bi-flag-fill color--red"></button> {% else %} <button type="submit" class="bi bi-flag color--green"></button>{% endif %}</form></div>';
-      mountainCourses.push(visitedCourse);
-    {% endfor %}
-
-    var position = {
-      title: "{{ mountain.name }}",
-      latlng: new kakao.maps.LatLng({{ mountain.geom.y }}, {{ mountain.geom.x }}),
-      content: content,
-      style: "padding: 30px;",
-      courses: mountainCourses,
-    };
-    positions.push(position);
+{% for mountain in mountains %}
+  var content = '<div class="fs-4 text-center fw-bolder" style="width: 200px; z-index: 1;">{{ mountain.name }}</div><br>';
+  var mountainCourses = [];
+  {% for course in mountain.course_set.all %}
+  var visitedCourse = {% if course in visited_courses %}true{% else %}false{% endif %};
+  content += '<div class="flex--row m-1" style="width: 200px;">{{ course.crs_name_detail }}';
+  
+  if (visitedCourse) {
+    content += '<form class="flag-toggle-form" action="{% url "accounts:my_memories" %}" method="post">{% csrf_token %}' +
+              '<input type="hidden" name="course_id" value="{{ course.id }}">' +
+              '<input type="hidden" name="is_visited" value="false">' +
+              '<button type="submit" class="flag-toggle-btn bi bi-flag-fill color--red"></button></form>';
+  } else {
+    content += '<form class="flag-toggle-form" action="{% url "accounts:my_memories" %}" method="post">{% csrf_token %}' +
+              '<input type="hidden" name="course_id" value="{{ course.id }}">' +
+              '<input type="hidden" name="is_visited" value="true">' +
+              '<button type="submit" class="flag-toggle-btn bi bi-flag color--green"></button></form>';
+  }
+  content += '</div>';
+    mountainCourses.push(visitedCourse);
   {% endfor %}
 
-  // 마커 이미지 및 크기 커스텀
+  var position = {
+    title: "{{ mountain.name }}",
+    latlng: new kakao.maps.LatLng({{ mountain.geom.y }}, {{ mountain.geom.x }}),
+    content: content,
+    style: "padding: 30px;",
+    courses: mountainCourses,
+  };
+  positions.push(position);
+{% endfor %}
+
+// 마커 이미지 및 크기 커스텀
   var imageSrc = "{% static 'img/icons/mountain.png' %}";
   var imageSize = new kakao.maps.Size(25, 25);
   var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
@@ -177,6 +207,9 @@
   var markerImage2 = new kakao.maps.MarkerImage(imageSrc2, imageSize);
 
   var markers = [];
+  var infowindows = [];
+  var titleWindows = [];
+  var infoWindow = null;
 
   for (var i = 0; i < positions.length; i++) {
     var markerImageToUse = positions[i].courses.includes(true) ? markerImage2 : markerImage;
@@ -186,6 +219,46 @@
       image: markerImageToUse,
     });
     markers.push(marker);
+
+    var infowindow = new kakao.maps.InfoWindow({
+      content: '<div class="" style="width:200px; overflow: overlay; max-height:300px; z-index: 1;">' + positions[i].content + '</div>'
+    });
+    infowindows.push(infowindow);
+
+    var titleWindow = new kakao.maps.CustomOverlay({
+      position: positions[i].latlng,
+      content: '<div class="marker-title">' + positions[i].title + '</div>'
+    });
+    titleWindows.push(titleWindow);
+
+    kakao.maps.event.addListener(marker, 'click', makeClickListener(infowindow, marker));
+    kakao.maps.event.addListener(marker, 'mouseover', makeOverListener(i));
+    kakao.maps.event.addListener(marker, 'mouseout', makeOutListener(i));
+  }
+
+  // 마커 클릭시 인포창을 표시하는 함수
+  function makeClickListener(infowindow, marker) {
+    return function () {
+      if (infoWindow) {
+        infoWindow.close();
+      }
+      infowindow.open(map, marker);
+      infoWindow = infowindow;
+    };
+  }
+
+  // 마커 위로 마우스오버시 산 이름을 표시하는 함수
+  function makeOverListener(index) {
+    return function () {
+      titleWindows[index].setMap(map);
+    };
+  }
+
+  // 마커 위로 마우스아웃시 산 이름을 숨기는 함수
+  function makeOutListener(index) {
+    return function () {
+      titleWindows[index].setMap(null);
+    };
   }
 
   // 마커 클러스터러 생성
@@ -198,54 +271,39 @@
 
   clusterer.addMarkers(markers);
 
-  // 인포창 생성 및 지도 표시
-  var infowindows = [];
-  var titleWindows = [];
-  var infoWindow = null;
+  // AJAX 요청 보내기
+  $(document).ready(function() {
+    $(document).on('submit', '.flag-toggle-form', function(event) {
+      event.preventDefault();
+      var form = $(this);
+      var courseId = form.find('input[name="course_id"]').val();
+      var isVisited = form.find('input[name="is_visited"]').val() === 'true';
 
-  for (var i = 0; i < positions.length; i++) {
-    var infowindow = new kakao.maps.InfoWindow({
-      content: '<div class="" style="width:200px; overflow: overlay; max-height:300px; z-index: 1;">' + positions[i].content + '</div>'
+      $.ajax({
+        url: form.attr('action'),
+        type: 'POST',
+        data: {
+          course_id: courseId,
+          is_visited: isVisited ? 'true' : 'false',
+          csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        dataType: 'json',
+        success: function(response) {
+          console.log(form.find('button'))
+          if (response.is_visited) {
+            form.find('button').removeClass('bi bi-flag color--green').addClass('bi bi-flag-fill color--red');
+          } else {
+            form.find('button').removeClass('bi bi-flag-fill color--red').addClass('bi bi-flag color--green');
+          }
+        },
+        error: function(xhr, errmsg, err) {
+          console.log(xhr.status + ": " + xhr.responseText);
+        }
+      });
     });
+  });
 
-    infowindows.push(infowindow);
 
-    var titleWindow = new kakao.maps.CustomOverlay({
-      position: positions[i].latlng,
-      content: '<div class="marker-title">' + positions[i].title + '</div>'
-    });
-
-    titleWindows.push(titleWindow);
-
-    kakao.maps.event.addListener(markers[i], 'click', makeClickListener(i));
-    kakao.maps.event.addListener(markers[i], 'mouseover', makeOverListener(i));
-    kakao.maps.event.addListener(markers[i], 'mouseout', makeOutListener(i));
-  }
-
-  // 마커 클릭시 인포창을 표시하는 함수
-  function makeClickListener(index) {
-    return function() {
-      if (infoWindow) {
-        infoWindow.close();
-      }
-      infoWindow = infowindows[index];
-      infoWindow.open(map, markers[index]);
-    };
-  }
-
-  // 마커 위로 마우스오버시 산 이름을 표시하는 함수
-  function makeOverListener(index) {
-    return function() {
-      titleWindows[index].setMap(map);
-    };
-  }
-
-  // 마커 밖으로 마우스아웃시 산 이름이 사라지는 함수
-  function makeOutListener(index) {
-    return function() {
-      titleWindows[index].setMap(null);
-    };
-  }
 
   // 인포창를 닫는 함수
   function closeInfoWindow() {
@@ -268,5 +326,42 @@
   });
 
 </script>
+<script>
+  $(document).ready(function() {
+    // 깃발 토글 버튼 클릭 시 이벤트 처리
+    $('.flag-toggle-form').submit(function(e) {
+      e.preventDefault();
+  
+      var form = $(this);
+      var courseId = form.find('input[name="course_id"]').val();
+      var visitedcsrfToken = form.find('input[name="csrfmiddlewaretoken"]').val();
+      var button = form.find('button');
+  
+      $.ajax({
+        type: 'POST',
+        url: '{% url "accounts:my_memories" %}',
+        data: {
+          course_id: courseId,
+          csrfmiddlewaretoken: visitedcsrfToken
+        },
+        dataType: 'json',
+        success: function(response) {
+          if (response.is_visited) {
+            button.removeClass('bi bi-flag color--green').addClass('bi bi-flag-fill color--red');
+          } else {
+            button.removeClass('bi bi-flag-fill color--red').addClass('bi bi-flag color--green');
+          }
+          // 메시지 출력
+          console.log(response.message);
+        },
+        error: function(xhr, errmsg, err) {
+          console.log(errmsg);
+        }
+      });
+    });
+  });
+  
+</script>
+
 
 {% endblock javascript %}
