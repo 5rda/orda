@@ -25,7 +25,7 @@ def index(request):
         if search_option == 'title':
             filtered_posts = Post.objects.filter(title__contains=query)
         elif search_option == 'author':
-            filtered_posts = Post.objects.filter(user__username__contains=query)
+            filtered_posts = Post.objects.filter(user__nickname__contains=query)
         elif search_option == 'content':
             filtered_posts = Post.objects.filter(content__contains=query)
         elif search_option == 'title_content':
@@ -243,7 +243,7 @@ def search(request):
         if search_option == 'title':
             filtered_posts = Post.objects.filter(title__contains=query)
         elif search_option == 'author':
-            filtered_posts = Post.objects.filter(user__username__contains=query)
+            filtered_posts = Post.objects.filter(user__nickname__contains=query)
         elif search_option == 'content':
             filtered_posts = Post.objects.filter(content__contains=query)
         elif search_option == 'title_content':
