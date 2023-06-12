@@ -8,6 +8,7 @@ from django.views.generic import ListView, FormView
 from django.contrib.auth.decorators import login_required
 from django.contrib.gis.serializers.geojson import Serializer
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import DetailView
 
 class SearchView(FormView):
     template_name = 'mountains/search.html'
@@ -227,4 +228,29 @@ def bookmark(request, mountain_pk, course_pk):
 
 
 
+class CourseDetailView(DetailView):
+    model = Course
+    template_name = 'mountains/course_detail.html'
+    context_object_name = 'course'
 
+    def get_object(self, queryset=None):
+        # mountain_pk = self.kwargs['mountain_pk']
+        course_pk = self.kwargs['pk']
+        # mountain = get_object_or_404(Mountain, pk=mountain_pk)
+        course = get_object_or_404(Course, pk=course_pk)
+        return course
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        course = self.object
+        mountain = course.mntn_name
+
+        serializer = Serializer()
+        data = {course.pk: serializer.serialize([course], geometry_field='geom')}
+
+        context.update({
+            'mountain': mountain,
+            'course': course,
+            'course_data': data
+        })
+        return context

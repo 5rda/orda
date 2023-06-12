@@ -132,7 +132,7 @@
                             {% if first_image_url %}
                               <img class="profile__content--img" src="{{ first_image_url }}" alt="썸네일">
                             {% else %}
-                              <img class="profile__content--img" src="{% static 'img/nav_logo.png' %}" alt="대체이미지">
+                              <img class="profile__content--img" src="{% static 'img/Noimage.png' %}" alt="대체이미지">
                             {% endif %}
                           {% endwith %}
                         </div>
@@ -159,9 +159,9 @@
               <div class="profile__content--postbox">
                 {% if bookmark_course %}
                   {% for course in bookmark_course %}
-                    <a class="profile__content--post" title="{{ course.crs_name }}" href="">
+                    <a class="profile__content--post" title="{{ course.mntn_name }}" onclick="openSmallWindow('{% url 'mountains:course_detail' course.pk %}');" id="{{course.pk}}" >
                       <div class="profile__content--imgbox">                        
-                        <div id="map3-{{ course.pk }}" style="width: 100%;"></div>
+                        <img class="profile__content--img" src="{% get_static_prefix %}img/mountains/{{ course.mntn_name }}.png" alt="썸네일">
                       </div>
                       <p class="profile__content--posttext">{{ course.crs_name_detail }}</p>
                     </a>
@@ -214,7 +214,7 @@
                           {% if first_image_url %}
                             <img class="profile__content--img" src="{{ first_image_url }}" alt="썸네일">
                           {% else %}
-                            <img class="profile__content--img" src="{% static 'img/nav_logo.png' %}" alt="대체이미지">
+                            <img class="profile__content--img" src="{% static 'img/Noimage.png' %}" alt="대체이미지">
                           {% endif %}
                         {% endwith %}
                       </div>
@@ -489,5 +489,11 @@
   {% for course in bookmark_course %}
     bookmark({{ course.pk }});
   {% endfor %}
+
+  
+  function openSmallWindow(url) {
+    var smallWindow = window.open(url, '_blank', 'width=1060, height=650');
+    smallWindow.focus();
+  }
 </script>
 {% endblock javascript %}

@@ -70,7 +70,6 @@
             <a href="?page=1{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" class="page__btn ">&lt;&lt;</a>
           {% endif %}
 
-
           {% for num in page_obj.paginator.page_range %}
             {% if num > page_obj.number|add:'-5' and num < page_obj.number|add:'5' %}
               {% if num == page_obj.number %}
