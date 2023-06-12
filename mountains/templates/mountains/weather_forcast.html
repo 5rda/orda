@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <h2>{{ mountain.name }} 5일 예보(3시간 간격)</h2>
+  <ul>
+    <table>
+        <thead>
+            <tr>
+                <th></th>
+                {% for forecast in weather_data.list %}
+                <th>{{ forecast.dt_txt }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>날씨</td>
+                {% for forecast in weather_data.list %}
+                <td>
+                    <img id="weather-icon" src="http://openweathermap.org/img/wn/{{ forecast.weather.0.icon }}.png"
+                        alt="{{ forecast.weather.0.description }}" />
+                </td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td>온도</td>
+                {% for forecast in weather_data.list %}
+                <td>{{ forecast.main.temp|floatformat:0 }}°C</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td>습도</td>
+                {% for forecast in weather_data.list %}
+                <td>{{ forecast.main.humidity }}%</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td>강수확률</td>
+                {% for forecast in weather_data.list %}
+                <td>{{ forecast.pop }}%</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td>강수량</td>
+                {% for forecast in weather_data.list %}
+                <td>
+                    {% if forecast.rain %}
+                    {{ forecast.rain.3h }}mm
+                    {% endif %}
+                </td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td>바람</td>
+                {% for forecast in weather_data.list %}
+                <td>
+                    {% if forecast.wind.deg >= 337.5 or forecast.wind.deg < 22.5 %}
+                    북
+                    {% elif forecast.wind.deg >= 22.5 and forecast.wind.deg < 67.5 %}
+                    북동
+                    {% elif forecast.wind.deg >= 67.5 and forecast.wind.deg < 112.5 %}
+                    동
+                    {% elif forecast.wind.deg >= 112.5 and forecast.wind.deg < 157.5 %}
+                    남동
+                    {% elif forecast.wind.deg >= 157.5 and forecast.wind.deg < 202.5 %}
+                    남
+                    {% elif forecast.wind.deg >= 202.5 and forecast.wind.deg < 247.5 %}
+                    남서
+                    {% elif forecast.wind.deg >= 247.5 and forecast.wind.deg < 292.5 %}
+                    서
+                    {% elif forecast.wind.deg >= 292.5 and forecast.wind.deg < 337.5 %}
+                    북서
+                    {% endif %}
+                    {{ forecast.wind.speed }}m/s</td>
+                {% endfor %}
+            </tr>
+        </tbody>
+    </table>
+</ul>
+</body>
+</html>

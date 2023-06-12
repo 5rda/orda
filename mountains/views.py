@@ -13,6 +13,9 @@ from django.http import HttpResponse
 from .forms import ReviewCreationForm, SearchForm
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
+from utils.weather import get_weather
+import datetime
+
 # Create your views here.
 
 
@@ -592,3 +595,24 @@ class SearchView(FormView):
     template_name = 'mountains/search.html'
     form_class = SearchForm
     success_url = 'mountains/mountain_list.html'
+
+
+def weather_forcast(request, pk):
+    mountain = Mountain.objects.get(pk=pk)
+    lat = mountain.geom.y
+    lon = mountain.geom.x
+    api_key = "f0b89520154cdfcc100e02c4acfd8849"
+
+    weather_data = get_weather(lat, lon, api_key)
+
+    for forecast in weather_data['list']:
+        dt_txt = datetime.datetime.strptime(forecast['dt_txt'], '%Y-%m-%d %H:%M:%S') + datetime.timedelta(hours=9)
+        forecast['dt_txt'] = dt_txt.strftime('%m월 %d일 %H시')
+        forecast['pop'] = int(forecast['pop'] * 100)
+
+    context = {
+        'mountain': mountain,
+        'weather_data': weather_data
+    }
+
+    return render(request, 'mountains/weather_forcast.html', context)
