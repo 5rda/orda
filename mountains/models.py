@@ -35,6 +35,11 @@ class Mountain(models.Model):
         tags = self.review_set.values('tags__name').annotate(tag_count=Count('tags__name')).order_by('-tag_count')[:3]
         return [tag['tags__name'] for tag in tags]
     
+    @property
+    def top_tags_pk(self):
+        tags = self.review_set.values('tags__pk').annotate(tag_count=Count('tags__pk')).order_by('-tag_count')[:3]
+        return [tag['tags__pk'] for tag in tags]
+    
     def __str__(self):
         return self.name
         
@@ -76,7 +81,23 @@ class CourseDetail(models.Model):
         ordering = ['crs_name_detail', 'track']
 
     def __str__(self):
-        return str(self.crs_name)
+        return str(self.crs_name_detail)
+    
+    
+# class CourseDetail2(models.Model):
+#     id = models.AutoField(primary_key=True)
+#     crs_name = models.CharField(max_length=100)    
+#     waypoint_name = models.CharField(max_length=50)
+#     waypoint_category = models.CharField(max_length=256, db_column='category')
+#     geom = models.GeometryField()
+
+#     class Meta:
+#         managed = False
+#         db_table = 'mountains_coursedetail_2'
+#         ordering = ['crs_name']
+
+#     def __str__(self):
+#         return str(self.crs_name)
 
 
 class Tag(models.Model):
