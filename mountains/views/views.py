@@ -1,6 +1,6 @@
 from mountains.models import *
 from mountains.forms import SearchForm
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect
 from django.db.models import Count, When, Case, Q
 from django.shortcuts import render, get_object_or_404
@@ -8,8 +8,8 @@ from django.core.paginator import Paginator
 from django.core.mail import EmailMessage
 from django.views.generic import ListView, FormView, View
 from django.contrib.auth.decorators import login_required
-from django.contrib.gis.serializers.geojson import Serializer
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.gis.serializers.geojson import Serializer
 import gpxpy, gpxpy.gpx, os
 from utils.weather import get_weather
 import datetime
@@ -202,6 +202,22 @@ def course_all_list(request):
     }
     return render(request, 'mountains/course_all_list.html', context)
 
+
+def reset_filter(request):
+    if 'filtered_courses' in request.session:
+        # 세션에서 'filtered_courses' 키 제거
+        request.session.pop('filtered_courses')
+        # 세션을 수정한 것을 알림
+        request.session.modified = True  
+        return redirect('mountains:course_all_list')
+    
+    elif 'filtered_mountains' in request.session:
+        request.session.pop('filtered_mountains')
+        request.session.modified = True  
+        return redirect('mountains:mountain_list')
+    
+    else:
+        return HttpResponseBadRequest("Bad Request")
 
 def mountain_likes(request, mountain_pk):
     mountain = get_object_or_404(Mountain, pk=mountain_pk)

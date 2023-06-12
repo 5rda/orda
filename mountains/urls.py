@@ -16,4 +16,5 @@ urlpatterns = [
     path('<int:pk>/review_update/<int:review_pk>/', review_update, name='review_update'),
     path('search/', SearchView.as_view(), name='search'),
     path('weather_forecast/<int:pk>/', weather_forecast, name='weather_forecast'),
+    path('reset/', reset_filter, name='reset'),
 ]
