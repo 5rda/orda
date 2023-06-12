@@ -10,6 +10,15 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <title>orda</title>
   <style>
+    @font-face {
+      font-family: 'GangwonEdu_OTFBoldA';
+      src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2201-2@1.0/GangwonEdu_OTFBoldA.woff') format('woff');
+      font-weight: normal;
+      font-style: normal;
+  }
+    .orda {
+      font-family: 'GangwonEdu_OTFBoldA';
+    }
   </style>
   <link rel="stylesheet" href="{% static 'css/base.css' %}">
   <link rel="stylesheet" href="{% static 'css/main_index.css' %}">
@@ -18,15 +27,14 @@
 <body>
   <header class='header__wrap'>
     <div class='header__box'>
-      <p class='header__box__p'>누구나 등산을 즐길 수 있도록</p>
-      <p class='header__box__p'>당신에게 맞는 길을 찾아주는</p>
-      <p class='header__box__p--size'>오르다</p>
+      <p class='header__box__p orda text-2xl'>누구나 등산을 즐길 수 있도록</p>
+      <p class='header__box__p orda text-2xl'>당신에게 맞는 길을 찾아주는</p>
+      <p class='mt-3 header__box__p--size orda text-5xl'>"오르다"</p>
     </div>
     <div  class='header__box1'>
       <img class='header__box1__img' src="{% static 'img/index_header1.png' %}" alt="forest">
     </div>
   </header>
-
 
   <nav class='nav__box' id='main-nav'>
     {% include 'nav.html' %}
