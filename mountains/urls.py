@@ -16,4 +16,3 @@ urlpatterns = [
     path('search/', SearchView.as_view(), name='search'),
     path('weather_forcast/<int:pk>/', weather_forcast, name='weather_forcast'),
 ]
-
