@@ -8,6 +8,8 @@ from bs4 import BeautifulSoup
 from django.http import JsonResponse
 import os
 from django.http import JsonResponse
+from mountains.models import Mountain
+
 
 # Create your views here.
 
@@ -23,7 +25,7 @@ def index(request):
         if search_option == 'title':
             filtered_posts = Post.objects.filter(title__contains=query)
         elif search_option == 'author':
-            filtered_posts = Post.objects.filter(user__username__contains=query)
+            filtered_posts = Post.objects.filter(user__nickname__contains=query)
         elif search_option == 'content':
             filtered_posts = Post.objects.filter(content__contains=query)
         elif search_option == 'title_content':
@@ -52,11 +54,12 @@ def detail(request, post_pk):
     prev_posts = Post.objects.filter(pk__lt=post_pk).order_by('-pk')[:2]
     next_posts = Post.objects.filter(pk__gt=post_pk).order_by('pk')[:2]
     posts = list(prev_posts) + [post] + list(next_posts)
-    session_key = f'post_viewed_{post_pk}'  # 게시물 고유 세션 키 생성
+    session_key = f'post_viewed_{post_pk}'
+
     if not request.session.get(session_key):
-        post.view_count += 1  # 조회수 증가
-        post.save()  # 변경된 조회수 저장
-        request.session[session_key] = True  # 세션에 조회 여부 기록
+        post.view_count += 1
+        post.save()
+        request.session[session_key] = True
 
     context = {
         'post': post,
@@ -74,6 +77,7 @@ def create(request):
         if form.is_valid():
             post = form.save(commit=False)
             post.user = request.user
+            post.mountain = Mountain.objects.get(pk=request.POST.get('mountain'))
             post.save()
             return redirect('posts:detail', post.pk)
     else:
@@ -81,6 +85,7 @@ def create(request):
 
     context = {
         'form': form,
+        'mountains': Mountain.objects.all(),
     }
     return render(request, 'posts/create.html', context)
 
@@ -238,7 +243,7 @@ def search(request):
         if search_option == 'title':
             filtered_posts = Post.objects.filter(title__contains=query)
         elif search_option == 'author':
-            filtered_posts = Post.objects.filter(user__username__contains=query)
+            filtered_posts = Post.objects.filter(user__nickname__contains=query)
         elif search_option == 'content':
             filtered_posts = Post.objects.filter(content__contains=query)
         elif search_option == 'title_content':
@@ -251,18 +256,17 @@ def search(request):
         'like_posts': like_posts,
         'posts': filtered_posts,
         'query': query,
+        'search_option': search_option,
     }
 
     return render(request, 'posts/search.html', context)
 
 
 def proofshot(request):
-    posts = Post.objects.order_by('-created_at')
-    view_posts = Post.objects.order_by('-view_count')
+    image_posts = Post.objects.filter(content__icontains='<img').order_by('-created_at')
     
     context = {
-        'posts': posts,
-        'view_posts': view_posts,
+        'image_posts': image_posts,
     }
 
     return render(request, 'posts/proofshot.html', context)

@@ -17,17 +17,16 @@
     <select name="sort" id="sort-select" class="select__box focus:outline-none">
       <option value="">기본</option>
       <option value="bookmarks">북마크순</option>
+      <option value="diff">난이도순</option>
       <option value="distance">거리순</option>
       <option value="hidden_time">소요시간순</option>
-      <option value="diff">난이도순</option>
     </select>
   </form>
-
   
   <ul class="my-4">
     {% for course in courses %}
     <li class="flex flex-col bg-white border border-gray-200 rounded-lg shadow md:flex-row grid md:grid-cols-4 li--relative">
-      {% comment %} 지도 {% endcomment %}
+      <!-- 지도 -->
       <div id="map-{{ course.pk }}" class="borderline col-span-3 " style="width: 100%; height: 300px;"></div>
       <div class="li--textbox flex--col flex--align">
         <p class="coursetitle--font">{{ course.crs_name_detail }}</p>
@@ -35,13 +34,15 @@
           <div class="ps-1">
             <p class="my-2">총거리</p>
             <p class="my-2">소요시간</p>
-            {% comment %} <p>소요시간2</p> {% endcomment %}
             <p class="my-2">난이도</p>
+            <form id="download-form" action="{% url 'mountains:download' course.mntn_name.pk course.pk %}" method="POST">
+              {% csrf_token %}
+              <input class="my-2 font-bold" type="submit" value="GPX 다운로드">
+            </form>
           </div>
           <div class="ps-3">
             <p class="my-2">{{ course.distance }}km</p>
             <p class="my-2">{{ course.duration }}</p>
-            {% comment %} <p>{{ course.hidden_time }}</p> {% endcomment %}
             <p class="my-2">{{ course.diff }}</p>
           </div>
         </div>
@@ -58,9 +59,37 @@
     </li>
       <br>
       {% empty %}
-      <li>No courses available.</li>
-      {% endfor %}
-    </ul>
+        <li>No courses available.</li>
+        {% endfor %}
+      </ul>
+      
+    <!-- 페이지네이션 -->
+    <div class="pagination mt-4">
+      <div class="mx-auto">
+        {% if is_paginated %}
+          {% if page_obj.has_previous %}
+            <a href="?page=1{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" class="page__btn ">&lt;&lt;</a>
+          {% endif %}
+
+
+          {% for num in page_obj.paginator.page_range %}
+            {% if num > page_obj.number|add:'-5' and num < page_obj.number|add:'5' %}
+              {% if num == page_obj.number %}
+                <span class="page__btn pagination__link--active">{{ num }}</span>
+              {% else %}
+                <a href="?page={{ num }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" class="page__btn ">{{ num }}</a>
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" class="page__btn ">&gt;&gt;</a>
+          {% endif %}
+        {% endif %}
+      </div>
+</div>
+
+
   </div>
 {% endblock content %}
 
@@ -80,6 +109,36 @@ loadKakaoMapScript(function () {
     initMap(courseId, courseInfo);
   {% endfor %}
 });
+</script>
+
+<script>
+  document.getElementById('download-form').addEventListener('submit', function(event) {
+    event.preventDefault();  // 기본 폼 제출 동작을 막습니다.
+  
+    var confirmation = confirm("메일을 전송하시겠습니까?");  // 확인 창을 띄웁니다.
+  
+    if (confirmation) {
+      fetch(this.action, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': this.querySelector('input[name="csrfmiddlewaretoken"]').value
+        }
+      })
+      .then(response => {
+        if (response.ok) {
+          // 성공적으로 응답을 받았을 때
+          alert("GPX 파일을 등록한 이메일로 전송했습니다.");
+        } else {
+          // 응답에 문제가 있을 때
+          throw new Error('이메일 전송에 실패했습니다. 이메일 등록 여부를 확인하고, 다시 시도해주세요.');
+        }
+      })
+      .catch(error => {
+        // 네트워크 오류 등의 문제로 실패했을 때
+        alert(error.message);
+      });
+    }
+  });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 {% endblock javascript %}

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/accounts_delete.css' %}">
+{% endblock style %}
+{% block content %}
+  <div class="select__box--wrap">
+    <div class="rounded-t-lg select__box1"><a href="{% url 'accounts:update' %}">정보 수정</a></div>
+    <div class="rounded-t-lg select__box1"><a href="{% url 'accounts:password_change' %}">비밀번호 변경</a></div>
+    <div class="rounded-t-lg select__box"><a href="{% url 'accounts:delete' %}">회원탈퇴</a></div>
+  </div>
+
+  <div class='title__box rounded-tr-lg'>
+    <h1 class="title">회원탈퇴</h1>
+  </div> 
+  <div class="form__box rounded-b-lg">
+    <form action="{% url 'accounts:delete' %}" method="POST" class="form__text">
+      {% csrf_token %}
+      <img src="{% static 'img/sad_emoji.gif' %}" alt="우는 이모지" class="form__image">
+      <p><b>탈퇴 시, 작성한 게시글 및 댓글을 포함한 모든 정보가 삭제되며 재가입 시에도 복구되지 않습니다.</b></p>
+      <input type="submit" onclick="return confirmDelete();" class="form__submitbtn rounded-2" value="회원탈퇴">
+    </form>
+  </div>
+{% endblock content %}
+{% block javascript %}
+  <script>
+    function confirmDelete() {
+      return confirm("정말 탈퇴하시겠습니까?");
+    }
+  </script>
+{% endblock javascript %}

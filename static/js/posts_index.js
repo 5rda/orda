@@ -36,24 +36,25 @@ if (allPosts.length <= perPage) {
 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
 // 좋아요 버튼 클릭 이벤트 리스너
-const postlikeBtns = document.querySelectorAll('.postindex__post--like');
+const forms = document.querySelectorAll('.postindex__post--like');
 
-if (postlikeBtns) {
-  postlikeBtns.forEach((postlikeBtn) => {
-    postlikeBtn.addEventListener('click', (e) => {
+if (forms) {
+  forms.forEach((form) => {
+    form.addEventListener('click', (e) => {
       e.preventDefault();
-      const postId = postlikeBtn.getAttribute('data-post');
+      const postId = form.getAttribute('data-post');
       axios.defaults.headers.common['X-CSRFToken'] = csrftoken;  // CSRF 토큰 설정
       axios.post(`/posts/${postId}/likes/`)
         .then((response) => {
           const isliked = response.data.is_liked
+          const postlikeBtn = form.querySelector(`#postlike-btn`)
           // 서버로부터의 응답을 처리
           if (isliked == true) {
             // 좋아요 성공 시 동작
-            postlikeBtn.innerHTML = '<svg id="i-heart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="#FFB6C1" stroke="#FFB6C1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M4 16 C1 12 2 6 7 4 12 2 15 6 16 8 17 6 21 2 26 4 31 6 31 12 28 16 25 20 16 28 16 28 16 28 7 20 4 16 Z" /></svg>';
+            postlikeBtn.className = 'bi bi-heart-fill like__btn--style';
           } else {
             // 좋아요 취소 성공 시 동작
-            postlikeBtn.innerHTML = '<svg id="i-heart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="#DBDBDB" stroke="#FFB6C1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M4 16 C1 12 2 6 7 4 12 2 15 6 16 8 17 6 21 2 26 4 31 6 31 12 28 16 25 20 16 28 16 28 16 28 7 20 4 16 Z" /></svg>';
+            postlikeBtn.className = 'bi bi-heart like__btn--style';
           }
 
           const likesCountTags = document.querySelectorAll('.postindex__post--likecount')
@@ -61,7 +62,7 @@ if (postlikeBtns) {
             const likeId = likesCountTag.getAttribute('data-like');
             if (postId === likeId) {
               const likesCountData = response.data.like_count
-              likesCountTag.textContent = '좋아요' + ' ' + likesCountData
+              likesCountTag.textContent = likesCountData
             }
           });
         })

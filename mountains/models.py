@@ -13,11 +13,11 @@ class Mountain(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50 , unique=True)
     subname = models.CharField(max_length=200)
+    info = models.TextField(db_column='mntn_info')
     height = models.IntegerField()
     region = models.CharField(max_length=100)
     diff = models.CharField(max_length=30)
     geom = models.GeometryField()
-    image = models.ImageField(upload_to=image_path, blank=True)
     likes = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='liked_mountains', db_table='mountains_mountain_likes')
     views = models.PositiveIntegerField(default=0)
     
