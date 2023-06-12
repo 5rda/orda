@@ -89,7 +89,7 @@ def mountain_list(request):
     return render(request, 'mountains/mountain_list.html', context)
 
 
-class CourseListView(ListView):
+class CourseListView(ListView, LoginRequiredMixin):
     template_name = 'mountains/course_list.html'
     context_object_name = 'courses'
     model = Course
@@ -232,6 +232,7 @@ def reset_filter(request):
     else:
         return HttpResponseBadRequest("Bad Request")
 
+
 def mountain_likes(request, mountain_pk):
     mountain = get_object_or_404(Mountain, pk=mountain_pk)
     user = request.user
@@ -261,7 +262,7 @@ def bookmark(request, mountain_pk, course_pk):
     return JsonResponse(context)
 
 
-class gpxDownloadView(View):
+class gpxDownloadView(View, LoginRequiredMixin):
     def dispatch(self, request, *args, **kwargs):
         if request.method == 'POST':
             return self.post(request, *args, **kwargs)
@@ -331,7 +332,8 @@ def weather_forecast(request, pk):
 
     return render(request, 'mountains/weather_forecast.html', context)
 
-class CourseDetailView(DetailView):
+
+class CourseDetailView(DetailView, LoginRequiredMixin):
     model = Course
     template_name = 'mountains/course_detail.html'
     context_object_name = 'course'
