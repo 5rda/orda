@@ -1,6 +1,6 @@
 from mountains.models import *
 from mountains.forms import SearchForm
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import redirect
 from django.db.models import Count, When, Case, Q
 from django.shortcuts import render, get_object_or_404
@@ -231,10 +231,6 @@ def bookmark(request, mountain_pk, course_pk):
 
 
 class gpxDownloadView(View):
-    # 1. gpx 파일 생성
-    # 2. gpx 파일을 메일로 보내기
-        # 2-1. 메일 전송하시겠습니까? 라는 알림창이 뜨게한다.
-        # 2-2. 예를 누르면 메일이 보내지게 만든다.
     def dispatch(self, request, *args, **kwargs):
         if request.method == 'POST':
             return self.post(request, *args, **kwargs)
@@ -246,15 +242,15 @@ class gpxDownloadView(View):
         name = course.crs_name_detail
 
         # GPX 파일 생성 및 변환
-        gpx_data = self.create_gpx(geom, name)  # 등산 코스의 geom 데이터를 GPX 형식으로 변환합니다.
+        gpx_data = self.create_gpx(geom, name)
 
         # 이메일 전송
         email = request.user.email  # 유저의 이메일 주소를 가져옵니다.
-        
-        self.send_email(email, gpx_data, name)  # 이메일로 GPX 파일을 전송합니다.
-
-
-        return redirect('mountains:course_list', mountain_pk)
+        if email:
+            self.send_email(email, gpx_data, name)  # 이메일로 GPX 파일을 전송합니다.
+            return HttpResponse(status=200)
+        else:
+            return HttpResponse(status=400)
 
     def create_gpx(self, geom, name):
         # 등산 코스의 geom 데이터를 GPX 형식으로 변환하는 로직을 구현합니다.
