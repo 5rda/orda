@@ -311,7 +311,7 @@
       <li id="best-{{ review.pk }}" {% if forloop.counter > 5 %}style="display: none;"{% endif %} class="{% if review == most_liked_review %}mountain__bestreview{% else %}mountain__review{% endif %}">
         <div class="mountain__detail--reviewbox">
           <!-- Button trigger modal -->
-          <button type="button" class="" data-bs-toggle="modal" data-bs-target="#reviewImg-{{ review.pk }}">
+          <button type="button" class="mountain__detail--reviewcontimgbtn" data-bs-toggle="modal" data-bs-target="#reviewImg-{{ review.pk }}">
             <div class="mountain__detail--reviewcontimgbox">
               {% if review.image %}
                 <img class="mountain__detail--reviewcontimg" src="{{ review.image.url }}" alt="">
