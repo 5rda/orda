@@ -404,9 +404,16 @@ th {
   height: 100%;
 }
 
+.mountain__detail--reviewcontimgbtn {
+  display: flex;
+  align-items: flex-start;
+}
+
 .mountain__detail--reviewcontimgbox {
   position: relative;
   width: 160px;
+  height: 160px;
+  margin-top: 5px;
 }
 
 .mountain__detail--reviewmodalimgbox {

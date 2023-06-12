@@ -93,8 +93,14 @@ class ReviewCreationForm(forms.ModelForm):
 class SearchForm(forms.Form):
     tags = forms.ModelMultipleChoiceField(
         queryset=Tag.objects.all(),
-        widget=forms.CheckboxSelectMultiple,
+        widget=ButtonSelectMultiple(
+            queryset=Tag.objects.all(),
+            attrs={
+                'class': "visually-hidden",
+            }
+        ),
         label='태그 선택'
     )
+        
     # sido2 = forms.CharField(label='시도', max_length=100, widget=forms.HiddenInput())
     # gugun2 = forms.CharField(label='시군구', max_length=100, widget=forms.HiddenInput())
