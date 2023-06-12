@@ -101,10 +101,12 @@
 // 카카오맵 API 로드 후 초기화 함수 호출
 loadKakaoMapScript(function () {
   var course_data = {{ courses_data|safe }};
+  var detail_data = {{ detail_data|safe }};
   {% for course in courses %}
     var courseId = {{ course.pk }};
     var courseInfo = JSON.parse(course_data[courseId]);
-    initMap(courseId, courseInfo);
+    var courseDetail = JSON.parse(detail_data[courseId]);
+    initMap(courseId, courseInfo, courseDetail);
   {% endfor %}
 });
 </script>
