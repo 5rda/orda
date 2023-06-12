@@ -24,18 +24,22 @@ from django.utils.safestring import mark_safe
 def login(request):
     if request.user.is_authenticated:
         return render(request, 'pjt/index.html')
+    
     if request.method == 'POST':
         form = CustomUserAuthenticationForm(request, request.POST)
+        
         if form.is_valid():
             auth_login(request, form.get_user())
             prev_url = request.session.get('prev_url')
-            if prev_url:
+            
+            if 'logout' or 'delete' in prev_url:
+                return render(request, 'pjt/index.html')
+            else:
                 del request.session['prev_url']
-                return redirect(prev_url)
-            return render(request, 'pjt/index.html')
+                return redirect(prev_url)       
     else:
         form = CustomUserAuthenticationForm()
-    request.session['prev_url'] = request.META.get('HTTP_REFERER')
+
     context = {
         'form': form,
     }
