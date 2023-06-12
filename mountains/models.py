@@ -96,7 +96,7 @@ class Review(models.Model):
     mountain = models.ForeignKey(Mountain, on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, db_column='user_id')
     content = models.TextField()
-    image = models.ImageField(blank=True, upload_to=image_path)
+    image = models.ImageField(blank=True, null=True, upload_to=image_path)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     tags = models.ManyToManyField(Tag, related_name='reviews')
