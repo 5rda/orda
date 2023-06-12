@@ -40,8 +40,15 @@ def mountain_list(request):
                     filter_condition.add(Q(region__contains=sido) & Q(region__contains=gugun), filter_condition.AND)
 
         if tags:
-            filtered_mountains = mountains.filter(review__tags__pk__in=tags).annotate(tag_count=Count('review__tags__pk')).order_by('-tag_count')[:3]
-            filtered_pks = filtered_mountains.values_list('pk', flat=True)
+            filtered_mountains = mountains.filter(review__tags__pk__in=tags).distinct()
+            int_tags = list(map(int, tags))
+            filtered_pks = []
+            for filtered_mountain in filtered_mountains:
+                # print(f'산:{filtered_mountain.top_tags_pk}')
+                # print(f'태그:{int_tags}')
+                top_tags_pk = filtered_mountain.top_tags_pk
+                if any((tag_pk in top_tags_pk) for tag_pk in int_tags):
+                    filtered_pks.append(filtered_mountain.pk)
             mountains = mountains.filter(pk__in=filtered_pks)
 
         if search_query:
