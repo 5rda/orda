@@ -17,5 +17,6 @@ urlpatterns = [
     path('search/', SearchView.as_view(), name='search'),
     path('course/<int:pk>/', CourseDetailView.as_view(), name='course_detail'),
     path('weather_forecast/<int:pk>/', weather_forecast, name='weather_forecast'),
-    path('reset/', reset_filter, name='reset'),
+    path('course_reset/', course_reset_filter, name='course_reset'),
+    path('mountain_reset/', mountain_reset_filter, name='mountain_reset'),
 ]

@@ -203,21 +203,19 @@ def course_all_list(request):
     return render(request, 'mountains/course_all_list.html', context)
 
 
-def reset_filter(request):
-    if 'filtered_courses' in request.session:
-        # 세션에서 'filtered_courses' 키 제거
-        request.session.pop('filtered_courses')
-        # 세션을 수정한 것을 알림
-        request.session.modified = True  
-        return redirect('mountains:course_all_list')
+def course_reset_filter(request):
+    # 세션에서 'filtered_courses' 키 제거
+    request.session.pop('filtered_courses', None)
+    # 세션을 수정한 것을 알림
+    request.session.modified = True  
+    return redirect('mountains:course_all_list')
     
-    elif 'filtered_mountains' in request.session:
-        request.session.pop('filtered_mountains')
-        request.session.modified = True  
-        return redirect('mountains:mountain_list')
-    
-    else:
-        return HttpResponseBadRequest("Bad Request")
+
+def mountain_reset_filter(request):    
+    request.session.pop('filtered_mountains', None)
+    request.session.modified = True  
+    return redirect('mountains:mountain_list')
+
 
 def mountain_likes(request, mountain_pk):
     mountain = get_object_or_404(Mountain, pk=mountain_pk)
