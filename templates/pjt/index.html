@@ -36,7 +36,7 @@
   <article>
     <div class='article__divbox'>
       <p class='article__p'>나에게 딱 맞는 산을 찾고있다면?</p>
-      <img class='article__icon' src="{% static 'img/icon/search.png' %}" alt="">
+      <img class='article__icon' src="{% static 'img/icons/search.png' %}" alt="">
       <P class='article__p--strong'>키워드 검색으로 찾으로 가기!</P>
       <a href="{% url 'mountains:search' %}"><button class='rounded-full article__btn'>탐색</button></a>
       {% comment %}  {% url 'mountains:search' %}  {% endcomment %}
@@ -44,7 +44,7 @@
   
     <div class='article__divbox--color'>
       <P class='article__p'>내가 원하는 등산로만 보고싶다면?</P>
-      <img class='article__icon' src="{% static 'img/icon/road.png' %}" alt="">
+      <img class='article__icon' src="{% static 'img/icons/road.png' %}" alt="">
       <P class='article__p--strong'>등산로를 한눈에!</P>
       <a href="{% url 'mountains:course_all_list' %}"><button class='rounded-full article__btn2'>등산로</button></a> 
       {% comment %}  {% url 'mountains:course' %}  {% endcomment %}
@@ -52,14 +52,14 @@
   
     <div class='article__divbox'>
       <P class='article__p'>정상을 갔다면?</P>
-     <img class='article__icon' src="{% static 'img/icon/summit.png' %}" alt="">
+     <img class='article__icon' src="{% static 'img/icons/summit.png' %}" alt="">
       <P class='article__p--strong'>내가 다녀온 후기는 공유해보세요</P>
       <a href="{% url 'posts:index' %}"><button class='rounded-full article__btn'>공유</button></a>
     </div>
   
     <div class='article__divbox--color'>
       <P class='article__p'>인증샷을 찍었다면?</P>
-      <img class='article__icon header__div__img' src="{% static 'img/icon/selfie.png' %}" alt="">
+      <img class='article__icon header__div__img' src="{% static 'img/icons/selfie.png' %}" alt="">
       <P class='article__p--strong'>추억을 공유해보세요</P>
       <a href="{% url 'posts:proofshot' %}"><button class='rounded-full article__btn2'>인증샷</button></a>
       {% comment %} {% url 'mountains:photo?' %} {% endcomment %}
