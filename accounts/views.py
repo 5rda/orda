@@ -20,6 +20,7 @@ from .models import Notification
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
+
 def login(request):
     if request.user.is_authenticated:
         return render(request, 'pjt/index.html')
@@ -67,47 +68,43 @@ def signup(request):
 def profile(request, user_pk):
     User = get_user_model()
     person = User.objects.get(pk=user_pk)
-    post = Post.objects.filter(user=person)
     posts = person.post_set.all().order_by('-created_at')
-    reviews = person.review_set.all().count()
-    posts_comments = person.postcomment_set.all().count()
-    visited_courses = person.visitedcourse_set.all().count()
+    reviews = person.review_set.all().order_by('-created_at')
+    posts_comments = person.postcomment_set.count()
+    visited_courses = person.visitedcourse_set.count()
 
-    liked_posts = Post.objects.filter(like_users=person)
-    liked_mountains = Mountain.objects.filter(likes=person)
-    bookmark_course = Course.objects.filter(bookmarks=person)
+    liked_posts = person.like_posts.only('title').all()
+    liked_mountains = person.liked_mountains.only('name').all()
+    bookmark_course = person.bookmarks.only('crs_name', 'crs_name_detail').all()
 
-    serializer = Serializer()
-    course_details = {}
-    for course in bookmark_course:
-        geojson_data = serializer.serialize(CourseDetail.objects.filter(crs_name_detail=course), fields=('geom', 'is_waypoint', 'waypoint_name', 'crs_name_detail'))
-        course_details[course.pk] =geojson_data
+    # serializer = Serializer()
+    # course_details = {}
+    # for course in bookmark_course:
+    #     geojson_data = serializer.serialize(CourseDetail.objects.filter(crs_name_detail=course), fields=('geom', 'is_waypoint', 'waypoint_name', 'crs_name_detail'))
+    #     course_details[course.pk] =geojson_data
     
-    score = posts.count() * 40 + reviews * 30 + visited_courses * 20 + posts_comments * 5
+    score = posts.count() * 30 + reviews.count() * 20 + visited_courses * 10 + posts_comments * 5
 
     if score < 200:
         level = 1
-        rest = score
         max_score = 200
-    elif score < 300:
-        level = 2
-        rest = score-200
-        max_score = 300
-    elif score < 400:
-        level = 3
-        rest = score-300
-        max_score = 400
     elif score < 500:
+        level = 2
+        score -= 200
+        max_score = 300
+    elif score < 900:
+        level = 3
+        score -= 500
+        max_score = 400
+    elif score < 1400:
         level = 4
-        rest = score-400
+        score -= 900
         max_score = 500
     else:
         level = 5
-        rest = score-500
-        if rest < 600:
-            rest = score-500
-        else:
-            rest = 600
+        score -= 1400
+        if score >= 2000:
+            score = 600
         max_score = 600
 
     # 추가
@@ -117,16 +114,15 @@ def profile(request, user_pk):
     level_dict = {1:'등산새싹', 2:'등산샛별', 3:'등산인', 4:'등산고수', 5:'등산왕'}
     context = {
         'person': person,
-        'post': post,
         'posts': posts,
+        'reviews': reviews,
         'level': level,
         'level_name': level_dict[level],
-        'rest': rest,
         'max_score': max_score,
         'liked_posts': liked_posts,
         'liked_mountains': liked_mountains,
         'bookmark_course': bookmark_course,
-        'course_details': course_details,
+        # 'course_details': course_details,
 
         # 추가
         'score': score,
@@ -134,6 +130,7 @@ def profile(request, user_pk):
         'restexp': restexp,
     }
     return render(request, 'accounts/profile.html', context)
+
 
 @login_required
 def update(request):
@@ -238,8 +235,14 @@ def kakao_callback(request):
             user_info = response.json()
 
             kakao_user_id = user_info['id']
-            email = user_info['kakao_account']['email']
-            profile_img = user_info['properties']['profile_image']
+            if 'email' in user_info['kakao_account']:
+                email = user_info['kakao_account']['email']
+            else:
+                email = None
+            if 'profile_image' in user_info['properties']:
+                profile_img = user_info['properties']['profile_image']
+            else:
+                profile_img = None
 
             user, created = User.objects.get_or_create(kakao_user_id=kakao_user_id)
 

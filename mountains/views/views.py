@@ -1,14 +1,20 @@
 from mountains.models import *
 from mountains.forms import SearchForm
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
+from django.shortcuts import redirect
 from django.db.models import Count, When, Case, Q
 from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator
-from django.views.generic import ListView, FormView
+from django.core.mail import EmailMessage
+from django.views.generic import ListView, FormView, View
 from django.contrib.auth.decorators import login_required
-from django.contrib.gis.serializers.geojson import Serializer
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import DetailView
+from django.contrib.gis.serializers.geojson import Serializer
+import gpxpy, gpxpy.gpx, os
+from utils.weather import get_weather
+import datetime
+
 
 class SearchView(FormView):
     template_name = 'mountains/search.html'
@@ -30,7 +36,7 @@ def mountain_list(request):
                 filter_condition.add(Q(region__contains=sido), filter_condition.AND)
             else:
                 if '전체' in gugun:
-                    filter_condition.add(Q(region__contains=sido),  filter_condition.AND)
+                    filter_condition.add(Q(region__contains=sido), filter_condition.AND)
                 else:
                     filter_condition.add(Q(region__contains=sido) & Q(region__contains=gugun), filter_condition.AND)
 
@@ -59,7 +65,7 @@ def mountain_list(request):
         if sort== 'likes':
             mountains = mountains.annotate(likes_count=Count('likes')).order_by('-likes_count')  # 좋아요순으로 정렬
         elif sort == 'reviews':
-            mountains = mountains.annotate(reviews_count2=Count('review')).order_by('-reviews_count2') 
+            mountains = mountains.annotate(reviews_count2=Count('review')).order_by('-reviews_count2') # 리뷰순으로 정렬
         elif sort == 'id':
             mountains = mountains.order_by('id')  # 가나다순으로 정렬
         elif sort== 'views':
@@ -198,6 +204,22 @@ def course_all_list(request):
     return render(request, 'mountains/course_all_list.html', context)
 
 
+def reset_filter(request):
+    if 'filtered_courses' in request.session:
+        # 세션에서 'filtered_courses' 키 제거
+        request.session.pop('filtered_courses')
+        # 세션을 수정한 것을 알림
+        request.session.modified = True  
+        return redirect('mountains:course_all_list')
+    
+    elif 'filtered_mountains' in request.session:
+        request.session.pop('filtered_mountains')
+        request.session.modified = True  
+        return redirect('mountains:mountain_list')
+    
+    else:
+        return HttpResponseBadRequest("Bad Request")
+
 def mountain_likes(request, mountain_pk):
     mountain = get_object_or_404(Mountain, pk=mountain_pk)
     user = request.user
@@ -227,6 +249,75 @@ def bookmark(request, mountain_pk, course_pk):
     return JsonResponse(context)
 
 
+class gpxDownloadView(View):
+    def dispatch(self, request, *args, **kwargs):
+        if request.method == 'POST':
+            return self.post(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)    
+    
+    def post(self, request, mountain_pk, course_pk):
+        course = Course.objects.get(pk=course_pk)
+        geom = course.geom
+        name = course.crs_name_detail
+
+        # GPX 파일 생성 및 변환
+        gpx_data = self.create_gpx(geom, name)
+
+        # 이메일 전송
+        email = request.user.email  # 유저의 이메일 주소를 가져옵니다.
+        if email:
+            self.send_email(email, gpx_data, name)  # 이메일로 GPX 파일을 전송합니다.
+            return HttpResponse(status=200)
+        else:
+            return HttpResponse(status=400)
+
+    def create_gpx(self, geom, name):
+        # 등산 코스의 geom 데이터를 GPX 형식으로 변환하는 로직을 구현합니다.
+        gpx = gpxpy.gpx.GPX()
+        gpx_track = gpxpy.gpx.GPXTrack()
+        gpx.tracks.append(gpx_track)
+
+        gpx_segment = gpxpy.gpx.GPXTrackSegment()
+        gpx_track.segments.append(gpx_segment)
+
+        # LineString의 좌표들을 가져와서 GPX 세그먼트에 추가합니다.
+        for point in geom.coords:
+            gpx_segment.points.append(gpxpy.gpx.GPXTrackPoint(latitude=point[1], longitude=point[0]))
+
+        # GPX 데이터를 반환합니다.
+        gpx_data = gpx.to_xml()
+        return gpx_data    
+
+    def send_email(self, email, gpx_data, name):
+        # 이메일을 전송하는 로직을 구현합니다.
+        email_subject = f"[오르다] {name} 등산 코스 GPX 파일"
+        email_body = f"안녕하세요. 100대 명산, 당신에게 딱 맞는 코스를 찾아주는 ORDA입니다. 저희 ORDA를 이용해주셔서 감사하며, {name} 등산 코스 GPX 파일을 첨부합니다. 행복한 등산하시길 바라요!"
+        email_attachment = (f"{name.replace(' ', '_')}_course.gpx", gpx_data, "application/gpx+xml")
+
+        email_message = EmailMessage(email_subject, email_body, os.getenv('DEFAULT_FROM_EMAIL'), [email])
+        email_message.attach(*email_attachment)
+        email_message.send()
+        
+        
+def weather_forecast(request, pk):
+    mountain = Mountain.objects.get(pk=pk)
+    lat = mountain.geom.y
+    lon = mountain.geom.x
+    api_key = "f0b89520154cdfcc100e02c4acfd8849"
+
+    weather_data = get_weather(lat, lon, api_key)
+
+    for forecast in weather_data['list']:
+        dt_txt = datetime.datetime.strptime(forecast['dt_txt'], '%Y-%m-%d %H:%M:%S') + datetime.timedelta(hours=9)
+        forecast['dt_txt'] = dt_txt.strftime('%m월 %d일 %H시')
+        forecast['pop'] = int(forecast['pop'] * 100)
+
+    context = {
+        'mountain': mountain,
+        'weather_data': weather_data
+    }
+
+    return render(request, 'mountains/weather_forecast.html', context)
 
 class CourseDetailView(DetailView):
     model = Course
