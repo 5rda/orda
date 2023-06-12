@@ -1,5 +1,7 @@
+import gpxpy, gpxpy.gpx, os, datetime
 from mountains.models import *
 from mountains.forms import SearchForm
+from utils.weather import get_weather
 from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect
 from django.db.models import Count, When, Case, Q
@@ -7,14 +9,11 @@ from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator
 from django.core.mail import EmailMessage
 from django.views.generic import ListView, FormView, View
+from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import DetailView
 from django.contrib.gis.serializers.geojson import Serializer
-import gpxpy, gpxpy.gpx, os
-from utils.weather import get_weather
-import datetime
-
 
 class SearchView(FormView):
     template_name = 'mountains/search.html'
@@ -290,8 +289,8 @@ class gpxDownloadView(View):
 
     def send_email(self, email, gpx_data, name):
         # 이메일을 전송하는 로직을 구현합니다.
-        email_subject = f"[오르다] {name} 등산 코스 GPX 파일"
-        email_body = f"안녕하세요. 100대 명산, 당신에게 딱 맞는 코스를 찾아주는 ORDA입니다. 저희 ORDA를 이용해주셔서 감사하며, {name} 등산 코스 GPX 파일을 첨부합니다. 행복한 등산하시길 바라요!"
+        email_subject = f'[오르다] {name} 등산 코스 GPX 파일'
+        email_body = render_to_string('mountains/email.html', {'name': name})
         email_attachment = (f"{name.replace(' ', '_')}_course.gpx", gpx_data, "application/gpx+xml")
 
         email_message = EmailMessage(email_subject, email_body, os.getenv('DEFAULT_FROM_EMAIL'), [email])
