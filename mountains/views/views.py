@@ -11,6 +11,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.gis.serializers.geojson import Serializer
 from django.contrib.auth.mixins import LoginRequiredMixin
 import gpxpy, gpxpy.gpx, os
+from utils.weather import get_weather
+import datetime
 
 
 class SearchView(FormView):
@@ -282,5 +284,26 @@ class gpxDownloadView(View):
         email_message = EmailMessage(email_subject, email_body, os.getenv('DEFAULT_FROM_EMAIL'), [email])
         email_message.attach(*email_attachment)
         email_message.send()
+        
+        
+def weather_forecast(request, pk):
+    mountain = Mountain.objects.get(pk=pk)
+    lat = mountain.geom.y
+    lon = mountain.geom.x
+    api_key = "f0b89520154cdfcc100e02c4acfd8849"
+
+    weather_data = get_weather(lat, lon, api_key)
+
+    for forecast in weather_data['list']:
+        dt_txt = datetime.datetime.strptime(forecast['dt_txt'], '%Y-%m-%d %H:%M:%S') + datetime.timedelta(hours=9)
+        forecast['dt_txt'] = dt_txt.strftime('%m월 %d일 %H시')
+        forecast['pop'] = int(forecast['pop'] * 100)
+
+    context = {
+        'mountain': mountain,
+        'weather_data': weather_data
+    }
+
+    return render(request, 'mountains/weather_forecast.html', context)
 
 
