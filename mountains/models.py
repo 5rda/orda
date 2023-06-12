@@ -67,41 +67,24 @@ class Course(models.Model):
 
 class CourseDetail(models.Model):
     id = models.AutoField(primary_key=True)
-    crs_name = models.CharField(max_length=100)
-    crs_name_detail = models.ForeignKey(Course, on_delete=models.CASCADE, to_field="crs_name_detail", db_column="crs_name_detail")
-    is_waypoint = models.BooleanField(default=False)
+    crs_name = models.CharField(max_length=100)  
+    crs_name_detail = models.ForeignKey(Course, on_delete=models.CASCADE, to_field="crs_name_detail", db_column="crs_name_detail")  
     waypoint_name = models.CharField(max_length=50)
     waypoint_category = models.CharField(max_length=256, db_column='category')
-    track = models.FloatField( db_column="track_se_1")
     geom = models.GeometryField()
 
     class Meta:
         managed = False
         db_table = 'mountains_coursedetail'
-        ordering = ['crs_name_detail', 'track']
+        ordering = ['crs_name_detail']
 
     def __str__(self):
         return str(self.crs_name_detail)
-    
-    
-# class CourseDetail2(models.Model):
-#     id = models.AutoField(primary_key=True)
-#     crs_name = models.CharField(max_length=100)    
-#     waypoint_name = models.CharField(max_length=50)
-#     waypoint_category = models.CharField(max_length=256, db_column='category')
-#     geom = models.GeometryField()
-
-#     class Meta:
-#         managed = False
-#         db_table = 'mountains_coursedetail_2'
-#         ordering = ['crs_name']
-
-#     def __str__(self):
-#         return str(self.crs_name)
 
 
 class Tag(models.Model):
     name = models.CharField(max_length=200)
+    category = models.CharField(max_length=50, null=True)
 
     def __str__(self):
         return self.name
@@ -125,4 +108,21 @@ class Review(models.Model):
         return self.content
 
 
+# class CourseDetail(models.Model):
+#     id = models.AutoField(primary_key=True)
+#     crs_name = models.CharField(max_length=100)
+#     crs_name_detail = models.ForeignKey(Course, on_delete=models.CASCADE, to_field="crs_name_detail", db_column="crs_name_detail")
+#     is_waypoint = models.BooleanField(default=False)
+#     waypoint_name = models.CharField(max_length=50)
+#     waypoint_category = models.CharField(max_length=256, db_column='category')
+#     track = models.FloatField( db_column="track_se_1")
+#     geom = models.GeometryField()
+
+#     class Meta:
+#         managed = False
+#         db_table = 'mountains_coursedetail'
+#         ordering = ['crs_name_detail', 'track']
+
+#     def __str__(self):
+#         return str(self.crs_name_detail)
 

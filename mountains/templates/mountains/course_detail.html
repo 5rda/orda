@@ -48,10 +48,12 @@
 <script>
   loadKakaoMapScript(function () {
     var course_data = {{ course_data|safe }};
+    var detail_data = {{ detail_data|safe }};
     var modal_courseId = {{ course.pk }};
     var courseInfo = JSON.parse(course_data[modal_courseId]);
-    initMap(modal_courseId, courseInfo);
-  });
+    var courseDetail = JSON.parse(detail_data[modal_courseId]);
+    initMap(modal_courseId, courseInfo, courseDetail);
+  })
 </script>
 
 </body>

@@ -133,15 +133,21 @@ class CourseListView(ListView):
         page_obj = paginator.get_page(page_number)
 
         serializer = Serializer()
+        detail_serializer = Serializer()
         data = {}
+        detail_data = {}
         for course in page_obj:
+            detail = CourseDetail.objects.filter(crs_name_detail=course)
+            geojson_detail_data = detail_serializer.serialize(detail, fields=('geom', 'waypoint_name', 'waypoint_category'))
             geojson_data = serializer.serialize([course], geometry_field='geom')
             data[course.pk] = geojson_data
+            detail_data[course.pk] = geojson_detail_data
 
         context.update({
             'mountain': mountain,
             'courses': page_obj,
             'courses_data': data,
+            'detail_data': detail_data,
             'is_paginated': page_obj.has_other_pages(),
             'page_obj': page_obj,
         })
@@ -341,13 +347,18 @@ class CourseDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         course = self.object
         mountain = course.mntn_name
+        detail = CourseDetail.objects.filter(crs_name_detail=course)
 
         serializer = Serializer()
+        detail_serializer = Serializer()
+
         data = {course.pk: serializer.serialize([course], geometry_field='geom')}
+        detail_data = {course.pk: detail_serializer.serialize(detail, fields=('geom', 'waypoint_name', 'waypoint_category'))}
 
         context.update({
             'mountain': mountain,
             'course': course,
-            'course_data': data
+            'course_data': data,
+            'detail_data': detail_data,
         })
         return context
