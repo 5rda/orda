@@ -129,6 +129,7 @@
 .postindex__post--userimgbox {
   position: relative;
   width: 40px;
+  height: 40px;
   margin: 3px 5px 5px 0px;
 }
 
@@ -137,6 +138,7 @@
   top: 50%;
   left: 50%;
   width: 100%;
+  height: 100%;
   box-sizing: border-box;
   border: 1px solid #DBDBDB;
   border-radius: 100%;
@@ -181,6 +183,11 @@
 .owl-carousel {
  position: relative;
 }
+
+.owl-carousel .owl-stage-outer {
+  position: relative;
+  border: none;
+ }
 
 .owl-carousel .owl-prev,
 .owl-carousel .owl-next {
