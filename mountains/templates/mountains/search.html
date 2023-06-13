@@ -33,22 +33,7 @@
 {% block javascript %}
 <script src="{% static 'js/mountains_search.js' %}"></script>
 <script>
-  $(document).ready(function() {
-    // 전국 이미지창만 보이기
-    $(".mountain__search--mapbox").hide();
 
-    $(".mountain__search--mapbox[data-sido='전국']").first().show();
-    
-    $("select[name^=sido]").change(function() {
-      var selectedSido = $(this).val();
-      
-      // 모든 이미지 숨기기
-      $(".mountain__search--mapbox").hide();
-      
-      // 선택한 sido에 해당하는 이미지만 보이기
-      $(".mountain__search--mapbox[data-sido='" + selectedSido + "']").show();
-    });
-  });
 </script>
 
 {% endblock javascript %}

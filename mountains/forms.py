@@ -55,7 +55,8 @@ class ReviewCreationForm(forms.ModelForm):
     )
 
     image = forms.ImageField(
-        widget=forms.ClearableFileInput(
+        required=False,
+        widget=forms.FileInput(
             attrs={
                 'onchange': "previewImage(event)",
                 'class': "mountain__reviewcrt--imgbox",

@@ -70,4 +70,15 @@ def review_update(request, pk, review_pk):
         'form': form,
         'review': review,
     }
-    return render(request, 'mountains/mountain_detail.html', context)
+    return render(request, 'mountains/review_update.html', context)
+
+
+@login_required
+def review_image_delete(request, pk, review_pk):
+    review = Review.objects.get(pk=review_pk)
+    if review.user == request.user:
+        if request.method == 'POST':
+            review.image.delete(save=True)
+            return redirect('mountains:review_update', pk, review_pk)
+    else:
+        return JsonResponse({'error': '권한이 없습니다.'})

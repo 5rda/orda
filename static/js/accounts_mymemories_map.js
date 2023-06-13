@@ -18,7 +18,7 @@
   }
 
   // 카카오맵 초기화 함수
-  function initMap(modal_courseId, courseInfo) {
+  function initMap(modal_courseId, courseInfo, courseDetail) {
     var container = document.getElementById('map-' + modal_courseId);
     var options = {
       center: new kakao.maps.LatLng(37.5665, 126.9780), 
@@ -83,7 +83,30 @@
       strokeStyle: 'solid'
     });
     polyline.setMap(map);
+    
+  // courseDetail의 마커 추가
+  var detail = courseDetail.features
+  console.log(detail)
+  detail.forEach(function(feature) {
+    var geometry = feature.geometry;
+    var properties = feature.properties;
 
+    if (geometry.type === 'Point' && ['PEAK', 'CULTURAL', 'ENTRY', 'SCENERY'].includes(properties.waypoint_category) && properties.waypoint_name !== '자연경관') {
+      var coordinates = geometry.coordinates;
+      var markerPosition = new kakao.maps.LatLng(coordinates[1], coordinates[0]);
+
+      var imageSrc = "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png";
+      var imageSize = new kakao.maps.Size(16, 24); 
+      var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
+
+      var marker = new kakao.maps.Marker({
+        position: markerPosition,
+        map: map,
+        title: properties.waypoint_name,
+        image: markerImage
+      });
+    }
+  });
     // 부드럽게 마커가 위치한 곳으로 이동합니다
     map.panTo(center);
   };

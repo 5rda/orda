@@ -8,7 +8,7 @@ from django.views.generic import DetailView
 from django.contrib.gis.serializers.geojson import Serializer
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-class MountainDetailView(DetailView):
+class MountainDetailView(LoginRequiredMixin, DetailView):
     template_name = 'mountains/mountain_detail.html'
     context_object_name = 'mountain'
     model = Mountain

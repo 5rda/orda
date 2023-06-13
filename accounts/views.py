@@ -20,22 +20,33 @@ from .models import Notification
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
-
 def login(request):
     if request.user.is_authenticated:
         return render(request, 'pjt/index.html')
+    
     if request.method == 'POST':
         form = CustomUserAuthenticationForm(request, request.POST)
+        
         if form.is_valid():
             auth_login(request, form.get_user())
             prev_url = request.session.get('prev_url')
+            
             if prev_url:
-                del request.session['prev_url']
-                return redirect(prev_url)
-            return render(request, 'pjt/index.html')
+                if 'logout' in prev_url or 'delete' in prev_url:
+                    del request.session['prev_url']
+                    return render(request, 'pjt/index.html')
+                else:
+                    del request.session['prev_url']
+                    return redirect(prev_url)
+            
+            return render(request, 'pjt/index.html')    
     else:
         form = CustomUserAuthenticationForm()
-    request.session['prev_url'] = request.META.get('HTTP_REFERER')
+
+    prev_url = request.META.get('HTTP_REFERER')
+    if prev_url and ('logout' not in prev_url and 'delete' not in prev_url):
+        request.session['prev_url'] = prev_url
+
     context = {
         'form': form,
     }
@@ -371,17 +382,18 @@ def my_memories(request):
 def notification(request):
     user = request.user
     notifications = user.notifications.all()
-    return render(request, 'accounts/notification.html', {'notifications': notifications})
+    notification_count = notifications.count()  
+    return render(request, 'accounts/notification.html', {'notifications': notifications, 'notification_count': notification_count})
 
 
 def notification_check(request, notification_id):
     notification = Notification.objects.get(id=notification_id)
     notification.is_read = True
     notification.save()
-    return redirect('accounts:notification')
+    return JsonResponse({'success': True})  
 
 
 def notification_delete(request, notification_id):
     notification = Notification.objects.get(id=notification_id)
     notification.delete()
-    return redirect('accounts:notification')
+    return JsonResponse({'success': True}) 

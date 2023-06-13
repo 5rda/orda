@@ -14,6 +14,7 @@ urlpatterns = [
     path('<int:pk>/review_likes/<int:review_pk>/', review_likes, name='review_likes'),
     path('<int:pk>/review_delete/<int:review_pk>/', review_delete, name='review_delete'),
     path('<int:pk>/review_update/<int:review_pk>/', review_update, name='review_update'),
+    path('<int:pk>/review_image_delete/<int:review_pk>/', review_image_delete, name='review_image_delete'),
     path('search/', SearchView.as_view(), name='search'),
     path('course/<int:pk>/', CourseDetailView.as_view(), name='course_detail'),
     path('weather_forecast/<int:pk>/', weather_forecast, name='weather_forecast'),
