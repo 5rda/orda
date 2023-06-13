@@ -79,9 +79,9 @@
               <div class="header__user--item">
                 <button id="notification-button" onclick="toggleNotificationPopup()"><span id="notification-count">
                   {% if request.notification_count %}
-                    <span id="fill"><i class="bi bi-bell-fill"></i></span>
+                    <span id="fill"><i class="bi bi-bell-fill"></i>{{ request.notification_count }}</span>
                   {% else %}
-                    <span id= "empty"><i class="bi bi-bell"></i></span>
+                    <span id= "empty"><i class="bi bi-bell"></i>{{ request.notification_count }}</span>
                   {% endif %}</span>
                 </button>
                 <div id="notification-popup" class="notification-popup" style="display: none;">
