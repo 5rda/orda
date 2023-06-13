@@ -20,7 +20,6 @@ from .models import Notification
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
-
 def login(request):
     if request.user.is_authenticated:
         return render(request, 'pjt/index.html')
@@ -375,17 +374,18 @@ def my_memories(request):
 def notification(request):
     user = request.user
     notifications = user.notifications.all()
-    return render(request, 'accounts/notification.html', {'notifications': notifications})
+    notification_count = notifications.count()  
+    return render(request, 'accounts/notification.html', {'notifications': notifications, 'notification_count': notification_count})
 
 
 def notification_check(request, notification_id):
     notification = Notification.objects.get(id=notification_id)
     notification.is_read = True
     notification.save()
-    return redirect('accounts:notification')
+    return JsonResponse({'success': True})  
 
 
 def notification_delete(request, notification_id):
     notification = Notification.objects.get(id=notification_id)
     notification.delete()
-    return redirect('accounts:notification')
+    return JsonResponse({'success': True}) 
