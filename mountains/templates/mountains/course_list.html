@@ -39,6 +39,8 @@
               {% csrf_token %}
               <input class="my-2 font-bold" type="submit" value="GPX 다운로드">
             </form>
+            <input type="checkbox" id="waypoint-checkbox-{{ course.pk }}" onchange="toggleWaypoints({{ course.pk }})">
+            <label for="waypoint-checkbox-{{ course.pk }}">경유지 표시</label>
           </div>
           <div class="ps-3">
             <p class="my-2">{{ course.distance }}km</p>
@@ -99,6 +101,8 @@
 <script>
 
 // 카카오맵 API 로드 후 초기화 함수 호출
+ // 코스별 지도를 저장할 객체
+var mapList = {};
 loadKakaoMapScript(function () {
   var course_data = {{ courses_data|safe }};
   var detail_data = {{ detail_data|safe }};

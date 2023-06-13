@@ -1,4 +1,3 @@
-
 function loadKakaoMapScript(callback) {
   if (window.kakao) {
       // 이미 카카오맵 API가 로드되어 있는 경우
@@ -17,6 +16,37 @@ function loadKakaoMapScript(callback) {
       };
   }
 }
+
+function toggleWaypoints(courseId) {
+  var checkbox = document.getElementById('waypoint-checkbox-' + courseId);
+  var mapInfo = mapList[courseId];
+
+  if (mapInfo && mapInfo.waypoints) {
+    var waypoints = mapInfo.waypoints;
+
+    if (checkbox.checked) {
+      // 체크박스가 선택된 경우, 모든 경유지 마커를 표시합니다.
+      for (var i = 0; i < waypoints.length; i++) {
+        waypoints[i].setMap(mapInfo.map);
+      }
+    } else {
+      // 체크박스가 선택되지 않은 경우, 모든 경유지 마커를 숨깁니다.
+      for (var i = 0; i < waypoints.length; i++) {
+        waypoints[i].setMap(null);
+      }
+    }
+  }
+}
+
+// 페이지 로드 시 경유지 체크박스를 선택한 상태로 초기화합니다.
+document.addEventListener("DOMContentLoaded", function() {
+  var checkboxes = document.querySelectorAll("[id^='waypoint-checkbox-']");
+  checkboxes.forEach(function(checkbox) {
+    checkbox.checked = true; // 체크박스를 선택한 상태로 설정합니다.
+    var courseId = checkbox.id.split("-")[2];
+    toggleWaypoints(courseId); // 체크박스의 변경에 따라 경유지를 표시하거나 숨깁니다.
+  });
+});
 
 // 카카오맵 초기화 함수
 function initMap(courseId, courseInfo, courseDetail) {
@@ -87,7 +117,8 @@ function initMap(courseId, courseInfo, courseDetail) {
 
   // courseDetail의 마커 추가
   var detail = courseDetail.features
-  console.log(detail)
+  var courseWaypoints = [];
+
   detail.forEach(function(feature) {
     var geometry = feature.geometry;
     var properties = feature.properties;
@@ -104,14 +135,22 @@ function initMap(courseId, courseInfo, courseDetail) {
         position: markerPosition,
         map: map,
         title: properties.waypoint_name,
-        image: markerImage
+        image: markerImage,
       });
+
+      courseWaypoints.push(marker);
     }
   });
 
 
   // 부드럽게 마커가 위치한 곳으로 이동합니다
   map.panTo(center);
+
+  // 코스별 지도 정보를 저장합니다.
+  mapList[courseId] = {
+    map: map,
+    waypoints: courseWaypoints
+  };
 };
 
 // 북마크 비동기
