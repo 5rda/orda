@@ -25,13 +25,13 @@
       <li class="list-group-item" id="notification-{{ notification.id }}" style="max-width: 300px;">
         {{ notification.message|safe }}<br>{{ notification.created_at|date:"y.m.d H:i" }} 
         <span id="notification-status-{{ notification.id }}">
-          {% if not notification.is_read %}
+          {% comment %} {% if not notification.is_read %}
             <button onclick="markNotificationRead({{ notification.id }})">읽지 않음</button> |
           {% else %}
-            <span>읽음</span> |
-          {% endif %}
+            <span>읽음 |</span>
+          {% endif %} {% endcomment %}
         </span>
-        <button onclick="deleteNotification({{ notification.id }})">삭제</button>
+        <button onclick="deleteNotification({{ notification.id }})">| 삭제</button>
       </li>
     {% empty %}
       <li class="list-group-item">알림이 없습니다.</li>
