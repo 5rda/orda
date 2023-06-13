@@ -1,36 +1,35 @@
-var postGrid = document.getElementById('postGrid');
-var loadMoreBtn = document.getElementById('loadMoreBtn');
-var page = 1;
-var perPage = 12; 
+var page = 1; // 초기 페이지 번호
+var perPage = 12; // 한 페이지에 보여줄 글 수
+var postItems = Array.from(document.getElementsByClassName("post-item"));
+var loadMoreBtn = document.getElementById("loadMoreBtn");
 
-if (loadMoreBtn) {
-  loadMoreBtn.addEventListener('click', function() {
-    var hiddenPosts = postGrid.querySelectorAll('.post-item.hidden');
-    var i = 0;
-
-    while (i < perPage && hiddenPosts[i]) {
-      hiddenPosts[i].classList.remove('hidden');
-      i++;
-    }
-
-    if (hiddenPosts.length <= perPage) {
-      loadMoreBtn.style.display = 'none';
-    }
-  });  
-}
-
-var allPosts = postGrid.querySelectorAll('.post-item');
-allPosts.forEach(function(post, index) {
-  if (index >= perPage) {
-    post.classList.add('hidden');
-  }
-});
-
-if (allPosts.length <= perPage) {
-  if (loadMoreBtn) {
-    loadMoreBtn.style.display = 'none';
+function showPosts(startIndex, endIndex) {
+  for (var i = startIndex; i < endIndex; i++) {
+    postItems[i].style.display = "block";
   }
 }
+
+function loadMorePosts() {
+  var startIndex = (page - 1) * perPage;
+  var endIndex = startIndex + perPage;
+
+  if (endIndex >= postItems.length) {
+    loadMoreBtn.style.display = "none";
+    endIndex = postItems.length;
+  }
+
+  showPosts(startIndex, endIndex);
+  page++;
+}
+
+if (postItems.length > perPage) {
+  loadMoreBtn.style.display = "block";
+  showPosts(0, perPage);
+  page++;
+}
+
+loadMoreBtn.addEventListener("click", loadMorePosts);
+
 
 // 좋아요 비동기
 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
