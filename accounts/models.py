@@ -51,6 +51,5 @@ class Notification(models.Model):
         else:
             return reverse('accounts:profile', kwargs={'pk': self.user.pk})
 
-          
     def __str__(self):
         return self.message
