@@ -31,13 +31,21 @@ def login(request):
             auth_login(request, form.get_user())
             prev_url = request.session.get('prev_url')
             
-            if 'logout' or 'delete' in prev_url:
-                return render(request, 'pjt/index.html')
-            else:
-                del request.session['prev_url']
-                return redirect(prev_url)       
+            if prev_url:
+                if 'logout' in prev_url or 'delete' in prev_url:
+                    del request.session['prev_url']
+                    return render(request, 'pjt/index.html')
+                else:
+                    del request.session['prev_url']
+                    return redirect(prev_url)
+            
+            return render(request, 'pjt/index.html')    
     else:
         form = CustomUserAuthenticationForm()
+
+    prev_url = request.META.get('HTTP_REFERER')
+    if prev_url and ('logout' not in prev_url and 'delete' not in prev_url):
+        request.session['prev_url'] = prev_url
 
     context = {
         'form': form,
