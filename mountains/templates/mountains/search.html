@@ -9,23 +9,29 @@
 
 {% block content %}
 <div class="mountain__search--wrap">
-  <form method="Post" action="{% url 'mountains:mountain_list' %}">
+  <div class="d-flex">
+    <img style="width:30px; height:30px; margin-right: 10px;" class="mountain__search--titleimg" src="{% static 'img/goal_1.png' %}" alt="">
+    <h1 class="mountain__search--title">원하는 산을 검색해보세요!</h1>
+  </div>
+  <form method="Post" action="{% url 'mountains:mountain_list' %}" class="select__form">
     {% csrf_token %}
-    <section>
-      <div id="review-tags" class="mountain__reviewcrt--tagbox">
-        {{ form.tags|safe }}
-      </div>
-      <div id="selected-tags" class="selected-tags"></div>
-    </section>
-  
-    <br>
-    <section>
-      <select class="form-control" name="sido2" id="sido2"></select>
-      <select class="form-control" name="gugun2" id="gugun2"></select>
-      <button type="submit">탐색</button>
-    </section>
+    <div class="mountain__search--content" style="position: relative; margin: 0 auto;">
+      {% include 'mountains/search_region.html' %}
+      <div class="d-flex flex-column" style="width: 100%; padding: 0 25px;">        
+        <section class="d-flex flex-column" style="width: 100%;">
+          <select class="select__box focus:outline-none" name="sido2" id="sido2"></select>
+          <select class="select__box focus:outline-none" name="gugun2" id="gugun2"></select>
+        </section>
 
-    {% include 'mountains/search_region.html' %}
+        <section>
+          <div id="review-tags" class="mountain__reviewcrt--tagbox">
+            {{ form.tags|safe }}
+          </div>
+          <div id="selected-tags" class="selected-tags"></div>
+        </section>
+        <button type="submit" class="rounded-full px-3 pt-2 pb-1 text-white bg-[#47A945]"><i class="bi bi-geo-alt-fill"></i></button>
+      </div>
+    </div>
   </form>
 </div>
 {% endblock content %}
@@ -33,7 +39,7 @@
 {% block javascript %}
 <script src="{% static 'js/mountains_search.js' %}"></script>
 <script>
-
+  
 </script>
 
 {% endblock javascript %}

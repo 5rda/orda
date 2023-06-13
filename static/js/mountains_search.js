@@ -56,6 +56,35 @@ $('document').ready(function() {
 //  });
 });
 
+$(document).ready(function() {    
+  $("select[name^=sido]").change(function() {
+    var selectedSido = $(this).val();
+    
+    // 모든 이미지 숨기기
+    $(".mountain__search--mapbox").hide();
+    
+    // 선택한 sido에 해당하는 이미지만 보이기
+    $(".mountain__search--mapbox[data-sido='" + selectedSido + "']").show();
+
+    $(".mountain__search--gugun").show();
+
+    $(document).ready(function() {
+      $("select[name^=gugun]").change(function() {
+        var selectedGugun = $(this).val();
+
+        if (selectedGugun === '전체') {
+          // 전체 선택 시 모든 mountain__search--gugun 요소를 보이도록 설정
+          $(".mountain__search--gugun").show();
+        } else {
+          // 선택한 gugun에 해당하는 mountain__search--gugun 요소만 보이도록 설정
+          $(".mountain__search--gugun").hide();
+          $(".mountain__search--gugun[data-gugun='" + selectedGugun + "']").show();
+        }
+      });
+    });
+  });
+});
+
 document.addEventListener('DOMContentLoaded', function() {
   var tagButtons = document.querySelectorAll('#review-tags label input');
   var selectedTagsContainer = document.getElementById('selected-tags');

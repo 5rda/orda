@@ -1,5 +1,6 @@
 // 버튼 요소들을 선택합니다.
 const reviewButton = document.querySelector('.profile__user--review');
+console.log(reviewButton)
 const bookmarkButton = document.querySelector('.profile__user--bookmark');
 const likeButton = document.querySelector('.profile__user--like');
 const followerButton = document.querySelector('.profile__user--followercount');
