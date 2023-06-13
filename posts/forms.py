@@ -32,6 +32,13 @@ class PostForm(forms.ModelForm):
             }
         )
     )
+    
+    def __init__(self, *args, **kwargs):
+        instance = kwargs.get('instance')
+        initial = kwargs.get('initial', {})
+        initial['mountain'] = instance.mountain if instance else None
+        kwargs['initial'] = initial
+        super(PostForm, self).__init__(*args, **kwargs)
 
     class Meta:
         model = Post

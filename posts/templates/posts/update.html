@@ -15,11 +15,18 @@
       {{ form.media }}  
       {{ form.title }}
       <div>
-        {{ form.content }}
+        <label for="mountain">다녀온 산:</label>
+        <select name="mountain" id="mountain" required>
+          <option value="" {% if form.instance.mountain is None %}selected{% endif %}>선택</option>
+          {% for mountain in mountains %}
+            <option value="{{ mountain.pk }}" {% if form.instance.mountain_id == mountain.pk %}selected{% endif %}>{{ mountain.name }}</option>
+          {% endfor %}
+        </select>
       </div>
+      {{ form.content }}
       <div class="btn__wrap">
-        <input type="submit" value="뒤로가기" class="btn--back rounded"  onclick=window.history.back()>
-        <input type="submit" value='작성' class="btn--submit rounded">
+        <input type="button" value="뒤로가기" class="btn--back rounded" onclick="window.history.back()">
+        <input type="submit" value="작성" class="btn--submit rounded">
       </div>
     </form>
   </div>

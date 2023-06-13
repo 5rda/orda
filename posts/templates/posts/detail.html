@@ -31,7 +31,7 @@
         <p style="font-weight: bold;">{{ post.user }}</p>
         </a>
       <div class="post__data--box">
-        <p> {{ post.updated_at|date:'Y. m. d. h. i'}} |&nbsp;</p>          
+        <p> {{ post.updated_at|date:'Y. m. d. h. i'}} &nbsp;</p>          
         {% if request.user == post.user %}
         <a href="{% url 'posts:update' post.pk %}">수정 |&nbsp;</a>
         <form action="{% url 'posts:delete' post.pk %}" method="POST" id="delete-form">
