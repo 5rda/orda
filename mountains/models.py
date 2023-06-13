@@ -3,6 +3,8 @@ from .models import *
 from django.conf import settings
 from django.db.models import Count
 from django.contrib.gis.db import models
+from imagekit.models import ProcessedImageField
+from imagekit.processors import ResizeToFill
 
 # Create your models here.
 class Mountain(models.Model):
@@ -96,11 +98,16 @@ class Review(models.Model):
     mountain = models.ForeignKey(Mountain, on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, db_column='user_id')
     content = models.TextField()
-    image = models.ImageField(blank=True, null=True, upload_to=image_path)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     tags = models.ManyToManyField(Tag, related_name='reviews')
     like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='like_reviews')
+    image = ProcessedImageField(upload_to=image_path,
+                                        processors=[ResizeToFill(500,500)],
+                                        format='JPEG',
+                                        options={'quality': 90},
+                                        null=True,
+                                        blank=True)
 
     class Meta:
         db_table = 'mountains_review'
