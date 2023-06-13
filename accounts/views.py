@@ -19,6 +19,9 @@ from accounts.models import Notification
 from .models import Notification
 from django.urls import reverse
 from django.utils.safestring import mark_safe
+from django.core.files.temp import NamedTemporaryFile
+import urllib.request
+
 
 def login(request):
     if request.user.is_authenticated:
@@ -235,24 +238,24 @@ def kakao_callback(request):
                 email = user_info['kakao_account']['email']
             else:
                 email = None
-            if 'profile_image' in user_info['properties']:
-                profile_img = user_info['properties']['profile_image']
-            else:
-                profile_img = None
 
-            user, created = User.objects.get_or_create(kakao_user_id=kakao_user_id)
+            user, created = User.objects.get_or_create(username=kakao_user_id)
 
             if created:
-                user.username = kakao_user_id
+                user.kakao_user_id = kakao_user_id
                 user.email = email
-                if 'http://' in profile_img:
-                    profile_img = profile_img.replace('http://', '')
-                else:
-                    profile_img = profile_img
 
-                image_url = f"http://{profile_img}"
-                response = urlopen(image_url)
-                user.profile_img.save(f"{kakao_user_id}.png", File(response))
+                if 'properties' in user_info and 'profile_image' in user_info['properties']:
+                    profile_img_url = user_info['properties']['profile_image']
+                    try:
+                        with urllib.request.urlopen(profile_img_url) as response:
+                            with NamedTemporaryFile(delete=True) as temp_file:
+                                temp_file.write(response.read())
+                                temp_file.flush()
+                                user.profile_img.save(f"{kakao_user_id}.png", temp_file)
+                    except Exception as e:
+                        print(f"Error saving profile image: {e}")
+
                 auth_login(request, user)
                 return redirect('accounts:update')
             else:
@@ -294,18 +297,24 @@ def naver_callback(request):
                 email = user_info['response']['email']
             else:
                 email = None
-            if 'profile_image' in user_info['response']:
-                profile_img = user_info['response']['profile_image']
-            else:
-                profile_img = None
 
-            user, created = User.objects.get_or_create(naver_user_id=naver_user_id)
+            user, created = User.objects.get_or_create(username=naver_user_id)
 
             if created:
-                user.username = naver_user_id
+                user.naver_user_id = naver_user_id
                 user.email = email
-                response = urlopen(profile_img)
-                user.profile_img.save(f"{naver_user_id}.png", File(response))
+
+                if 'response' in user_info and 'profile_image' in user_info['response']:
+                    profile_img_url = user_info['response']['profile_image']
+                    try:
+                        with urllib.request.urlopen(profile_img_url) as response:
+                            with NamedTemporaryFile(delete=True) as temp_file:
+                                temp_file.write(response.read())
+                                temp_file.flush()
+                                user.profile_img.save(f"{naver_user_id}.png", temp_file)
+                    except Exception as e:
+                        print(f"Error saving profile image: {e}")
+
                 auth_login(request, user)
                 return redirect('accounts:update')
             else:
