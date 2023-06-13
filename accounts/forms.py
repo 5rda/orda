@@ -101,10 +101,49 @@ class CustomUserCreationForm(UserCreationForm):
 
 
 class CustomUserChangeForm(UserChangeForm):
-    nickname = forms.CharField(label="닉네임")
-    email = forms.EmailField(label="이메일", required=False)
-    message = forms.CharField(label="상태메시지", required=False)
-    profile_img = forms.ImageField(label="프로필 이미지", required=False)
+    nickname = forms.CharField(
+        label="닉네임",
+        widget=forms.TextInput(
+            attrs={
+                'class': '"appearance-none bg-transparent border-none text-gray-700  py-1 px-2 leading-tight focus:outline-none',
+                'style': 'width: 96%',
+                'placeholder': '닉네임를 입력하세요',
+                'id': "닉네임",
+            }
+        ))
+    email = forms.EmailField(
+        label="이메일", 
+        required=False,
+        widget=forms.EmailInput(
+            attrs={
+                'class': '"appearance-none bg-transparent border-none text-gray-700  py-1 px-2 leading-tight focus:outline-none',
+                'style': 'width: 96%',
+                'placeholder': '이메일을 입력하세요',
+                'id': "이메일",
+            }
+          )
+        )
+    message = forms.CharField(
+        label="상태메시지", 
+        required=False,
+        widget=forms.Textarea(
+            attrs={
+                'class': '"appearance-none bg-transparent border-none text-gray-700  py-1 px-2 leading-tight focus:outline-none',
+                'style': 'width: 96%; height:100px',
+                'placeholder': '상태메세지를 입력하세요',
+                'id': "상태메세지",
+            }
+        )
+        )
+    profile_img = forms.ImageField(
+        label="프로필 이미지", 
+        required=False,
+        widget=forms.ClearableFileInput(
+            attrs={
+                "class" : "d-none ",
+                'id': "프로필 이미지",
+            }
+        ))
     class Meta:
         model = get_user_model()
         fields = ("nickname", "email", "message", "profile_img",)

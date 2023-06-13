@@ -48,7 +48,7 @@
               <div style="height:75px;">
                 <a href="{% url 'mountains:mountain_list' %}"><img class='header__logo--img' src="{% static 'img/logo_long.png' %}" alt="ordalogo"></a>
               </div>
-              <div class="d-flex align-items-end fs-5 ms-3 menu--hidden" >
+              <div class="d-flex align-items-end fs-5 ms-3 hearder__btn--box" >
                 <a href="{% url 'mountains:search' %}" class="{% if '/search/' in request.path %} active-button {% endif %} btn--hover mb-1  mx-3">탐색</a>
                 <a href="{% url 'mountains:mountain_list' %}" class="{% if request.resolver_match.url_name == 'mountain_list' %} active-button {% endif %} btn--hover mb-1 mx-3">100대 명산</a>
                 <a href="{% url 'mountains:course_all_list' %}" class="{% if '/courses/' in request.path %} active-button {% endif %} btn--hover mb-1 mx-3">등산로</a>
@@ -57,7 +57,7 @@
               </div>
             </div>
             <div class="d-flex">
-              <div class="d-flex align-items-end me-3">
+              <div class="d-flex align-items-end me-3 hearder__search--box">
                 <div class="rounded-pill d-flex mb-1" style="border:var(--main-color) 3px solid; background-color:white">
                   <i class="bi bi-search align-self-center ps-3"></i>  
                   <form action="{% url 'mountains:mountain_list' %}" method="POST">
@@ -69,10 +69,16 @@
               </div>
               <div class="d-flex align-items-end mb-2">
                 <div class="d-flex">
-                  <a id="로그인" class="{% if active_button_id == '로그인' %}active-button{% endif %} fs-5 me-3" href="{% url 'accounts:login' %}">로그인</a>
+                  {% if user.is_authenticated %}
+                  <form action="{% url 'accounts:logout' %}" method="POST">
+                    {% csrf_token %}
+                    <button id="로그아웃" type="submit" class="fs-5">로그아웃</button>
+                  </form>
+                  {% else %}
+                    <a id="로그인" class="{% if active_button_id == '로그인' %}active-button{% endif %} fs-5 me-3" href="{% url 'accounts:login' %}">로그인</a>
+                    <a id="회원가입" class="{% if active_button_id == '회원가입' %}active-button{% endif %} fs-5" href="{% url 'accounts:signup' %}">회원가입</a>
+                  {% endif %}
                   
-                  <a id="회원가입" class="{% if active_button_id == '회원가입' %}active-button{% endif %} fs-5" href="{% url 'accounts:signup' %}">
-                    회원가입</a>
                   
                 </div>
                 </div>
@@ -90,7 +96,6 @@
       <img class='article__icon' src="{% static 'img/icons/search.png' %}" alt="">
       <P class='article__p--strong'>키워드 검색으로 찾으로 가기!</P>
       <a href="{% url 'mountains:search' %}"><button class='rounded-full article__btn'>탐색</button></a>
-      {% comment %}  {% url 'mountains:search' %}  {% endcomment %}
     </div>
   
     <div class='article__divbox--color'>
@@ -98,8 +103,7 @@
       <img class='article__icon' src="{% static 'img/icons/road.png' %}" alt="">
       <P class='article__p--strong'>등산로를 한눈에!</P>
       <a href="{% url 'mountains:course_all_list' %}"><button class='rounded-full article__btn2'>등산로</button></a> 
-      {% comment %}  {% url 'mountains:course' %}  {% endcomment %}
-    </div>
+  </div>
   
     <div class='article__divbox'>
       <P class='article__p'>정상을 갔다면?</P>
@@ -113,7 +117,6 @@
       <img class='article__icon header__div__img' src="{% static 'img/icons/selfie.png' %}" alt="">
       <P class='article__p--strong'>추억을 공유해보세요</P>
       <a href="{% url 'posts:proofshot' %}"><button class='rounded-full article__btn2'>인증샷</button></a>
-      {% comment %} {% url 'mountains:photo?' %} {% endcomment %}
     </div>
   </article>
 

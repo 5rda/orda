@@ -36,7 +36,6 @@ def login(request):
                 return redirect(previous_page)
             else:
                 return redirect('mountains:mountain_list')
-        
     else:
         form = CustomUserAuthenticationForm()
     context = {
