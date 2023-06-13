@@ -220,6 +220,7 @@ def reset_filter(request):
     else:
         return HttpResponseBadRequest("Bad Request")
 
+
 def mountain_likes(request, mountain_pk):
     mountain = get_object_or_404(Mountain, pk=mountain_pk)
     user = request.user

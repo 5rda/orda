@@ -74,7 +74,21 @@
   color: var(--green-btn);
 }
 
+.arrow--rotate {
+  border: 3px solid ;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  color: var(--sub-color);
+  margin-bottom: 10px;
+  
+}
 
+.arrow--rotate:hover {
+  transform: rotate(75deg);
+  transition: transform 0.75s ease;
+  color: #75a64a;
+}
 
 @media (max-width:1080px) {
   .course__wrap {

@@ -19,6 +19,12 @@
         <option value="id">가나다순</option>
     </select>
   </form>
+  <form action="{% url 'mountains:reset' %}" method="GET" id="reset-form">
+    {% if 'filtered_courses' in request.session or 'filtered_mountains' in request.session %}
+      <input type="hidden" name="reset" value="true">
+      <button type="submit" class="bi bi-arrow-clockwise align-self-end ms-2 fs-5 arrow--rotate"></button>
+    {% endif %}
+  </form>
   
   <div id="results" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 mb-4">
     {% for mountain in page_obj %}
@@ -68,75 +74,26 @@
     {% endfor %}
   </div>
   <hr>
-
-<!-- 페이지네이션 -->
-<ul class="pagination justify-content-center">
-  {% if  page_obj.has_previous %}
-  <li class="page-item">
-    <a class="page-link" href="?page=1" aria-label="처음">
-      <span aria-hidden="true">&laquo;</span>
-      <span class="sr-only"></span>
-    </a>
-  </li>
-    <li class="page-item">
-      <a class="page-link" href="?page={{   page_obj.previous_page_number }}">이전</a>
-    </li>
-  {% else %}
-    <li class="page-item disabled">
-      <a class="page-link" tabindex="-1" aria-disabled="true" href="#">이전</a>
-    </li>
-  {% endif %}
-  {% for page_number in   page_obj.paginator.page_range %}
-    {% if page_number >=  page_obj.number|add:-2 and page_number <=   page_obj.number|add:2 %}
-      {% if page_number ==  page_obj.number %}
-        <li class="page-item btn_active" aria-current="page">
-          <a class="page-link" href="?page={{ page_number }}">{{ page_number }}</a>
-        </li>
-      {% else %}
-        <li class="page-item">
-          <a class="page-link" href="?page={{ page_number }}">{{ page_number }}</a>
-        </li>
-      {% endif %}
-    {% endif %}
-  {% endfor %}
-  {% if   page_obj.has_next %}
-    <li class="page-item">
-      <a class="page-link" href="?page={{   page_obj.next_page_number }}">다음</a>
-    </li>
-    <li class="page-item">
-      <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="마지막">
-        <span aria-hidden="true">&raquo;</span>
-        <span class="sr-only"></span>
-      </a>
-    </li>
-  {% else %}
-    <li class="page-item disabled">
-      <a class="page-link" tabindex="-1" aria-disabled="true" href="#">다음</a>
-    </li>
-  {% endif %}
-</ul>
-  {% comment %} <div class="pagination mt-4">
+  {% comment %} pagenator {% endcomment %}
+  <div class="pagination mt-4">
     <div class="mx-auto">
-      {% if is_paginated %}
-        {% if page_obj.has_previous %}
-          <a href="?page=1 {% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" class="page__btn ">&lt;&lt;</a>
-        {% endif %}
-
-        {% for num in page_obj.paginator.page_range %}
-          {% if num == page_obj.number %}
-            <span class="page__btn pagination__link--active">{{ num }}</span>
+      {% if  page_obj.has_previous %}
+        <a href="?page=1{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" class="page__btn ">&lt;&lt;</a>
+      {% endif %}
+      {% for page_number in   page_obj.paginator.page_range %}
+        {% if page_number >=  page_obj.number|add:'-5' and page_number <=   page_obj.number|add:'4' %}
+          {% if page_number ==  page_obj.number %}
+            <span class="page__btn pagination__link--active">{{ page_number }}</span>
           {% else %}
-            <a href="?page={{ num }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" class="page__btn ">{{ num }}</a>
+            <a href="?page={{ page_number }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" class="page__btn ">{{ page_number }}</a>
           {% endif %}
-        {% endfor %}
-
-        {% if page_obj.has_next %}
-          <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" class="page__btn ">&gt;&gt;</a>
         {% endif %}
+      {% endfor %}
+      {% if   page_obj.has_next %}
+        <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" class="page__btn ">&gt;&gt;</a>
       {% endif %}
     </div>
-  </div> {% endcomment %}
-
+  </div>
 </div>
 {% endblock content %}
 
