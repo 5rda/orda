@@ -36,7 +36,6 @@ class VisitedCourse(models.Model):
         self.mountain_name = self.course.mntn_name
         self.mountain_id = self.course.mntn_name.id
         super().save(*args, **kwargs)
-
         
 class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')

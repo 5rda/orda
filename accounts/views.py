@@ -20,7 +20,6 @@ from .models import Notification
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
-
 def login(request):
     if request.user.is_authenticated:
         return render(request, 'pjt/index.html')
