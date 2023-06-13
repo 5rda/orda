@@ -234,28 +234,18 @@ def kakao_callback(request):
             user_info = response.json()
 
             kakao_user_id = user_info['id']
-            if 'email' in user_info['kakao_account']:
-                email = user_info['kakao_account']['email']
-            else:
-                email = None
 
             user, created = User.objects.get_or_create(username=kakao_user_id)
 
             if created:
                 user.kakao_user_id = kakao_user_id
-                user.email = email
+                if 'kakao_account' in user_info and 'email' in user_info['kakao_account']:
+                    user.email = user_info['kakao_account']['email']
 
                 if 'properties' in user_info and 'profile_image' in user_info['properties']:
-                    profile_img_url = user_info['properties']['profile_image']
-                    try:
-                        with urllib.request.urlopen(profile_img_url) as response:
-                            with NamedTemporaryFile(delete=True) as temp_file:
-                                temp_file.write(response.read())
-                                temp_file.flush()
-                                user.profile_img.save(f"{kakao_user_id}.png", temp_file)
-                    except Exception as e:
-                        print(f"Error saving profile image: {e}")
+                    user.profile_img = user_info['properties']['profile_image']
 
+                user.save()
                 auth_login(request, user)
                 return redirect('accounts:update')
             else:
@@ -293,28 +283,18 @@ def naver_callback(request):
             user_info = response.json()
 
             naver_user_id = user_info['response']['id']
-            if 'email' in user_info['response']:
-                email = user_info['response']['email']
-            else:
-                email = None
 
             user, created = User.objects.get_or_create(username=naver_user_id)
 
             if created:
                 user.naver_user_id = naver_user_id
-                user.email = email
+                if 'email' in user_info['response']:
+                    user.email = user_info['response']['email']
 
-                if 'response' in user_info and 'profile_image' in user_info['response']:
-                    profile_img_url = user_info['response']['profile_image']
-                    try:
-                        with urllib.request.urlopen(profile_img_url) as response:
-                            with NamedTemporaryFile(delete=True) as temp_file:
-                                temp_file.write(response.read())
-                                temp_file.flush()
-                                user.profile_img.save(f"{naver_user_id}.png", temp_file)
-                    except Exception as e:
-                        print(f"Error saving profile image: {e}")
+                if 'profile_image' in user_info['response']:
+                    user.profile_img = user_info['response']['profile_image']
 
+                user.save()
                 auth_login(request, user)
                 return redirect('accounts:update')
             else:
