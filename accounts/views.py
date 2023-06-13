@@ -22,31 +22,22 @@ from django.utils.safestring import mark_safe
 
 def login(request):
     if request.user.is_authenticated:
-        return render(request, 'pjt/index.html')
+        return redirect('mountains:mountain_list')
     
     if request.method == 'POST':
         form = CustomUserAuthenticationForm(request, request.POST)
         
         if form.is_valid():
             auth_login(request, form.get_user())
-            prev_url = request.session.get('prev_url')
-            
-            if prev_url:
-                if 'logout' in prev_url or 'delete' in prev_url:
-                    del request.session['prev_url']
-                    return render(request, 'posts/index.html')
-                else:
-                    del request.session['prev_url']
-                    return redirect(prev_url)
-            
-            return render(request, 'posts/index.html')    
+            # 이전 페이지 URL 가져오기
+            previous_page = request.session.get('previous_page')
+            if previous_page:
+                del request.session['previous_page']
+                return redirect(previous_page)
+            else:
+                return redirect('mountains:mountain_list')
     else:
         form = CustomUserAuthenticationForm()
-
-    prev_url = request.META.get('HTTP_REFERER')
-    if prev_url and ('logout' not in prev_url and 'delete' not in prev_url):
-        request.session['prev_url'] = prev_url
-
     context = {
         'form': form,
     }
@@ -61,13 +52,13 @@ def logout(request):
 
 def signup(request):
     if request.user.is_authenticated:
-        return render(request, 'pjt/index.html')
+        return redirect('mountains:mountain_list')
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save()
             auth_login(request, user)
-            return render(request, 'pjt/index.html')
+            return redirect('mountains:mountain_list')
     else:
         form = CustomUserCreationForm()
     context = {
@@ -266,7 +257,7 @@ def kakao_callback(request):
                 return redirect('accounts:update')
             else:
                 auth_login(request, user)
-                return render(request, 'pjt/index.html')
+                return redirect('mountains:mountain_list')
     return redirect('accounts:login')
 
 
@@ -319,7 +310,7 @@ def naver_callback(request):
                 return redirect('accounts:update')
             else:
                 auth_login(request, user)
-                return render(request, 'pjt/index.html')
+                return redirect('mountains:mountain_list')
     return redirect('accounts:login')
 
 
