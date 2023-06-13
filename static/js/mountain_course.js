@@ -123,7 +123,14 @@ function initMap(courseId, courseInfo, courseDetail) {
     var geometry = feature.geometry;
     var properties = feature.properties;
 
-    if (geometry.type === 'Point' && ['PEAK', 'CULTURAL', 'ENTRY', 'SCENERY'].includes(properties.waypoint_category) && properties.waypoint_name !== '자연경관') {
+    const forbiddenWords = ['계단', '길', '바위', '자연경관', '계곡', '나무', '쉼터', '흙', '하봉', '중봉', '고목', '관광', '전망대', '등산로 입구'];
+    const regexPattern = new RegExp(forbiddenWords.join('|'), 'i');
+
+    if (
+      geometry.type === 'Point' &&
+      ['PEAK', 'CULTURAL', 'ENTRY', 'SCENERY'].includes(properties.waypoint_category) &&
+      !regexPattern.test(properties.waypoint_name)
+    ) {
       var coordinates = geometry.coordinates;
       var markerPosition = new kakao.maps.LatLng(coordinates[1], coordinates[0]);
 
