@@ -1,0 +1,409 @@
+{% load static %}
+
+<section>
+  <div class="mountain__search--map">
+    <div class="mountain__search--mapbox" data-sido="전국">
+      <img class="mountain__search--mapimg" src="{% static 'img/searchmap/jeonkuk.png' %}" alt="지도">
+    </div>
+    <div class="mountain__search--mapbox" data-sido="서울특별시">
+      <img class="mountain__search--mapimg" src="{% static 'img/searchmap/seoul.png' %}" alt="지도">
+      <dl class="seoul--gwanak">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">관악산</dt>
+      </dl>
+      <dl class="seoul--dobong">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">도봉산</dt>
+      </dl>
+      <dl class="seoul--bukhan">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">북한산</dt>
+      </dl>
+    </div>
+    <div class="mountain__search--mapbox" data-sido="인천광역시">
+      <img class="mountain__search--mapimg" src="{% static 'img/searchmap/incheon.png' %}" alt="지도">
+      <dl class="incheon--mani">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">마니산</dt>
+      </dl>
+    </div>
+    <div class="mountain__search--mapbox" data-sido="대전광역시">
+      <img class="mountain__search--mapimg" src="{% static 'img/searchmap/daejeon.png' %}" alt="지도">
+      <dl class="deajeon--gyeryong">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">계룡산</dt>
+      </dl>
+    </div>
+    <div class="mountain__search--mapbox" data-sido="광주광역시">
+      <img class="mountain__search--mapimg" src="{% static 'img/searchmap/kwangju.png' %}" alt="지도">
+      <dl class="gwangju--mudeung">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color); height: 30px;"></i></dd>
+        <dt class="d-flex align-items-center">무등산</dt>
+      </dl>
+    </div>
+    <div class="mountain__search--mapbox" data-sido="대구광역시">
+      <img class="mountain__search--mapimg" src="{% static 'img/searchmap/daegu.png' %}" alt="지도">
+      <dl class="deagu--biseul">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">비슬산</dt>
+      </dl>
+      <dl class="deagu--palgong">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">팔공산</dt>
+      </dl>
+    </div>
+    <div class="mountain__search--mapbox" data-sido="울산광역시">
+      <img class="mountain__search--mapimg" src="{% static 'img/searchmap/ulsan.png' %}" alt="지도">
+      <dl class="ulsan--gaji">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">가지산</dt>
+      </dl>
+      <dl class="ulsan--sinbul">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">신불산</dt>
+      </dl>
+      <dl class="ulsan--jaeyak">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">재약산</dt>
+      </dl>
+    </div>
+    <div class="mountain__search--mapbox" data-sido="부산광역시">
+      <img class="mountain__search--mapimg" src="{% static 'img/searchmap/busan.png' %}" alt="지도">
+      <dl class="busan--geumjeong">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">금정산</dt>
+      </dl>
+    </div>
+    <div class="mountain__search--mapbox" data-sido="경기도">
+      <img class="mountain__search--mapimg" src="{% static 'img/searchmap/kyeonggi.png' %}" alt="지도">
+      <dl class="kyeonggi--gamak">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">감악산</dt>
+      </dl>
+      <dl class="kyeonggi--gwanak">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">관악산</dt>
+      </dl>
+      <dl class="kyeonggi--dobong">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">도봉산</dt>
+      </dl>
+      <dl class="kyeonggi--myeongseong">
+        <dt class="d-flex align-items-center">명성산</dt>
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+      </dl>
+      <dl class="kyeonggi--myeongji">
+        <dt class="d-flex align-items-center">명지산</dt>
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+      </dl>
+      <dl class="kyeonggi--baeckun">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">백운산</dt>
+      </dl>
+      <dl class="kyeonggi--bukhan">
+        <dt class="d-flex align-items-center">북한산</dt>
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+      </dl>
+      <dl class="kyeonggi--soyo">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">소요산</dt>
+      </dl>
+      <dl class="kyeonggi--yongmun">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">용문산</dt>
+      </dl>
+      <dl class="kyeonggi--unak">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">운악산</dt>
+      </dl>
+      <dl class="kyeonggi--yumyeong">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color); height: 25px;"></i></dd>
+        <dt class="d-flex align-items-center">유명산</dt>
+      </dl>
+      <dl class="kyeonggi--cheonma">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">천마산</dt>
+      </dl>
+      <dl class="kyeonggi--chuckryeong">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">축령산</dt>
+      </dl>
+      <dl class="kyeonggi--hwaac">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">화악산</dt>
+      </dl>
+    </div>
+    <div class="mountain__search--mapbox" data-sido="강원도">
+      <img class="mountain__search--mapimg" src="{% static 'img/searchmap/kangwon.png' %}" alt="지도">
+      <dl class="kangwon--gari">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 25px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">가리산</dt>
+      </dl>
+      <dl class="kangwon--samak">
+        <dt class="d-flex align-items-center">삼악산</dt>
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 25px; color: var(--red-color);"></i></dd>
+      </dl>
+      <dl class="kangwon--obong">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 25px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">오봉산</dt>
+      </dl>
+      <dl class="kangwon--gariwang">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 25px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">가리왕산</dt>
+      </dl>
+      <dl class="kangwon--baeckun">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 25px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">백운산</dt>
+      </dl>
+      <dl class="kangwon--gyebang">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 25px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">계방산</dt>
+      </dl>
+      <dl class="kangwon--gongjak">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 25px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">공작산</dt>
+      </dl>
+      <dl class="kangwon--palbong">
+        <dt class="d-flex align-items-center">팔봉산</dt>
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 25px; color: var(--red-color);"></i></dd>
+      </dl>
+      <dl class="kangwon--daeam">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 25px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">대암산</dt>
+      </dl>
+      <dl class="kangwon--deokhang">
+        <dt class="d-flex align-items-center">덕항산</dt>
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 25px; color: var(--red-color);"></i></dd>
+      </dl>
+      <dl class="kangwon--eungbong">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 25px; color: var(--red-color); height: 20px;"></i></dd>
+        <dt class="d-flex align-items-center">응봉산</dt>
+      </dl>
+      <dl class="kangwon--duta">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 25px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">두타산</dt>
+      </dl>
+      <dl class="kangwon--myeongseong">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 25px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">명성산</dt>
+      </dl>
+      <dl class="kangwon--bangtae">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 25px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">방태산</dt>
+      </dl>
+      <dl class="kangwon--baekdeok">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 25px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">백덕산</dt>
+      </dl>
+      <dl class="kangwon--odae">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 25px; color: var(--red-color); height: 20px;"></i></dd>
+        <dt class="d-flex align-items-center">오대산</dt>
+      </dl>
+      <dl class="kangwon--baekun">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 25px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">백운산</dt>
+      </dl>
+      <dl class="kangwon--seorak">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 25px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">설악산</dt>
+      </dl>
+      <dl class="kangwon--yonghwa">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 25px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">용화산</dt>
+      </dl>
+      <dl class="kangwon--jeombong">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 25px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">점봉산</dt>
+      </dl>
+      <dl class="kangwon--chiak">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 25px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">치악산</dt>
+      </dl>
+      <dl class="kangwon--taebaek">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 25px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">태백산</dt>
+      </dl>
+      <dl class="kangwon--taehwa">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 25px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">태화산</dt>
+      </dl>
+      <dl class="kangwon--hwaac">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 25px; color: var(--red-color); height: 20px;"></i></dd>
+        <dt class="d-flex align-items-center">화악산</dt>
+      </dl>
+    </div>
+    <div class="mountain__search--mapbox" data-sido="충청북도">
+      <img class="mountain__search--mapimg" src="{% static 'img/searchmap/chungbuk.png' %}" alt="지도">
+      <dl class="chungbuk--gubyeong">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">구병산</dt>
+      </dl>
+      <dl class="chungbuk--songni">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">속리산</dt>
+      </dl>
+      <dl class="chungbuk--geumsu">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">금수산</dt>
+      </dl>
+      <dl class="chungbuk--worak">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">월악산</dt>
+      </dl>
+      <dl class="chungbuk--daeya">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">대야산</dt>
+      </dl>
+      <dl class="chungbuk--heuiyang">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">희양산</dt>
+      </dl>
+      <dl class="chungbuk--dorak">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">도락산</dt>
+      </dl>
+      <dl class="chungbuk--minjuji">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">민주지산</dt>
+      </dl>
+      <dl class="chungbuk--cheontae">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">천태산</dt>
+      </dl>
+      <dl class="chungbuk--taehwa">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">태화산</dt>
+      </dl>
+      <dl class="chungbuk--seodae">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">서대산</dt>
+      </dl>
+      <dl class="chungbuk--sobaek">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">소백산</dt>
+      </dl>
+    </div>
+    <div class="mountain__search--mapbox" data-sido="충청남도">
+      <img class="mountain__search--mapimg" src="{% static 'img/searchmap/chungnam.png' %}" alt="지도">
+      <dl class="chungnam--gyeryong">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">계룡산</dt>
+      </dl>
+      <dl class="chungnam--daedun">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">대둔산</dt>
+      </dl>
+      <dl class="chungnam--deoksung">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">덕숭산</dt>
+      </dl>
+      <dl class="chungnam--seodae">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">서대산</dt>
+      </dl>
+      <dl class="chungnam--cheontae">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color); height: 25px;"></i></dd>
+        <dt class="d-flex align-items-center">천태산</dt>
+      </dl>
+      <dl class="chungnam--chilgab">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">칠갑산</dt>
+      </dl>
+    </div>
+    <div class="mountain__search--mapbox" data-sido="전라북도">
+      <img class="mountain__search--mapimg" src="{% static 'img/searchmap/jeonbuk.png' %}" alt="지도">
+      <dl class="jeonbuk--gangcheon">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">강천산</dt>
+      </dl>
+      <dl class="jeonbuk--baekam">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color); height: 25px;"></i></dd>
+        <dt class="d-flex align-items-center">백암산</dt>
+      </dl>
+      <dl class="jeonbuk--seonun">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">선운산</dt>
+      </dl>
+      <dl class="jeonbuk--chuweol">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color); height: 25px;"></i></dd>
+        <dt class="d-flex align-items-center">추월산</dt>
+      </dl>
+      <dl class="jeonbuk--naejang">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">내장산</dt>
+      </dl>
+      <dl class="jeonbuk--daedun">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">대둔산</dt>
+      </dl>
+      <dl class="jeonbuk--deogyu">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">덕유산</dt>
+      </dl>
+      <dl class="jeonbuk--minjuji">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color); height: 25px;"></i></dd>
+        <dt class="d-flex align-items-center">민주지산</dt>
+      </dl>
+      <dl class="jeonbuk--jeoksang">
+        <dt class="d-flex align-items-center">적상산</dt>
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+      </dl>
+      <dl class="jeonbuk--mai">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">마이산</dt>
+      </dl>
+      <dl class="jeonbuk--unjang">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">운장산</dt>
+      </dl>
+      <dl class="jeonbuk--moak">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">모악산</dt>
+      </dl>
+      <dl class="jeonbuk--bangjang">
+        <dt class="d-flex align-items-center">방장산</dt>
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+      </dl>
+      <dl class="jeonbuk--byeon">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">변산</dt>
+      </dl>
+      <dl class="jeonbuk--jangan">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">장안산</dt>
+      </dl>
+      <dl class="jeonbuk--jiri">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">지리산</dt>
+      </dl>
+    </div>     
+    <div class="mountain__search--mapbox" data-sido="전라남도">
+      <img class="mountain__search--mapimg" src="{% static 'img/searchmap/jeonnam.png' %}" alt="지도">
+      <dl class="jeonnam--gangcheon">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">강천산</dt>
+      </dl>
+      <dl class="jeonnam--mudeung">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">무등산</dt>
+      </dl>
+      <dl class="jeonnam--chuweol">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color); height: 25px;"></i></dd>
+        <dt class="d-flex align-items-center">추월산</dt>
+      </dl>
+    </div>        
+    <div class="mountain__search--mapbox" data-sido="경상북도">
+      <img class="mountain__search--mapimg" src="{% static 'img/searchmap/kyeongbuk.png' %}" alt="지도">
+    </div>        
+    <div class="mountain__search--mapbox" data-sido="경상남도">
+      <img class="mountain__search--mapimg" src="{% static 'img/searchmap/kyeongnam.png' %}" alt="지도">
+    </div>        
+    <div class="mountain__search--mapbox" data-sido="제주도">
+      <img class="mountain__search--mapimg" src="{% static 'img/searchmap/jeju.png' %}" alt="지도">
+      <dl class="jeju--halla">
+        <dd class="d-flex align-items-center"><i class="bi bi-dot" style="font-size: 30px; color: var(--red-color);"></i></dd>
+        <dt class="d-flex align-items-center">한라산</dt>
+      </dl>
+    </div>           
+  </div>
+</section>

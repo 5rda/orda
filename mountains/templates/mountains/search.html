@@ -4,6 +4,7 @@
 
 {% block style %}
 <link rel="stylesheet" href="{% static 'css/mountains_search.css' %}">
+<link rel="stylesheet" href="{% static 'css/search_region.css' %}">
 {% endblock style %}
 
 {% block content %}
@@ -19,10 +20,12 @@
   
     <br>
     <section>
-      <select name="sido2" id="sido2"></select>
-      <select name="gugun2" id="gugun2"></select>
+      <select class="form-control" name="sido2" id="sido2"></select>
+      <select class="form-control" name="gugun2" id="gugun2"></select>
       <button type="submit">탐색</button>
     </section>
+
+    {% include 'mountains/search_region.html' %}
   </form>
 </div>
 {% endblock content %}
@@ -30,7 +33,22 @@
 {% block javascript %}
 <script src="{% static 'js/mountains_search.js' %}"></script>
 <script>
-  
+  $(document).ready(function() {
+    // 전국 이미지창만 보이기
+    $(".mountain__search--mapbox").hide();
+
+    $(".mountain__search--mapbox[data-sido='전국']").first().show();
+    
+    $("select[name^=sido]").change(function() {
+      var selectedSido = $(this).val();
+      
+      // 모든 이미지 숨기기
+      $(".mountain__search--mapbox").hide();
+      
+      // 선택한 sido에 해당하는 이미지만 보이기
+      $(".mountain__search--mapbox[data-sido='" + selectedSido + "']").show();
+    });
+  });
 </script>
 
 {% endblock javascript %}
