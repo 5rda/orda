@@ -6,7 +6,13 @@
 <link rel="stylesheet" href="{% static 'css/posts_index.css' %}">
 {% endblock style %}
 {% block content %}
-<div style="padding: 30px 60px;">
+<div style="padding: 20px 60px;">
+  <div class="flex flex-row-reverse">
+    <a href="{% url 'posts:create' %}" class="bg-[#A2E04E] hover:bg-[#47A945] text-white font-bold py-2 px-4 rounded">
+      <i class="bi bi-pencil-square"></i>
+      마이코스 작성하기
+    </a>
+  </div>
   {% comment %} 조회순 {% endcomment %}
   <section style="margin-bottom: 120px;">
     <h1 class="postindex__Content--title">조회수가 높은 마이코스</h1>
