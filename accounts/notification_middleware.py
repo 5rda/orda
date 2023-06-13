@@ -13,4 +13,5 @@ class NotificationMiddleware:
             request.notification_count = 0
 
         response = self.get_response(request)
+
         return response
