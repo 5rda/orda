@@ -3,13 +3,17 @@ from django.urls import reverse
 from django.contrib.auth.models import AbstractUser
 from mountains.models import Mountain, Course
 from django.urls import reverse
+from imagekit.models import ProcessedImageField
+from imagekit.processors import ResizeToFill
 
 class User(AbstractUser):
+    def image_path(instance, filename):
+        return f'accounts/{instance.pk}/{filename}'
+    
     username = models.CharField(max_length=50, unique=True)
     password = models.CharField(max_length=256)
     nickname = models.CharField(max_length=20, unique=True, blank=True, null=True)
     email = models.CharField(max_length=50, blank=True, null=True)
-    profile_img = models.ImageField(blank=True, null=True)
     joined_at = models.DateTimeField(auto_now_add=True)
     followings = models.ManyToManyField('self', symmetrical=False, related_name='followers')
     message = models.CharField(max_length=200, blank=True)
@@ -17,6 +21,12 @@ class User(AbstractUser):
     naver_user_id = models.CharField(max_length=50, unique=True, blank=True, null=True)
     visited_courses = models.ManyToManyField(Course, through='VisitedCourse', related_name='visitors', blank=True)
     level = models.IntegerField(default=1)
+    profile_img = ProcessedImageField(upload_to=image_path,
+                                        processors=[ResizeToFill(200,200)],
+                                        format='JPEG',
+                                        options={'quality': 90},
+                                        null=True,
+                                        blank=True)
 
     def check_notifications(self):
         unchecked_notifications = self.notifications.filter(is_checked=False)

@@ -4,9 +4,16 @@
 {% block style %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
 <link rel="stylesheet" href="{% static 'css/posts_index.css' %}">
+
 {% endblock style %}
 {% block content %}
-<div style="padding: 30px 60px;">
+<div style="padding: 20px 60px;">
+  <div class="flex flex-row-reverse">
+    <a href="{% url 'posts:create' %}" class="bg-[#A2E04E] hover:bg-[#47A945] text-white font-bold py-2 px-4 rounded">
+      <i class="bi bi-pencil-square"></i>
+      마이코스 작성하기
+    </a>
+  </div>
   {% comment %} 조회순 {% endcomment %}
   <section style="margin-bottom: 120px;">
     <h1 class="postindex__Content--title">조회수가 높은 마이코스</h1>
@@ -141,7 +148,8 @@
     <h1 class="postindex__Content--title">전체 글<span style="color: var(--main-color); margin-left: 10px;">{{ posts|length }}</span></h1>  
     <div class="post-grid" id="postGrid">
       {% for post in posts %}
-        <div class="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+        <div class="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 post-item" style="display: none;">
+          <!-- 글 내용을 표시하는 부분 -->
           <a href="{% url 'posts:detail' post.pk %}"  class="position--relative">
             <div class="postindex__post--imgbox">
               {% with first_image_url=post.content|get_first_image_from_content %}
@@ -197,7 +205,7 @@
         </div>
       {% endfor %}
     </div>
-    <button id="loadMoreBtn">더 보기</button>
+    <button id="loadMoreBtn" style="display: none;">더 보기</button>
   </section>
 </div>
 

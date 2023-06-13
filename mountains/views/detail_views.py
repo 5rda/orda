@@ -16,7 +16,9 @@ class MountainDetailView(LoginRequiredMixin, DetailView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
 
-        Mountain.objects.filter(pk=self.object.pk).update(views=F('views') + 1)
+        if not request.session.get('mountain_viewed_{}'.format(self.object.pk), False):
+            Mountain.objects.filter(pk=self.object.pk).update(views=F('views') + 1)
+            request.session['mountain_viewed_{}'.format(self.object.pk)] = True
 
         context = self.get_context_data(object=self.object)
         context.update(self.news())

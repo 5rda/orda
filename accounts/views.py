@@ -22,31 +22,22 @@ from django.utils.safestring import mark_safe
 
 def login(request):
     if request.user.is_authenticated:
-        return render(request, 'pjt/index.html')
+        return redirect('mountains:mountain_list')
     
     if request.method == 'POST':
         form = CustomUserAuthenticationForm(request, request.POST)
         
         if form.is_valid():
             auth_login(request, form.get_user())
-            prev_url = request.session.get('prev_url')
-            
-            if prev_url:
-                if 'logout' in prev_url or 'delete' in prev_url:
-                    del request.session['prev_url']
-                    return render(request, 'pjt/index.html')
-                else:
-                    del request.session['prev_url']
-                    return redirect(prev_url)
-            
-            return render(request, 'pjt/index.html')    
+            # 이전 페이지 URL 가져오기
+            previous_page = request.session.get('previous_page')
+            if previous_page:
+                del request.session['previous_page']
+                return redirect(previous_page)
+            else:
+                return redirect('mountains:mountain_list')
     else:
         form = CustomUserAuthenticationForm()
-
-    prev_url = request.META.get('HTTP_REFERER')
-    if prev_url and ('logout' not in prev_url and 'delete' not in prev_url):
-        request.session['prev_url'] = prev_url
-
     context = {
         'form': form,
     }
@@ -61,13 +52,13 @@ def logout(request):
 
 def signup(request):
     if request.user.is_authenticated:
-        return render(request, 'pjt/index.html')
+        return redirect('mountains:mountain_list')
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save()
             auth_login(request, user)
-            return render(request, 'pjt/index.html')
+            return redirect('mountains:mountain_list')
     else:
         form = CustomUserCreationForm()
     context = {
@@ -88,12 +79,7 @@ def profile(request, user_pk):
     liked_mountains = person.liked_mountains.only('name').all()
     bookmark_course = person.bookmarks.only('crs_name', 'crs_name_detail').all()
 
-    # serializer = Serializer()
-    # course_details = {}
-    # for course in bookmark_course:
-    #     geojson_data = serializer.serialize(CourseDetail.objects.filter(crs_name_detail=course), fields=('geom', 'is_waypoint', 'waypoint_name', 'crs_name_detail'))
-    #     course_details[course.pk] =geojson_data
-    
+    # Calculate the user's level and score
     score = posts.count() * 30 + reviews.count() * 20 + visited_courses * 10 + posts_comments * 5
 
     if score < 200:
@@ -118,11 +104,12 @@ def profile(request, user_pk):
             score = 600
         max_score = 600
 
-    # 추가
+    # Calculate the experience bar and remaining experience
     expbar = (score / max_score) * 100
     restexp = max_score - score
 
-    level_dict = {1:'등산새싹', 2:'등산샛별', 3:'등산인', 4:'등산고수', 5:'등산왕'}
+    level_dict = {1: '등산새싹', 2: '등산샛별', 3: '등산인', 4: '등산고수', 5: '등산왕'}
+
     context = {
         'person': person,
         'posts': posts,
@@ -133,13 +120,11 @@ def profile(request, user_pk):
         'liked_posts': liked_posts,
         'liked_mountains': liked_mountains,
         'bookmark_course': bookmark_course,
-        # 'course_details': course_details,
-
-        # 추가
         'score': score,
         'expbar': expbar,
         'restexp': restexp,
     }
+
     return render(request, 'accounts/profile.html', context)
 
 
@@ -272,7 +257,7 @@ def kakao_callback(request):
                 return redirect('accounts:update')
             else:
                 auth_login(request, user)
-                return render(request, 'pjt/index.html')
+                return redirect('mountains:mountain_list')
     return redirect('accounts:login')
 
 
@@ -325,7 +310,7 @@ def naver_callback(request):
                 return redirect('accounts:update')
             else:
                 auth_login(request, user)
-                return render(request, 'pjt/index.html')
+                return redirect('mountains:mountain_list')
     return redirect('accounts:login')
 
 

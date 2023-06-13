@@ -384,7 +384,7 @@
               {{ review.created_at|date:"Y-m-d" }}
             {% endif %}
           </div>
-          {% if review.user %}
+          {% if review.user == request.user %}
             <div class="mountain__detail--updatebox">
               <!-- 수정 버튼 -->
               <button class="editBtn" data-mountain-id="{{ review.mountain.pk }}" data-review-id="{{ review.pk }}">수정</button>
