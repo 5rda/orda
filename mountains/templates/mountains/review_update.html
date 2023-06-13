@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>리뷰 수정</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'css/topbutton.css' %}">
+  <link rel="stylesheet" href="{% static 'css/mountains_detail.css' %}">
+</head>
+<body>
+  <div class="p-3 position-relative">
+    <form id="review-form" action="{% url 'mountains:review_update' review.mountain.pk review.pk %}" method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="d-flex flex-row">
+        <div id="review-image" style="position: relative; height: 100%;">
+          <div class="mountain__reviewcrt--imgbox">
+            <i class="bi bi-plus-lg img--plus"></i>
+            {{ form.image }}
+            {% if review.image %}
+              <img id="preview" class="preview-image" src="{{ review.image.url }}" alt="Preview Image">
+            {% else %}
+              <img id="preview" class="preview-image" alt="Preview Image" style="display: none;">
+            {% endif %}
+              
+            
+          </div>
+          <div class="review__submit--btn">
+            <button type="submit" id="submit-button" class="btn btn-outline-success">수정하기</button>
+          </div>
+        </div>
+        <div>
+          <div id="review-tags" class="mountain__reviewcrt--tagbox">
+            {{ form.tags|safe }}
+          </div>
+          <div id="selected-tags" class="selected-tags"></div>
+          <div id="review-content" class="mountain__reviewcrt--contbox">
+            {{ form.content }}
+          </div>
+        </div>
+      </div>
+    </form>
+    <div class="position-absolute top-5 start-5">
+      <form action="{% url 'mountains:review_image_delete' review.mountain.pk review.pk %}" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <button type="submit" id="delete-image-button" class="btn btn-outline-success w-6 h-6 d-flex justify-content-center align-items-center">X</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var tagButtons = document.querySelectorAll('#review-tags label input');
+      var selectedTagsContainer = document.getElementById('selected-tags');
+  
+      tagButtons.forEach(function(tagButton) {
+        tagButton.addEventListener('click', function(event) {
+          var label = this.parentElement;
+          label.classList.toggle('selected');
+  
+          // 선택한 태그 목록 업데이트
+          var selectedTags = document.querySelectorAll('#review-tags label.selected input');
+          console.log(selectedTags)
+  
+          // 선택된 태그 목록 표시
+          var selectedTagsArray = Array.from(selectedTags).map(function(input) {
+            var inputName = '# ' + input.getAttribute('data-tag-name');
+            return '<div class="mountain__reviewcrt--tag selected">' + inputName + '</div>';
+          });
+  
+          // 선택된 태그들을 쉼표로 구분한 문자열로 설정하여 selectedTagsContainer 내에 업데이트
+          selectedTagsContainer.innerHTML = selectedTagsArray.join(' ');
+
+          // 태그 개수 제한 호출
+          limitCheckboxSelections(this, 4);
+        });
+      });
+  
+      function limitCheckboxSelections(checkbox, limit) {
+        var checkedCount = 0;
+        var checkboxes = checkbox.closest('form').querySelectorAll('input[type="checkbox"]');
+  
+        for (var i = 0; i < checkboxes.length; i++) {
+          if (checkboxes[i].checked) {
+            checkedCount++;
+          }
+          if (checkedCount >= limit) {
+            for (var j = 0; j < checkboxes.length; j++) {
+              if (!checkboxes[j].checked) {
+                checkboxes[j].disabled = true;
+              }
+            }
+            break;
+          } else {
+            checkboxes[i].disabled = false;
+          }
+        }
+      }
+  
+      var imageInputs = document.querySelectorAll("#review-image input[type=file]");
+  
+      // 이미지 파일 변경 시 미리보기 업데이트
+      imageInputs.forEach(function(input) {
+        input.addEventListener("change", function(event) {
+          var preview = input.parentNode.querySelector(".preview-image");
+          var file = event.target.files[0];
+  
+          if (file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+              preview.src = e.target.result;
+              preview.style.display = "block";
+            };
+            reader.readAsDataURL(file);
+          } else {
+            preview.src = "";
+            preview.style.display = "none";
+          }
+        });
+      });
+  
+      var imageInput = document.getElementById('id_image');
+      var imgPreview = document.getElementById('preview');
+      var iplus = document.querySelector(".img--plus");
+  
+      // 초기 로드 시 이미지가 있는지 확인하여 iplus 요소 표시 여부 결정
+      if (imgPreview.src !== "") {
+        imgPreview.style.display = 'block';
+        iplus.style.display = "none";
+        document.querySelector('.mountain__reviewcrt--imgbox').style.border = 'none';
+      }
+  
+      imageInput.addEventListener('change', function(event) {
+        if (event.target.files && event.target.files[0]) {
+          imgPreview.style.display = 'block';
+          iplus.style.display = "none";
+          document.querySelector('.mountain__reviewcrt--imgbox').style.border = 'none';
+        } else {
+          imgPreview.style.display = 'none';
+          iplus.style.display = "block";
+          document.querySelector('.mountain__reviewcrt--imgbox').style.border = '1px solid #ccc';
+        }
+      });
+  
+      function deleteImage() {
+        // 이미지 삭제 요청 전송
+        axios.post("{% url 'mountains:review_image_delete' review.mountain.pk review.pk %}")
+          .then(function(response) {
+            // 이미지 삭제 성공 시
+            alert(response.data.message);
+          })
+          .catch(function(error) {
+            // 이미지 삭제 실패 시
+            console.error(error);
+          });
+      }
+  
+      var deleteImageButton = document.getElementById('delete-image-button');
+      deleteImageButton.addEventListener('click', deleteImage);
+  
+      document.getElementById('review-form').addEventListener('submit', function(event) {
+        event.preventDefault(); // 폼 제출의 기본 동작 방지
+  
+        // 폼 데이터를 서버로 전송
+        var formData = new FormData(this);
+        axios.post(this.action, formData)
+          .then(function(response) {
+            // 데이터 저장이 성공한 경우
+            window.opener.location.reload(); // 부모 창 새로고침
+            window.close(); // 작은 창 닫기
+          })
+          .catch(function(error) {
+            // 데이터 저장이 실패한 경우
+            console.error(error);
+          });
+      });
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="{% static 'js/base.js' %}"></script>
+  <script src="{% static 'js/topbutton.js' %}"></script>
+</body>
+</html>
+
+

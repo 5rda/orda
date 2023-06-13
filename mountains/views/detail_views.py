@@ -8,7 +8,7 @@ from django.views.generic import DetailView
 from django.contrib.gis.serializers.geojson import Serializer
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-class MountainDetailView(DetailView):
+class MountainDetailView(LoginRequiredMixin, DetailView):
     template_name = 'mountains/mountain_detail.html'
     context_object_name = 'mountain'
     model = Mountain
@@ -16,7 +16,9 @@ class MountainDetailView(DetailView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
 
-        Mountain.objects.filter(pk=self.object.pk).update(views=F('views') + 1)
+        if not request.session.get('mountain_viewed_{}'.format(self.object.pk), False):
+            Mountain.objects.filter(pk=self.object.pk).update(views=F('views') + 1)
+            request.session['mountain_viewed_{}'.format(self.object.pk)] = True
 
         context = self.get_context_data(object=self.object)
         context.update(self.news())

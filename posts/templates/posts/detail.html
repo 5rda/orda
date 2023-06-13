@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load custom_filters %}
+{% load humanize %}
 {% block style %}
   {% comment %} <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/ckeditor.js"></script>
@@ -31,7 +32,7 @@
         <p style="font-weight: bold;">{{ post.user }}</p>
         </a>
       <div class="post__data--box">
-        <p> {{ post.updated_at|date:'Y. m. d. h. i'}} |&nbsp;</p>          
+        <p> {{ post.updated_at|date:'Y. m. d. h. i'}} &nbsp;</p>         
         {% if request.user == post.user %}
         <a href="{% url 'posts:update' post.pk %}">수정 |&nbsp;</a>
         <form action="{% url 'posts:delete' post.pk %}" method="POST" id="delete-form">
@@ -39,8 +40,11 @@
           <input type="submit" value="삭제">
         </form>
         {% endif %}
+        
       </div>
+      <p><a href="{% url 'mountains:mountain_detail' pk=post.mountain.pk %}">[{{ post.mountain.name }}]</a></p>
       </div>
+      
     </div>
     
     <div>
@@ -58,9 +62,6 @@
       {% endif %}
     </div>
   </div>
-
-
-다녀온 산: <a href="{% url 'mountains:mountain_detail' pk=post.pk %}">{{ post.mountain.name }}</a>
 
   {% comment %} ck에디터 출력부분/ 사진 크기 조정 미완성 {% endcomment %}
   <div class="content__wrap">
@@ -114,13 +115,21 @@
                     </form>
                   </div>
                 {% endif %} 
+                
               </div>
-
+              
               {% comment %} 싫어요가 10이상이면 보기 버튼 나오게 하기 {% endcomment %}
               <button class="comment-toggle-btn" {% if postcomment.dislike_users.count < 10 %}
               style="display: none;" {% endif %} id="comment-toggle-{{postcomment.pk}}" data-comment-id="{{ postcomment.pk }}">[보기]</button>
               <p class="comment__context {% if postcomment.dislike_users.count >= 10 %}
               hidden {% endif %}" id="comment-content-{{postcomment.pk}}"> {{ postcomment.content }}</p>
+              <span style="font-size: 12px;">
+                {% if postcomment.created_at|date:"Y-m-d" >= now|date:"Y-m-d" %}
+                  {{ postcomment.created_at|naturaltime }}
+                {% else %}
+                  {{ postcomment.created_at|date:"Y-m-d" }}
+                {% endif %}
+              </span>
 
               {% comment %} 댓글 수정 {% endcomment %}
         

@@ -1,35 +1,42 @@
-{% extends 'base.html' %}
-{% load static %}
-{% load custom_filters %}
-{% block style %}
-  <link rel="stylesheet" href="{% static 'css/profile.css' %}">
-{% endblock style %}
-{% block content %}
-<div>
-  <ul>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% load static %}
+  {% load custom_filters %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <style>
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+  
+    .list-group,
+    .list-group-item {
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <ul class="list-group">
     {% for notification in notifications %}
-      <li>
-        {{ notification.message|safe }} {{ notification.created_at|date:"y.m.d H:i" }}
-        {% if not notification.is_read %}
-        <form action="{% url 'accounts:notification_check' notification_id=notification.id %}" method="POST" style="display: inline;">
-            {% csrf_token %}
-            <button type="submit">읽지 않음</button>
-          </form>
-        {% else %}
-          <span>읽음</span>
-        {% endif %}
-        <form action="{% url 'accounts:notification_delete' notification_id=notification.id %}" method="POST" style="display: inline;">
-          {% csrf_token %}
-          <button type="submit">삭제</button>
-        </form>
+      <li class="list-group-item" id="notification-{{ notification.id }}" style="max-width: 300px;">
+        {{ notification.message|safe }}<br>{{ notification.created_at|date:"y.m.d H:i" }} 
+        <span id="notification-status-{{ notification.id }}">
+          {% comment %} {% if not notification.is_read %}
+            <button onclick="markNotificationRead({{ notification.id }})">읽지 않음</button> |
+          {% else %}
+            <span>읽음 |</span>
+          {% endif %} {% endcomment %}
+        </span>
+        <button onclick="deleteNotification({{ notification.id }})">| 삭제</button>
       </li>
     {% empty %}
-      <li>알림이 없습니다.</li>
+      <li class="list-group-item">알림이 없습니다.</li>
     {% endfor %}
   </ul>
-</div>
-{% endblock content %}
-{% block javascript %}
+</body>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script type="text/javascript" src="{% static 'js/profile.js' %}"></script>
-{% endblock javascript %}
+</html>

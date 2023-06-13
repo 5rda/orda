@@ -1,5 +1,7 @@
+import gpxpy, gpxpy.gpx, os, datetime
 from mountains.models import *
 from mountains.forms import SearchForm
+from utils.weather import get_weather
 from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect
 from django.db.models import Count, When, Case, Q
@@ -7,14 +9,11 @@ from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator
 from django.core.mail import EmailMessage
 from django.views.generic import ListView, FormView, View
+from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import DetailView
 from django.contrib.gis.serializers.geojson import Serializer
-import gpxpy, gpxpy.gpx, os
-from utils.weather import get_weather
-import datetime
-
 
 class SearchView(FormView):
     template_name = 'mountains/search.html'
@@ -41,8 +40,15 @@ def mountain_list(request):
                     filter_condition.add(Q(region__contains=sido) & Q(region__contains=gugun), filter_condition.AND)
 
         if tags:
-            filtered_mountains = mountains.filter(review__tags__pk__in=tags).annotate(tag_count=Count('review__tags__pk')).order_by('-tag_count')[:3]
-            filtered_pks = filtered_mountains.values_list('pk', flat=True)
+            filtered_mountains = mountains.filter(review__tags__pk__in=tags).distinct()
+            int_tags = list(map(int, tags))
+            filtered_pks = []
+            for filtered_mountain in filtered_mountains:
+                # print(f'산:{filtered_mountain.top_tags_pk}')
+                # print(f'태그:{int_tags}')
+                top_tags_pk = filtered_mountain.top_tags_pk
+                if any((tag_pk in top_tags_pk) for tag_pk in int_tags):
+                    filtered_pks.append(filtered_mountain.pk)
             mountains = mountains.filter(pk__in=filtered_pks)
 
         if search_query:
@@ -83,7 +89,7 @@ def mountain_list(request):
     return render(request, 'mountains/mountain_list.html', context)
 
 
-class CourseListView(ListView):
+class CourseListView(LoginRequiredMixin, ListView):
     template_name = 'mountains/course_list.html'
     context_object_name = 'courses'
     model = Course
@@ -127,15 +133,21 @@ class CourseListView(ListView):
         page_obj = paginator.get_page(page_number)
 
         serializer = Serializer()
+        detail_serializer = Serializer()
         data = {}
+        detail_data = {}
         for course in page_obj:
+            detail = CourseDetail.objects.filter(crs_name_detail=course)
+            geojson_detail_data = detail_serializer.serialize(detail, fields=('geom', 'waypoint_name', 'waypoint_category'))
             geojson_data = serializer.serialize([course], geometry_field='geom')
             data[course.pk] = geojson_data
+            detail_data[course.pk] = geojson_detail_data
 
         context.update({
             'mountain': mountain,
             'courses': page_obj,
             'courses_data': data,
+            'detail_data': detail_data,
             'is_paginated': page_obj.has_other_pages(),
             'page_obj': page_obj,
         })
@@ -221,6 +233,7 @@ def reset_filter(request):
         return HttpResponseBadRequest("Bad Request")
 
 
+@login_required
 def mountain_likes(request, mountain_pk):
     mountain = get_object_or_404(Mountain, pk=mountain_pk)
     user = request.user
@@ -234,6 +247,7 @@ def mountain_likes(request, mountain_pk):
     return JsonResponse({'is_liked': is_liked, 'like_count':mountain.likes.count()})    
 
 
+@login_required
 def bookmark(request, mountain_pk, course_pk):
     course = Course.objects.get(pk=course_pk)
     user = request.user
@@ -250,7 +264,7 @@ def bookmark(request, mountain_pk, course_pk):
     return JsonResponse(context)
 
 
-class gpxDownloadView(View):
+class gpxDownloadView(LoginRequiredMixin, View):
     def dispatch(self, request, *args, **kwargs):
         if request.method == 'POST':
             return self.post(request, *args, **kwargs)
@@ -291,15 +305,16 @@ class gpxDownloadView(View):
 
     def send_email(self, email, gpx_data, name):
         # 이메일을 전송하는 로직을 구현합니다.
-        email_subject = f"[오르다] {name} 등산 코스 GPX 파일"
-        email_body = f"안녕하세요. 100대 명산, 당신에게 딱 맞는 코스를 찾아주는 ORDA입니다. 저희 ORDA를 이용해주셔서 감사하며, {name} 등산 코스 GPX 파일을 첨부합니다. 행복한 등산하시길 바라요!"
+        email_subject = f'[오르다] {name} 등산 코스 GPX 파일'
+        email_body = render_to_string('mountains/email.html', {'name': name})
         email_attachment = (f"{name.replace(' ', '_')}_course.gpx", gpx_data, "application/gpx+xml")
 
         email_message = EmailMessage(email_subject, email_body, os.getenv('DEFAULT_FROM_EMAIL'), [email])
         email_message.attach(*email_attachment)
         email_message.send()
         
-        
+
+@login_required        
 def weather_forecast(request, pk):
     mountain = Mountain.objects.get(pk=pk)
     lat = mountain.geom.y
@@ -320,7 +335,8 @@ def weather_forecast(request, pk):
 
     return render(request, 'mountains/weather_forecast.html', context)
 
-class CourseDetailView(DetailView):
+
+class CourseDetailView(LoginRequiredMixin, DetailView):
     model = Course
     template_name = 'mountains/course_detail.html'
     context_object_name = 'course'
@@ -336,13 +352,18 @@ class CourseDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         course = self.object
         mountain = course.mntn_name
+        detail = CourseDetail.objects.filter(crs_name_detail=course)
 
         serializer = Serializer()
+        detail_serializer = Serializer()
+
         data = {course.pk: serializer.serialize([course], geometry_field='geom')}
+        detail_data = {course.pk: detail_serializer.serialize(detail, fields=('geom', 'waypoint_name', 'waypoint_category'))}
 
         context.update({
             'mountain': mountain,
             'course': course,
-            'course_data': data
+            'course_data': data,
+            'detail_data': detail_data,
         })
         return context

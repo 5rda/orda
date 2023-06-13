@@ -1,5 +1,5 @@
 from django import forms
-from .models import Post, PostComment
+from .models import Post, PostComment, Mountain
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
 
 
@@ -18,13 +18,31 @@ class PostForm(forms.ModelForm):
         widget=CKEditorUploadingWidget(
             attrs={
                 'placeholder': '내용',
-                }
-            ), 
-        label='')
+            }
+        ),
+        label=''
+    )
+    mountain = forms.ModelChoiceField(
+        queryset=Mountain.objects.all(),
+        empty_label=None,
+        widget=forms.Select(
+            attrs={
+                'id': 'mountain',
+                'required': True,
+            }
+        )
+    )
+    
+    def __init__(self, *args, **kwargs):
+        instance = kwargs.get('instance')
+        initial = kwargs.get('initial', {})
+        initial['mountain'] = instance.mountain if instance else None
+        kwargs['initial'] = initial
+        super(PostForm, self).__init__(*args, **kwargs)
 
     class Meta:
         model = Post
-        fields = ['title', 'content']
+        fields = ['title', 'content', 'mountain']
         widgets = {
             'content': CKEditorUploadingWidget(),
         }

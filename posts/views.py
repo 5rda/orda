@@ -49,7 +49,7 @@ def index(request):
 def detail(request, post_pk):
     post = Post.objects.get(pk=post_pk)
     postcomment_form = PostCommentForm()
-    postcomments = post.postcomment_set.all()
+    postcomments = post.postcomment_set.order_by('-id')
 
     prev_posts = Post.objects.filter(pk__lt=post_pk).order_by('-pk')[:2]
     next_posts = Post.objects.filter(pk__gt=post_pk).order_by('pk')[:2]
@@ -98,21 +98,18 @@ def update(request, post_pk):
 
     if request.method == "POST":
         form = PostForm(request.POST, request.FILES, instance=post)
-        print(request.FILES)
-        if request.FILES.get('image', None) != None:
-            image_path = os.path.join(settings.MEDIA_ROOT, str(post.image))
-            if os.path.isfile(image_path):
-                os.remove(image_path)
-
         if form.is_valid():
-            form.save()
+            post = form.save(commit=False)
+            post.mountain = form.cleaned_data['mountain']
+            post.save()
             return redirect('posts:detail', post.pk)
     else:
-        form = PostForm(instance=post)
+        form = PostForm(instance=post, initial={'mountain': post.mountain})
 
     context = {
         'post': post,
         'form': form,
+        'mountains': Mountain.objects.all(),
     }
     return render(request, 'posts/update.html', context)
 

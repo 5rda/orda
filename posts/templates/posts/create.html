@@ -4,9 +4,10 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/ckeditor.js"></script>
   <script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/translations/ko.js"></script>
-<style>
-</style>
-<link rel="stylesheet" href="{% static 'css/posts_create.css' %}">
+  <style>
+    /* Add any custom styles here */
+  </style>
+  <link rel="stylesheet" href="{% static 'css/posts_create.css' %}">
 {% endblock style %}
 {% block content %}
   <div class="create__wrap">
@@ -15,24 +16,22 @@
       {{ form.media }}  
       {{ form.title }}
       <div>
-        {{ form.content }}
-      </div>
-      <div>
         <label for="mountain">다녀온 산:</label>
-        <select name="mountain" id="mountain">
-            <option value="" selected></option>
-            {% for mountain in mountains %}
-                <option value="{{ mountain.pk }}">{{ mountain.name }}</option>
-            {% endfor %}
+        <select name="mountain" id="mountain" required>
+          <option value="" selected>선택</option>
+          {% for mountain in mountains %}
+            <option value="{{ mountain.pk }}">{{ mountain.name }}</option>
+          {% endfor %}
         </select>
-    </div>
+      </div>
+      {{ form.content }}
       <div class="btn__wrap">
-        <input type="submit" value="뒤로가기" class="btn--back rounded"  onclick=window.history.back()>
-        <input type="submit" value='작성' class="btn--submit rounded">
+        <input type="button" value="뒤로가기" class="btn--back rounded" onclick="window.history.back()">
+        <input type="submit" value="작성" class="btn--submit rounded">
       </div>
     </form>
   </div>
 {% endblock content %}
 {% block javascript %}
-<script src="{% static 'js/ckeditor.js' %}"></script>
+  <script src="{% static 'js/ckeditor.js' %}"></script>
 {% endblock javascript %}

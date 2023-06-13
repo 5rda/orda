@@ -1,11 +1,34 @@
 {% load static %}
+{% load custom_filters %}
+<link rel="stylesheet" href="{% static 'css/base.css' %}">
+<style>
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  .list-group,
+  .list-group-item {
+    font-size: 13px;
+  }
+
+  .notification-popup {
+    position: absolute;
+    top: 60px;
+    right: 120px;
+    z-index: 800;
+    background-color: rgba(255, 255, 255, 0);
+    width: 350px;
+    height: 300px;
+  }
+</style>
 <header style="position: sticky; top: 0; z-index: 1000;">
   <div style="height: 100%; background-color: #FFFFFF; border-bottom:#0B6623 solid 10px;">
     <div class="mx-auto w-100 p-4 py-3 py-2-lg" style="max-width: 1400px;">
       <div class="d-flex justify-content-between">
         <div class="d-flex">
           <div style="height:75px;">
-            <a href="{% url 'mountains:mountain_list' %}"><img class='header__logo--img' src="{% static 'img/logo_long.png' %}" alt="ordalogo"></a>
+            <a href="{% url 'mountains:mountain_list' %}"><img class='header__logo--img' src="{% static 'img/nav_logo.png' %}" alt="ordalogo"></a>
           </div>
           <div class="d-flex align-items-end fs-5 ms-3 menu--hidden" >
             <a href="{% url 'mountains:search' %}" class="{% if '/search/' in request.path %} active-button {% endif %} btn--hover mb-1  mx-3">탐색</a>
@@ -28,33 +51,50 @@
           </div>
           <div class="d-flex align-items-end">
             {% if user.is_authenticated %}
-              <div class="fs-5 d-flex">
-                <div class="header__user--item menu--hidden">
-                  <form action="{% url 'accounts:notification' %}" method="GET">
-                    <button id="알림" type="submit" class="btn--hover me-3"><i class="bi bi-bell-fill" style="color:var(--green-btn);  font-size: 38px;"></i>{% if request.notification_count %}({{ request.notification_count }}){% endif %}</button>
-                  </form>
-                </div>
-                <div class="dropdown">
-                  <button class="btn-outline-light " style="width: 50px;" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    {% if request.user.profile_img  %}
-                      <img class="header__profile" src="{{ request.user.profile_img.url }}" alt="{{ post.user }}프로필">
-                    {% else %}
-                      <img class="header__profile" src="{% static 'img/profile_no_img.png' %}" alt="no">
-                    {% endif %}
-                  </button>
-                  <ul class="dropdown-menu">
-                    <li><a class="dropdown-item {% if active_button_id == '마이페이지' %}active-button{% endif %}" href="{% url 'accounts:profile' user.pk %}">마이페이지</a></li>
-                    <li><a class="dropdown-item" href="{% url 'accounts:my_memories' %}">
-                      오른기억</a></li>
-                    <li><a class="dropdown-item" href="#">            
-                      <form action="{% url 'accounts:logout' %}" method="POST">
-                        {% csrf_token %}
-                        <button id="로그아웃" type="submit">로그아웃</button>
-                      </form></a>
-                    </li>
+            <div class="fs-5 d-flex">
+              <div class="header__user--item menu--hidden">
+
+                {% comment %} <form action="{% url 'accounts:notification' %}" method="GET">
+
+                  <button id="알림" type="submit" class="btn--hover me-3"><i class="bi bi-bell-fill" style="color:var(--green-btn);  font-size: 38px;"></i>{% if request.notification_count %}({{ request.notification_count }}){% endif %}</button>
+
+                </form>  {% endcomment %}
+
+                <button id="notification-button" class="btn--hover me-3" onclick="toggleNotificationPopup()"><span id="notification-count">
+                  {% if request.notification_count %}
+                    <span id="fill"><i class="bi bi-bell-fill" style="color:var(--green-btn); font-size: 38px;"></i>{{ request.notification_count }}</span>
+                  {% else %}
+                    <span id= "empty"><i class="bi bi-bell" style="color:var(--green-btn); font-size: 38px;"></i>{{ request.notification_count }}</span>
+                  {% endif %}</span>
+                </button>
+
+                <div id="notification-popup" class="notification-popup" style="display: none;">
+                  <ul class="list-group" id="notification-list">
+                    <div id="notification-container" class="notification-container"></div>
                   </ul>
                 </div>
               </div>
+              <div class="dropdown">
+                <button class="btn-outline-light " style="width: 50px;" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  {% if request.user.profile_img  %}
+                    <img class="header__profile" src="{{ request.user.profile_img.url }}" alt="{{ post.user }}프로필">
+                  {% else %}
+                    <img class="header__profile" src="{% static 'img/profile_no_img.png' %}" alt="no">
+                  {% endif %}
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item {% if active_button_id == '마이페이지' %}active-button{% endif %}" href="{% url 'accounts:profile' user.pk %}">마이페이지</a></li>
+                  <li><a class="dropdown-item" href="{% url 'accounts:my_memories' %}">
+                    오른기억</a></li>
+                  <li><a class="dropdown-item" href="#">            
+                    <form action="{% url 'accounts:logout' %}" method="POST">
+                      {% csrf_token %}
+                      <button id="로그아웃" type="submit">로그아웃</button>
+                    </form></a>
+                  </li>
+                </ul>
+              </div>
+            </div>
             {% else %}
               <div class="dropdown">
                 <button class="btn-outline-light " style="width: 50px;" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -72,4 +112,162 @@
         </div>
       </div>
     </div>
+  </div>
 </header>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+  $(document).ready(function() {
+    var notificationContainer = $('#notification-container'); // notification-container 요소를 변수에 저장합니다.
+    var notificationButton = $('#notification-button'); // 알림 버튼을 변수에 저장합니다.
+  
+    notificationButton.click(function(e) {
+      e.preventDefault();
+      if (notificationContainer.html().trim() === '') { // 알림 창이 비어있다면 AJAX 요청을 보냅니다.
+        $.ajax({
+          url: '{% url 'accounts:notification' %}',
+          type: 'GET',
+          success: function(response) {
+            notificationContainer.html(response).show(); // 불러온 창을 표시합니다.
+          },
+          error: function(xhr) {
+            console.log(xhr.responseText);
+          }
+        });
+      } else {
+        notificationContainer.empty().hide(); // 내용을 지우고 숨깁니다.
+      }
+    });
+  });
+
+  function toggleNotificationPopup() {
+    const notificationPopup = document.getElementById("notification-popup");
+    isNotificationPopupVisible = !isNotificationPopupVisible;
+    notificationPopup.style.display = isNotificationPopupVisible ? "block" : "none";
+    var popup = document.getElementById("notification-popup");
+    if (popup.style.display === "none") {
+      // 팝업이 숨겨져 있다면 AJAX 요청을 통해 알림 데이터를 가져옵니다.
+      $.ajax({
+        url: 'http://127.0.0.1:8000/accounts/notification/',
+        type: 'GET',
+        success: function(response) {
+          // 알림 데이터를 팝업에 추가합니다.
+          $("#notification-list").html(response);
+          // 팝업을 표시합니다.
+          popup.style.display = "block";
+        },
+        error: function(xhr) {
+          console.log(xhr.responseText);
+        }
+      });
+    } else {
+      // 팝업이 표시되어 있다면 숨깁니다.
+      popup.style.display = "none";
+    }
+  }  
+</script>
+<script>
+  function showNotificationPopup() {
+    const notificationPopup = document.getElementById("notification-popup");
+    notificationPopup.style.display = "block";
+  }
+  
+  function hideNotificationPopup() {
+    const notificationPopup = document.getElementById("notification-popup");
+    notificationPopup.style.display = "none";
+  }
+
+  $(document).ready(function() {
+    var notificationContainer = $('#notification-popup');
+    var notificationButton = $('#notification-button');
+    var isNotificationPopupVisible = false;
+  
+    notificationButton.click(function(e) {
+      e.preventDefault();
+      toggleNotificationPopup();
+    });
+  
+    function toggleNotificationPopup() {
+      isNotificationPopupVisible = !isNotificationPopupVisible;
+      notificationContainer.toggle(isNotificationPopupVisible);
+    }
+  });
+  
+  function markNotificationRead(notificationId) {
+    $.ajax({
+      url: '/accounts/notification/check/' + notificationId + '/',
+      type: 'POST',
+      data: {'csrfmiddlewaretoken': '{{ csrf_token }}'},
+      success: function(response) {
+        console.log('알림을 읽음으로 표시했습니다.');
+        updateNotificationStatus(notificationId, true);
+        updateNotificationCount(-1);
+      },
+      error: function(xhr) {
+        console.log(xhr.responseText);
+      }
+    });
+  }
+  
+  function deleteNotification(notificationId) {
+    $.ajax({
+      url: '/accounts/notification/delete/' + notificationId + '/',
+      type: 'POST',
+      data: {'csrfmiddlewaretoken': '{{ csrf_token }}'},
+      success: function(response) {
+        console.log('알림을 삭제했습니다.');
+        removeNotificationFromList(notificationId);
+        updateNotificationCount(-1); 
+        updateNotificationIconStyle(); // Update the style of the bell icon
+      },
+      error: function(xhr) {
+        console.log(xhr.responseText);
+      }
+    });
+  }
+  
+  function updateNotificationStatus(notificationId, isRead) {
+    var statusElement = $('#notification-status-' + notificationId);
+    if (isRead) {
+      statusElement.html('<span>읽음</span>');
+    } else {
+      statusElement.html('<button onclick="markNotificationRead(' + notificationId + ')">읽지 않음</button>');
+    }
+  }
+  
+  function removeNotificationFromList(notificationId) {
+    var notificationElement = $('#notification-' + notificationId);
+    notificationElement.remove();
+    var notificationList = $('#notification-list');
+    if (notificationList.children().length === 0) {
+      notificationList.append('<li class="list-group-item">알림이 없습니다.</li>');
+    }
+  }
+  
+  function updateNotificationCount(change) {
+    var notificationCountElement = $('#notification-count');
+    var notificationCount = parseInt(notificationCountElement.text());
+    notificationCount += change;
+    if (notificationCount > 0) {
+      notificationCountElement.html('<span id="fill"><i class="bi bi-bell-fill"></i>' + notificationCount + '</span>');
+    } else {
+      notificationCountElement.html('<span id="empty"><i class="bi bi-bell"></i>' + notificationCount + '</span>');
+    }
+  }
+
+  function updateNotificationIconStyle() {
+    var notificationCountElement = $('#notification-count');
+    var notificationCount = parseInt(notificationCountElement.text());
+    var bellIcon = notificationCountElement.find('i');
+  
+    if (notificationCount > 0) {
+      bellIcon.addClass('bi-bell-fill');
+      bellIcon.removeClass('bi-bell');
+      bellIcon.css({'color': 'var(--green-btn)', 'font-size': '38px'});
+    } else {
+      bellIcon.removeClass('bi-bell-fill');
+      bellIcon.addClass('bi-bell');
+      bellIcon.css({'color': 'var(--green-btn)', 'font-size': '38px'});
+    }
+  }
+</script>

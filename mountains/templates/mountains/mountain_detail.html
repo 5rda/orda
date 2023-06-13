@@ -311,7 +311,7 @@
       <li id="best-{{ review.pk }}" {% if forloop.counter > 5 %}style="display: none;"{% endif %} class="{% if review == most_liked_review %}mountain__bestreview{% else %}mountain__review{% endif %}">
         <div class="mountain__detail--reviewbox">
           <!-- Button trigger modal -->
-          <button type="button" class="" data-bs-toggle="modal" data-bs-target="#reviewImg-{{ review.pk }}">
+          <button type="button" class="mountain__detail--reviewcontimgbtn" data-bs-toggle="modal" data-bs-target="#reviewImg-{{ review.pk }}">
             <div class="mountain__detail--reviewcontimgbox">
               {% if review.image %}
                 <img class="mountain__detail--reviewcontimg" src="{{ review.image.url }}" alt="">
@@ -384,10 +384,10 @@
               {{ review.created_at|date:"Y-m-d" }}
             {% endif %}
           </div>
-          {% if review.user %}
+          {% if review.user == request.user %}
             <div class="mountain__detail--updatebox">
               <!-- 수정 버튼 -->
-              <button class="editBtn">수정</button>
+              <button class="editBtn" data-mountain-id="{{ review.mountain.pk }}" data-review-id="{{ review.pk }}">수정</button>
               <span> · </span>
               <form action="{% url 'mountains:review_delete' review.mountain.pk review.pk %}" method="POST">
                 {% csrf_token %}
@@ -397,31 +397,6 @@
           {% endif %}
         </div>
       </li>
-      <!-- 모달창 -->
-      <div class="editModal modal">
-        <div class="modal-content">
-          <button id="editModalClose" class="modal-close">X</button>
-          <form id="editForm" action="{% url 'mountains:review_update' review.mountain.pk review.pk %}" method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="d-flex flex-row">
-              <div id="review-image" style="position: relative; height: 100%;">
-                <div class="mountain__reviewcrt--imgbox">
-                  <i class="bi bi-plus-lg img--plus"></i>
-                  {{ form.image }}
-                  <img id="preview" class="preview-image" src="#" alt="Preview Image" style="display: none;">
-                </div>
-                <div class="review__submit--btn">
-                  <button type="submit" class="btn btn-outline-success">수정하기</button>
-                </div>
-              </div>
-              <div>
-                <div id="review-tags">{{ form.tags }}</div>
-                <div id="review-content" class="mountain__reviewcrt--contbox">{{ form.content }}</div>
-              </div>
-            </div>
-          </form>
-        </div>
-      </div>
       {% endfor %}
     </ul>
     {% if reviews|length > 5 %}
@@ -748,47 +723,20 @@ function initMap(courseId, course) {
 </script>
   
 <script>
-  // 수정 버튼 클릭 시 모달창 열기
+  // 수정 버튼 클릭 시 새 창 열기
   var editButtons = document.getElementsByClassName("editBtn");
-  var editModals = document.getElementsByClassName("editModal");
 
   for (var i = 0; i < editButtons.length; i++) {
-      var editButton = editButtons[i];
-      var editModal = editModals[i];
+    var editButton = editButtons[i];
 
-      editButton.addEventListener("click", function () {
-          editModal.style.display = "block";
-      });
-  }
+    editButton.addEventListener("click", function () {
+      var reviewId = this.getAttribute("data-review-id");
+      var mountainId = this.getAttribute("data-mountain-id");
 
-  // 모달창 닫기 버튼 클릭 시 모달창 닫기
-  var editModalCloses = document.getElementsByClassName("modal-close");
-
-  for (var i = 0; i < editModalCloses.length; i++) {
-      var editModalClose = editModalCloses[i];
-
-      editModalClose.addEventListener("click", function () {
-          var modal = this.parentElement.parentElement;
-          modal.style.display = "none";
-      });
-  }
-
-  // 모달창 영역 외의 클릭 이벤트 처리
-  window.addEventListener("click", function (event) {
-    var modals = document.getElementsByClassName("modal");
-
-    for (var i = 0; i < modals.length; i++) {
-        var modal = modals[i];
-
-        if (event.target === modal) {
-            closeModal(modal);
-        }
-    }
-  });
-
-  // 모달창 닫기 함수
-  function closeModal(modal) {
-      modal.style.display = "none";
+      var url = '/mountains/' + mountainId + '/review_update/' + reviewId;
+      var features = 'width=1000,height=380,resizable=yes';
+      window.open(url, '_blank', features);
+    });
   }
 </script>
 
