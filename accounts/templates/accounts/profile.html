@@ -107,15 +107,35 @@
 
         {% comment %} 나의글 목록 {% endcomment %}
         <div class="profile__content1" style="display: block;">
+          
           <div class="profile__content1--review">
             <div class="profile__content1--reviewtext">
               <p>내가 쓴 리뷰</p>
-              <span style="margin-left: 5px; color: var(--main-color);">0</span>
+              <span style="margin-left: 5px; color: var(--main-color);">{{ reviews.count }}</span>
             </div>
-            <div class="profile__content1--reviewcontent">
+          <div class="profile__content1--reviewcontent">
+            <div class="profile__content--postbox">
+            {% if reviews %}
+              {% for review in reviews %}
+                <a class="profile__content--post" title="{{ review.content }}" href="{% url 'mountains:mountain_detail' review.mountain.pk %}">
+                  <div class="profile__content--imgbox">                        
+                    {% if review.image %}
+                      <img class="profile__content--img" src="{{ review.image.url }}" alt="리뷰 이미지">
+                    {% else %}
+                      <img class="profile__content--img" src="{% static 'img/Noimage.png' %}" alt="대체이미지">
+                    {% endif %}
+                  </div>
+                  <p class="profile__content--posttext">{{ review.content }}</p>
+                </a>
+              {% endfor %}
+            {% else %}
               <p class="profile__content--nonewrite">등록된 글이 없습니다.</p>
-            </div>
+            {% endif %}
           </div>
+        </div>
+      </div>
+    </div>
+
           <div class="profile__content1--mycourse">
             <div class="profile__content1--mycoursetext">
               <p>마이코스</p>
