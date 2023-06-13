@@ -34,12 +34,12 @@ def login(request):
             if prev_url:
                 if 'logout' in prev_url or 'delete' in prev_url:
                     del request.session['prev_url']
-                    return render(request, 'pjt/index.html')
+                    return render(request, 'posts/index.html')
                 else:
                     del request.session['prev_url']
                     return redirect(prev_url)
             
-            return render(request, 'pjt/index.html')    
+            return render(request, 'posts/index.html')    
     else:
         form = CustomUserAuthenticationForm()
 
