@@ -41,8 +41,7 @@ class ButtonSelectMultiple(CheckboxSelectMultiple):
             ))
 
         return mark_safe('\n'.join(output))
-
-
+    
 
 class ReviewCreationForm(forms.ModelForm):
     content = forms.CharField(
@@ -97,7 +96,7 @@ class SearchForm(forms.Form):
         widget=ButtonSelectMultiple(
             queryset=Tag.objects.all(),
             attrs={
-                'class': "visually-hidden",
+                'class': "visually-hidden"
             }
         ),
         label='태그 선택'

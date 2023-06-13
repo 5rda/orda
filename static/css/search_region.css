@@ -1,0 +1,973 @@
+.seoul--gwanak {
+  position: absolute;
+  display: flex;
+  top: 346px;
+  left: 189px;
+}
+
+.seoul--dobong {
+  position: absolute;
+  display: flex;
+  top: 33px;
+  left: 249px;
+}
+
+.seoul--bukhan {
+  position: absolute;
+  display: flex;
+  top: 85px;
+  left: 226px;
+}
+
+.incheon--mani {
+  position: absolute;
+  display: flex;
+  top: 143px;
+  left: 220px;
+}
+
+.deajeon--gyeryong {
+  position: absolute;
+  display: flex;
+  top: 213px;
+  left: 85px;
+}
+
+.gwangju--mudeung {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  top: 220px;
+  left: 383px;
+}
+
+.deagu--biseul {
+  position: absolute;
+  display: flex;
+  top: 288px;
+  left: 186px;
+}
+
+.deagu--palgong {
+  position: absolute;
+  display: flex;
+  top: 20px;
+  left: 320px;
+}
+
+.ulsan--gaji {
+  position: absolute;
+  display: flex;
+  top: 122px;
+  left: 45px;
+}
+
+.ulsan--sinbul {
+  position: absolute;
+  display: flex;
+  top: 192px;
+  left: 80px;
+}
+
+.ulsan--jaeyak {
+  position: absolute;
+  display: flex;
+  top: 185px;
+  left: 25px;
+}
+
+.busan--geumjeong {
+  position: absolute;
+  display: flex;
+  top: 120px;
+  left: 225px;
+}
+
+.kyeonggi--gamak {
+  position: absolute;
+  display: flex;
+  top: 130px;
+  left: 110px;
+}
+
+.kyeonggi--gwanak {
+  position: absolute;
+  display: flex;
+  top: 250px;
+  left: 160px;
+}
+
+.kyeonggi--dobong {
+  position: absolute;
+  display: flex;
+  top: 178px;
+  left: 171px;
+}
+
+.kyeonggi--myeongseong {
+  position: absolute;
+  display: flex;
+  top: 55px;
+  left: 206px;
+}
+
+.kyeonggi--myeongji {
+  position: absolute;
+  display: flex;
+  top: 97px;
+  left: 248px;
+}
+
+.kyeonggi--baeckun {
+  position: absolute;
+  display: flex;
+  top: 62px;
+  left: 276px;
+}
+
+.kyeonggi--bukhan {
+  position: absolute;
+  display: flex;
+  top: 188px;
+  left: 121px;
+}
+
+.kyeonggi--soyo {
+  position: absolute;
+  display: flex;
+  top: 32px;
+  left: 190px;
+}
+
+.kyeonggi--yongmun {
+  position: absolute;
+  display: flex;
+  top: 200px;
+  left: 305px;
+}
+
+.kyeonggi--unak {
+  position: absolute;
+  display: flex;
+  top: 120px;
+  left: 280px;
+}
+
+.kyeonggi--yumyeong {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  top: 202px;
+  left: 282px;
+}
+
+.kyeonggi--cheonma {
+  position: absolute;
+  display: flex;
+  top: 178px;
+  left: 245px;
+}
+
+.kyeonggi--chuckryeong {
+  position: absolute;
+  display: flex;
+  top: 156px;
+  left: 245px;
+}
+
+.kyeonggi--hwaac {
+  position: absolute;
+  display: flex;
+  top: 97px;
+  left: 313px;
+}
+
+.kangwon--gari {
+  position: absolute;
+  display: flex;
+  top: 176px;
+  left: 140px;
+}
+
+.kangwon--samak {
+  position: absolute;
+  display: flex;
+  top: 191px;
+  left: 60px;
+}
+
+.kangwon--obong {
+  position: absolute;
+  display: flex;
+  top: 154px;
+  left: 136px;
+}
+
+.kangwon--gariwang {
+  position: absolute;
+  display: flex;
+  top: 264px;
+  left: 256px;
+}
+
+.kangwon--baeckun {
+  position: absolute;
+  display: flex;
+  top: 307px;
+  left: 156px;
+}
+
+.kangwon--gyebang {
+  position: absolute;
+  display: flex;
+  top: 205px;
+  left: 235px;
+}
+
+.kangwon--gongjak {
+  position: absolute;
+  display: flex;
+  top: 215px;
+  left: 165px;
+}
+
+.kangwon--palbong {
+  position: absolute;
+  display: flex;
+  top: 215px;
+  left: 84px;
+}
+
+.kangwon--daeam {
+  position: absolute;
+  display: flex;
+  top: 105px;
+  left: 194px;
+}
+
+.kangwon--deokhang {
+  position: absolute;
+  display: flex;
+  top: 305px;
+  left: 292px;
+}
+
+.kangwon--eungbong {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  top: 346px;
+  left: 377px;
+}
+
+.kangwon--duta {
+  position: absolute;
+  display: flex;
+  top: 284px;
+  left: 340px;
+}
+
+.kangwon--myeongseong {
+  position: absolute;
+  display: flex;
+  top: 130px;
+  left: 48px;
+}
+
+.kangwon--bangtae {
+  position: absolute;
+  display: flex;
+  top: 170px;
+  left: 230px;
+}
+
+.kangwon--baekdeok {
+  position: absolute;
+  display: flex;
+  top: 250px;
+  left: 225px;
+}
+
+.kangwon--odae {
+  position: absolute;
+  display: flex;
+  top: 158px;
+  left: 233px;
+}
+
+.kangwon--baekun {
+  position: absolute;
+  display: flex;
+  top: 145px;
+  left: 72px;
+}
+
+.kangwon--seorak {
+  position: absolute;
+  display: flex;
+  top: 95px;
+  left: 230px;
+}
+
+.kangwon--yonghwa {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  top: 156px;
+  left: 115px;
+}
+
+.kangwon--jeombong {
+  position: absolute;
+  display: flex;
+  top: 118px;
+  left: 185px;
+}
+
+.kangwon--chiak {
+  position: absolute;
+  display: flex;
+  top: 290px;
+  left: 166px;
+}
+
+.kangwon--taebaek {
+  position: absolute;
+  display: flex;
+  top: 356px;
+  left: 297px;
+}
+
+.kangwon--taehwa {
+  position: absolute;
+  display: flex;
+  top: 340px;
+  left: 220px;
+}
+
+.kangwon--hwaac {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  top: 155px;
+  left: 82px;
+}
+
+.chungbuk--gubyeong {
+  position: absolute;
+  display: flex;
+  top: 262px;
+  left: 190px;
+}
+
+.chungbuk--songni {
+  position: absolute;
+  display: flex;
+  top: 245px;
+  left: 202px;
+}
+
+.chungbuk--geumsu {
+  position: absolute;
+  display: flex;
+  top: 100px;
+  left: 295px;
+}
+
+.chungbuk--worak {
+  position: absolute;
+  display: flex;
+  top: 120px;
+  left: 255px;
+}
+
+.chungbuk--daeya {
+  position: absolute;
+  display: flex;
+  top: 195px;
+  left: 210px;
+}
+
+.chungbuk--heuiyang {
+  position: absolute;
+  display: flex;
+  top: 175px;
+  left: 220px;
+}
+
+.chungbuk--dorak {
+  position: absolute;
+  display: flex;
+  top: 124px;
+  left: 315px;
+}
+
+.chungbuk--minjuji {
+  position: absolute;
+  display: flex;
+  top: 396px;
+  left: 192px;
+}
+
+.chungbuk--cheontae {
+  position: absolute;
+  display: flex;
+  top: 356px;
+  left: 132px;
+}
+
+.chungbuk--taehwa {
+  position: absolute;
+  display: flex;
+  top: 37px;
+  left: 332px;
+}
+
+.chungbuk--seodae {
+  position: absolute;
+  display: flex;
+  top: 336px;
+  left: 112px;
+}
+
+.chungbuk--sobaek {
+  position: absolute;
+  display: flex;
+  top: 90px;
+  left: 365px;
+}
+
+.chungnam--gyeryong {
+  position: absolute;
+  display: flex;
+  top: 245px;
+  left: 290px;
+}
+
+.chungnam--daedun {
+  position: absolute;
+  display: flex;
+  top: 325px;
+  left: 320px;
+}
+
+.chungnam--deoksung {
+  position: absolute;
+  display: flex;
+  top: 170px;
+  left: 110px;
+}
+
+.chungnam--seodae {
+  position: absolute;
+  display: flex;
+  top: 293px;
+  left: 374px;
+}
+
+.chungnam--cheontae {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  top: 330px;
+  left: 386px;
+}
+
+.chungnam--chilgab {
+  position: absolute;
+  display: flex;
+  top: 238px;
+  left: 201px;
+}
+
+.jeonbuk--gangcheon {
+  position: absolute;
+  display: flex;
+  top: 308px;
+  left: 180px;
+}
+
+.jeonbuk--baekam {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  top: 287px;
+  left: 125px;
+}
+
+.jeonbuk--seonun {
+  position: absolute;
+  display: flex;
+  top: 273px;
+  left: 40px;
+}
+
+.jeonbuk--chuweol {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  top: 307px;
+  left: 155px;
+}
+
+.jeonbuk--naejang {
+  position: absolute;
+  display: flex;
+  top: 275px;
+  left: 132px;
+}
+
+.jeonbuk--daedun {
+  position: absolute;
+  display: flex;
+  top: 77px;
+  left: 252px;
+}
+
+.jeonbuk--deogyu {
+  position: absolute;
+  display: flex;
+  top: 150px;
+  left: 370px;
+}
+
+.jeonbuk--minjuji {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  top: 105px;
+  left: 388px;
+}
+
+.jeonbuk--jeoksang {
+  position: absolute;
+  display: flex;
+  top: 128px;
+  left: 315px;
+}
+
+.jeonbuk--mai {
+  position: absolute;
+  display: flex;
+  top: 200px;
+  left: 270px;
+}
+
+.jeonbuk--unjang {
+  position: absolute;
+  display: flex;
+  top: 150px;
+  left: 260px;
+}
+
+.jeonbuk--moak {
+  position: absolute;
+  display: flex;
+  top: 210px;
+  left: 170px;
+}
+
+.jeonbuk--bangjang {
+  position: absolute;
+  display: flex;
+  top: 290px;
+  left: 55px;
+}
+
+.jeonbuk--byeon {
+  position: absolute;
+  display: flex;
+  top: 225px;
+  left: 40px;
+}
+
+.jeonbuk--jangan {
+  position: absolute;
+  display: flex;
+  top: 235px;
+  left: 320px;
+}
+
+.jeonbuk--jiri {
+  position: absolute;
+  display: flex;
+  top: 318px;
+  left: 325px;
+}
+
+.jeonbuk--jiri {
+  position: absolute;
+  display: flex;
+  top: 318px;
+  left: 325px;
+}
+
+.jeonnam--gangcheon {
+  position: absolute;
+  display: flex;
+  top: 35px;
+  left: 246px;
+}
+
+.jeonnam--mudeung {
+  position: absolute;
+  display: flex;
+  top: 111px;
+  left: 246px;
+}
+
+.jeonnam--chuweol {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  top: 40px;
+  left: 230px;
+}
+
+.jeonnam--gitdae {
+  position: absolute;
+  display: flex;
+  top: 385px;
+  left: 21px;
+}
+
+.jeonnam--dulyun {
+  position: absolute;
+  display: flex;
+  top: 280px;
+  left: 150px;
+}
+
+.jeonnam--bangjang {
+  position: absolute;
+  display: flex;
+  top: 28px;
+  left: 190px;
+}
+
+.jeonnam--baekam {
+  position: absolute;
+  display: flex;
+  top: 15px;
+  left: 203px;
+}
+
+.jeonnam--baekun {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  top: 120px;
+  left: 380px;
+}
+
+.jeonnam--wolchul {
+  position: absolute;
+  display: flex;
+  top: 200px;
+  left: 175px;
+}
+
+.jeonnam--jogye {
+  position: absolute;
+  display: flex;
+  top: 135px;
+  left: 310px;
+}
+
+.jeonnam--jiri {
+  position: absolute;
+  display: flex;
+  top: 67px;
+  left: 362px;
+}
+
+.jeonnam--cheongwan {
+  position: absolute;
+  display: flex;
+  top: 265px;
+  left: 220px;
+}
+
+.jeonnam--palyeong {
+  position: absolute;
+  display: flex;
+  top: 245px;
+  left: 335px;
+}
+
+.kyeongbuk--gaya {
+  position: absolute;
+  display: flex;
+  top: 320px;
+  left: 131px;
+}
+
+.kyeongbuk--gaji {
+  position: absolute;
+  display: flex;
+  top: 360px;
+  left: 271px;
+}
+
+.kyeongbuk--biseul {
+  position: absolute;
+  display: flex;
+  top: 330px;
+  left: 206px;
+}
+
+.kyeongbuk--unmun {
+  position: absolute;
+  display: flex;
+  top: 345px;
+  left: 266px;
+}
+
+.kyeongbuk--gubyeong {
+  position: absolute;
+  display: flex;
+  top: 185px;
+  left: 65px;
+}
+
+.kyeongbuk--songni {
+  position: absolute;
+  display: flex;
+  top: 165px;
+  left: 70px;
+}
+
+.kyeongbuk--geumo {
+  position: absolute;
+  display: flex;
+  top: 270px;
+  left: 126px;
+}
+
+.kyeongbuk--nam {
+  position: absolute;
+  display: flex;
+  top: 328px;
+  left: 300px;
+}
+
+.kyeongbuk--naeyeon {
+  position: absolute;
+  display: flex;
+  top: 210px;
+  left: 310px;
+}
+
+.kyeongbuk--daeya {
+  position: absolute;
+  display: flex;
+  top: 140px;
+  left: 70px;
+}
+
+.kyeongbuk--juheul {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  top: 110px;
+  left: 100px;
+}
+
+.kyeongbuk--hwangjang {
+  position: absolute;
+  display: flex;
+  top: 102px;
+  left: 127px;
+}
+
+.kyeongbuk--heuiyang {
+  position: absolute;
+  display: flex;
+  top: 127px;
+  left: 37px;
+}
+
+.kyeongbuk--minjuji {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  top: 260px;
+  left: 78px;
+}
+
+.kyeongbuk--seongin {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  top: 15px;
+  left: 398px;
+}
+
+.kyeongbuk--sobaek {
+  position: absolute;
+  display: flex;
+  top: 74px;
+  left: 165px;
+}
+
+.kyeongbuk--eungbong {
+  position: absolute;
+  display: flex;
+  top: 45px;
+  left: 300px;
+}
+
+.kyeongbuk--juwang {
+  position: absolute;
+  display: flex;
+  top: 185px;
+  left: 302px;
+}
+
+.kyeongbuk--cheongnyang {
+  position: absolute;
+  display: flex;
+  top: 100px;
+  left: 272px;
+}
+
+.kyeongbuk--taebaek {
+  position: absolute;
+  display: flex;
+  top: 45px;
+  left: 243px;
+}
+
+.kyeongbuk--palgong {
+  position: absolute;
+  display: flex;
+  top: 275px;
+  left: 205px;
+}
+
+.kyeongbuk--hwangak {
+  position: absolute;
+  display: flex;
+  top: 245px;
+  left: 78px;
+}
+
+.kyeongnam--gaya {
+  position: absolute;
+  display: flex;
+  top: 50px;
+  left: 140px;
+}
+
+.kyeongnam--hwangmae {
+  position: absolute;
+  display: flex;
+  top: 130px;
+  left: 90px;
+}
+
+.kyeongnam--gaji {
+  position: absolute;
+  display: flex;
+  top: 112px;
+  left: 360px;
+}
+
+.kyeongnam--unmun {
+  position: absolute;
+  display: flex;
+  top: 107px;
+  left: 300px;
+}
+
+.kyeongnam--jaeyak {
+  position: absolute;
+  display: flex;
+  top: 132px;
+  left: 355px;
+}
+
+.kyeongnam--geum {
+  position: absolute;
+  display: flex;
+  top: 366px;
+  left: 112px;
+}
+
+.kyeongnam--geumjeong {
+  position: absolute;
+  display: flex;
+  top: 205px;
+  left: 365px;
+}
+
+.kyeongnam--cheonseong {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  top: 170px;
+  left: 390px;
+}
+
+.kyeongnam--deogyu {
+  position: absolute;
+  display: flex;
+  top: 50px;
+  left: 57px;
+}
+
+.kyeongnam--muhak {
+  position: absolute;
+  display: flex;
+  top: 235px;
+  left: 244px;
+}
+
+.kyeongnam--mireuk {
+  position: absolute;
+  display: flex;
+  top: 345px;
+  left: 218px;
+}
+
+.kyeongnam--jiri {
+  position: absolute;
+  display: flex;
+  top: 352px;
+  left: 172px;
+}
+
+.kyeongnam--yeonhwa {
+  position: absolute;
+  display: flex;
+  top: 277px;
+  left: 181px;
+}
+
+.kyeongnam--jiri-1 {
+  position: absolute;
+  display: flex;
+  top: 195px;
+  left: 65px;
+}
+
+.kyeongnam--hwawang {
+  position: absolute;
+  display: flex;
+  top: 145px;
+  left: 255px;
+}
+
+.kyeongnam--hwangseok {
+  position: absolute;
+  display: flex;
+  top: 83px;
+  left: 65px;
+}
+
+.jeju--halla {
+  position: absolute;
+  display: flex;
+  top: 210px;
+  left: 190px;
+}

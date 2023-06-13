@@ -1,5 +1,5 @@
 $('document').ready(function() {
-  var area0 = ["시/도 선택","서울특별시","인천광역시","대전광역시","광주광역시","대구광역시","울산광역시","부산광역시","경기도","강원도","충청북도","충청남도","전라북도","전라남도","경상북도","경상남도","제주도"];
+  var area0 = ["전국","서울특별시","인천광역시","대전광역시","광주광역시","대구광역시","울산광역시","부산광역시","경기도","강원도","충청북도","충청남도","전라북도","전라남도","경상북도","경상남도","제주도"];
   var area1 = ["전체"];
   var area2 = ["전체"];
   var area3 = ["전체"];
@@ -56,6 +56,35 @@ $('document').ready(function() {
 //  });
 });
 
+$(document).ready(function() {    
+  $("select[name^=sido]").change(function() {
+    var selectedSido = $(this).val();
+    
+    // 모든 이미지 숨기기
+    $(".mountain__search--mapbox").hide();
+    
+    // 선택한 sido에 해당하는 이미지만 보이기
+    $(".mountain__search--mapbox[data-sido='" + selectedSido + "']").show();
+
+    $(".mountain__search--gugun").show();
+
+    $(document).ready(function() {
+      $("select[name^=gugun]").change(function() {
+        var selectedGugun = $(this).val();
+
+        if (selectedGugun === '전체') {
+          // 전체 선택 시 모든 mountain__search--gugun 요소를 보이도록 설정
+          $(".mountain__search--gugun").show();
+        } else {
+          // 선택한 gugun에 해당하는 mountain__search--gugun 요소만 보이도록 설정
+          $(".mountain__search--gugun").hide();
+          $(".mountain__search--gugun[data-gugun='" + selectedGugun + "']").show();
+        }
+      });
+    });
+  });
+});
+
 document.addEventListener('DOMContentLoaded', function() {
   var tagButtons = document.querySelectorAll('#review-tags label input');
   var selectedTagsContainer = document.getElementById('selected-tags');
@@ -80,3 +109,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
+
