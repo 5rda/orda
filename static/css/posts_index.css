@@ -159,6 +159,12 @@
   border-radius: 100%;
 }
 
+.postindex__post--userimgbox .level5--img {
+  position: absolute;
+  width: 21.5px !important;
+  height: 21.5px !important;
+}
+
 .postindex__post--username {
   display: flex;
   align-items: center;

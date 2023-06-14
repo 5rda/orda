@@ -547,6 +547,12 @@ th {
   border-radius: 100%;
 }
 
+.mountain__detail--atpostsuserimgbox .level5--img {
+  position: absolute;
+  width: 18.9px !important;
+  height: 18.9px !important;
+}
+
 .mountain__detail--atpostsusername {
   display: flex;
   align-items: center;

@@ -57,7 +57,6 @@
 .profile__user--name {
   font-size: 25px;
   font-weight: bold;
-  margin-bottom: 5px;
 }
 
 .profile__user--expbar {
@@ -240,6 +239,14 @@
   object-fit: cover;
   width: 100%;
   height: 100%;
+  border-radius: 8px;
+}
+
+.profile__content--noimg {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  border: 1px solid #dbdbdb;
   border-radius: 8px;
 }
 
@@ -436,11 +443,13 @@
 .profile__follow--imgbox {
   position: relative;
   width:40px;
+  height: 40px;
 }
 
 .profile__follow--img {
   object-fit: cover;
   width: 100%;
+  height: 100%;
   box-sizing: border-box;
   border: 1px solid #DBDBDB;
   border-radius: 100%;
@@ -552,6 +561,7 @@
     position: relative;
     flex-basis: 20%;
     width:120px;
+    height: 120px;
     margin: 0 auto 25px;
   }
 
@@ -574,7 +584,6 @@
   .profile__user--name {
     font-size: 25px;
     font-weight: bold;
-    margin-bottom: 10px;
   }
   
   .profile__user--follow {
@@ -641,30 +650,3 @@
   }
 }
 
-/* level border */
-
-
-
-.level2 {
-  border: 3px solid yellow !important;
-}
-
-.level3 {
-  border: 3px solid green !important;
-}
-
-.level4 {
-  border: 3px solid red !important;
-}
-
-.level5 {
-  background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
-  border: 3px solid transparent;
-}
-
-.level5--img {
-  position: absolute;
-  right: 0;
-  top: 0;
-  transform: translate(0%, -50%) rotate(28deg);
-}

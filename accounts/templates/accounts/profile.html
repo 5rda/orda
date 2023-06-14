@@ -5,6 +5,7 @@
 
 {% block style %}
   <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+  <link rel="stylesheet" href="{% static 'css/level.css' %}">
 {% endblock style %}
 
 {% block content %}
@@ -16,22 +17,51 @@
         <div class="profile__user--info">
           <div class="profile__user--imgbox">
             {% if person.profile_img %}
-              <img class="profile__user--img {% if level == 2 %}level2 {% elif level == 3 %}level3 {% elif level == 4 %}level4 {% elif level == 5 %} level5{% endif %}" src="{{ person.profile_img.url }}" alt="">
-              {% if level == 5 %}
-                <img class="level5--img" src="{% static 'img/level5.png' %}" alt="level5">
+              <img class="profile__user--img {% if person.level == 2 %}level2-lg {% elif person.level == 3 %}level3-lg {% elif person.level == 4 %}level4-lg {% elif person.level == 5 %}level5-lg {% endif %} " src="{{ person.profile_img.url }}" alt="">
+              {% if person.level == 5 %}
+                <img class="level5--img-lg" src="{% static 'img/crown.png' %}" alt="level5">
               {% endif %}
             {% else %}
-              <img class="profile__user--img {% if level == 2 %}level2 {% elif level == 3 %}level3 {% elif level == 4 %}level4 {% elif level == 5 %} level5{% endif %}" src="{% static 'img/profile_no_img.png' %}" alt="">
-              {% if level == 5 %}
-                <img class="level5--img" src="{% static 'img/level5.png' %}" alt="level5">
+              <img class="profile__user--img {% if person.level == 2 %}level2-lg {% elif person.level == 3 %}level3-lg {% elif person.level == 4 %}level4-lg {% elif person.level == 5 %}level5-lg {% endif %}" src="{% static 'img/profile_no_img.png' %}" alt="">
+              {% if person.level == 5 %}
+                <img class="level5--img-lg" src="{% static 'img/crown.png' %}" alt="level5">
               {% endif %}
             {% endif %}
             </div>
             <div class="profile__user--stat">
             <div class="profile__user--name">{{ person.nickname }}</div>
+            <div>
+              {% if person.level == 1 %}
+                <div class="d-flex flex-row">
+                  <img class="levelname--img" src="{% static 'img/level/level1.png' %}" alt=""><p class="levelname">등산새싹</p>
+                </div>
+              {% elif person.level == 2 %}
+                <div class="d-flex flex-row">
+                  <img class="levelname--img" src="{% static 'img/level/level2.png' %}" alt=""><p class="levelname">등산샛별</p>
+                </div>
+              {% elif person.level == 3 %}
+              <div class="d-flex flex-row">
+                <img class="levelname--img" src="{% static 'img/level/level3.png' %}" alt=""><p class="levelname">등산인</p>
+              </div>
+              {% elif person.level == 4 %}
+              <div class="d-flex flex-row">
+                <img class="levelname--img" src="{% static 'img/level/level4.png' %}" alt=""><p class="levelname">등산고수</p>
+              </div>
+              {% elif person.level == 5 %}
+              <div class="d-flex flex-row">
+                <img class="levelname--img" src="{% static 'img/level/level5.png' %}" alt=""><p class="level5name">등산왕</p>
+              </div>
+              {% endif %}
+            </div>
             <div class="progress profile__user--expbar" role="progressbar" aria-label="Example with label" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" title="다음 레벨까지 {{ restexp }}점 남았습니다.">
               <div class="progress-bar bg-success" style="width: {{ expbar }}%"></div>
-              <p class="profile__user--expcount">{{ score }}/{{ max_score }}</p>
+              <p class="profile__user--expcount">
+                {% if max_score == 'MAX' %}
+                  {{ max_score }}
+                {% else %}
+                  {{ score }}/{{ max_score }}
+                {% endif %}
+              </p>
             </div>
             <div class="profile__user--follow">
               <p class="profile__user--followtext">팔로워</p><button id="followers-count" class="profile__user--followercount">{{ person.followers.all|length }}</button>
@@ -104,7 +134,6 @@
     {% comment %} 컨텐츠 {% endcomment %}
     <article class="profile__article3">
       <div class="profile__contentbox">
-
         {% comment %} 나의글 목록 {% endcomment %}
         <div class="profile__content1" style="display: block;">
           
@@ -113,37 +142,37 @@
               <p>내가 쓴 리뷰</p>
               <span style="margin-left: 5px; color: var(--main-color);">{{ reviews.count }}</span>
             </div>
-          <div class="profile__content1--reviewcontent">
-            <div class="profile__content--postbox">
-            {% if reviews %}
-              {% for review in reviews %}
-                <a class="profile__content--post" title="{{ review.content }}" href="{% url 'mountains:mountain_detail' review.mountain.pk %}">
-                  <div class="profile__content--imgbox">                        
-                    {% if review.image %}
-                      <img class="profile__content--img" src="{{ review.image.url }}" alt="리뷰 이미지">
-                    {% else %}
-                      <img class="profile__content--img" src="{% static 'img/Noimage.png' %}" alt="대체이미지">
-                    {% endif %}
-                  </div>
-                  <p class="profile__content--posttext">{{ review.content }}</p>
-                </a>
-              {% endfor %}
-            {% else %}
-              <p class="profile__content--nonewrite">등록된 글이 없습니다.</p>
-            {% endif %}
+            <div class="profile__content1--reviewcontent">
+              {% if reviews %}
+                <div class="profile__content--postbox">
+                  {% for review in reviews %}
+                    <a class="profile__content--post" title="{{ review.content }}" href="{% url 'mountains:mountain_detail' review.mountain.pk %}">
+                      <div class="profile__content--imgbox">                        
+                        {% if review.image %}
+                          <img class="profile__content--img" src="{{ review.image.url }}" alt="리뷰 이미지">
+                        {% else %}
+                          <img class="profile__content--noimg" src="{% static 'img/Noimage.png' %}" alt="대체이미지">
+                        {% endif %}
+                      </div>
+                      <p class="profile__content--posttext">{{ review.content }}</p>
+                    </a>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <p class="profile__content--nonewrite">등록된 글이 없습니다.</p>
+              {% endif %}
+            </div>
           </div>
-        </div>
-      </div>
 
 
           <div class="profile__content1--mycourse">
             <div class="profile__content1--mycoursetext">
-              <p>마이코스</p>
+              <p>내가 쓴 마이코스</p>
               <span style="margin-left: 5px; color: var(--main-color);">{{ posts|length }}</span>
             </div>
             <div class="profile__content1--mycoursecontent">
-              <div class="profile__content--postbox">
-                {% if posts %}
+              {% if posts %}
+                <div class="profile__content--postbox">
                   {% for post in posts %}
                     {% if post.user == person %}
                       <a class="profile__content--post" title="{{ post.title }}" href="{% url 'posts:detail' post.pk %}">
@@ -152,7 +181,7 @@
                             {% if first_image_url %}
                               <img class="profile__content--img" src="{{ first_image_url }}" alt="썸네일">
                             {% else %}
-                              <img class="profile__content--img" src="{% static 'img/Noimage.png' %}" alt="대체이미지">
+                              <img class="profile__content--noimg" src="{% static 'img/Noimage.png' %}" alt="대체이미지">
                             {% endif %}
                           {% endwith %}
                         </div>
@@ -160,10 +189,10 @@
                       </a>
                     {% endif %}
                   {% endfor %}
-                {% else %}
-                  <p class="profile__content--nonewrite">등록된 글이 없습니다.</p>
-                {% endif %}
-              </div>
+                </div>
+              {% else %}
+                <p class="profile__content--nonewrite">등록된 글이 없습니다.</p>
+              {% endif %}
             </div>
           </div>
         </div>
@@ -176,8 +205,8 @@
               <span style="margin-left: 5px; color: var(--main-color);">{{ bookmark_course|length }}</span>
             </div>
             <div class="profile__content2--bookmarkcontent">
-              <div class="profile__content--postbox">
-                {% if bookmark_course %}
+              {% if bookmark_course %}
+                <div class="profile__content--postbox">
                   {% for course in bookmark_course %}
                     <a class="profile__content--post" title="{{ course.mntn_name }}" onclick="openSmallWindow('{% url 'mountains:course_detail' course.pk %}');" id="{{course.pk}}" >
                       <div class="profile__content--imgbox">                        
@@ -186,10 +215,10 @@
                       <p class="profile__content--posttext">{{ course.crs_name_detail }}</p>
                     </a>
                   {% endfor %}
-                {% else %}
+                </div>
+              {% else %}
                 <p class="profile__content--nonewrite">북마크한 글이 없습니다.</p>
-                {% endif %}
-              </div>
+              {% endif %}
             </div>
           </div>
         </div>
@@ -199,12 +228,12 @@
         <div class="profile__content3" style="display: none;">
           <div class="profile__content3--mountain">
             <div class="profile__content3--mountaintext">
-              <p>산</p>
+              <p>좋아요 한 산</p>
               <span style="margin-left: 5px; color: var(--main-color);">{{ liked_mountains|length }}</span>
             </div>
             <div class="profile__content3--mountaincontent">
-              <div class="profile__content--postbox">
-                {% if liked_mountains %}
+              {% if liked_mountains %}
+                <div class="profile__content--postbox">
                   {% for mountain in liked_mountains %}
                     <a class="profile__content--post" title="{{ mountain.name }}" href="{% url 'mountains:mountain_detail' mountain.pk %}">
                       <div class="profile__content--imgbox">                        
@@ -213,20 +242,20 @@
                       <p class="profile__content--posttext">{{ mountain.name }}</p>
                     </a>
                   {% endfor %}
-                {% else %}
-                  <p class="profile__content--nonewrite">좋아요한 글이 없습니다.</p>
-                {% endif %}
-              </div>
+                </div>
+              {% else %}
+                <p class="profile__content--nonewrite">좋아요한 글이 없습니다.</p>
+              {% endif %}
             </div>
           </div>
           <div class="profile__content3--mycourse">
             <div class="profile__content3--mycoursetext">
-                <p>마이코스</p>
+                <p>좋아요 한 마이코스</p>
                 <span style="margin-left: 5px; color: var(--main-color);">{{ liked_posts|length }}</span>
             </div>
             <div class="profile__content3--mycoursecontent">
-              <div class="profile__content--postbox">
-                {% if liked_posts %}
+              {% if liked_posts %}
+                <div class="profile__content--postbox">
                   {% for post in liked_posts %}
                     <a class="profile__content--post" title="{{ post.title }}" href="{% url 'posts:detail' post.pk %}">
                       <div class="profile__content--imgbox">
@@ -234,17 +263,17 @@
                           {% if first_image_url %}
                             <img class="profile__content--img" src="{{ first_image_url }}" alt="썸네일">
                           {% else %}
-                            <img class="profile__content--img" src="{% static 'img/Noimage.png' %}" alt="대체이미지">
+                            <img class="profile__content--noimg" src="{% static 'img/Noimage.png' %}" alt="대체이미지">
                           {% endif %}
                         {% endwith %}
                       </div>
                       <p class="profile__content--posttext">{{ post.title }}</p>
                     </a>
                   {% endfor %}
-                {% else %}
-                  <p class="profile__content--nonewrite">좋아요한 글이 없습니다.</p>
-                {% endif %}
-              </div>
+                </div>
+              {% else %}
+                <p class="profile__content--nonewrite">좋아요한 글이 없습니다.</p>
+              {% endif %}
             </div>
           </div>
         </div>
@@ -262,15 +291,15 @@
                     <div class="profile__follow--item">
                       <a class="d-flex flex-row" href="{% url 'accounts:profile' follower.pk %}">
                         <div class="profile__follow--imgbox">
-                          {% if follower.profile %}
-                            <img class="profile__follow--img {% if level == 2 %}level2 {% elif level == 3 %}level3 {% elif level == 4 %}level4 {% elif level == 5 %} level5{% endif %}" src="{{ follower.profile }}" alt="팔로워유저이미지">
-                            {% if level == 5 %}
-                              <img class="level5--img" src="{% static 'img/level5.png' %}" alt="level5">
+                          {% if follower.profile_img %}
+                            <img class="profile__follow--img {% if follower.level == 2 %}level2 {% elif follower.level == 3 %}level3 {% elif follower.level == 4 %}level4 {% elif follower.level == 5 %} level5{% endif %}" src="{{ follower.profile_img.url }}" alt="팔로워유저이미지">
+                            {% if follower.level == 5 %}
+                              <img class="level5--img" src="{% static 'img/crown.png' %}" alt="level5">
                             {% endif %}
                           {% else %}
-                            <img class="profile__follow--img {% if level == 2 %}level2 {% elif level == 3 %}level3 {% elif level == 4 %}level4 {% elif level == 5 %} level5{% endif %}" src="{% static 'img/profile_no_img.png' %}" alt="유저대체이미지">
-                            {% if level == 5 %}
-                              <img class="level5--img" src="{% static 'img/level5.png' %}" alt="level5">
+                            <img class="profile__follow--img {% if follower.level == 2 %}level2 {% elif follower.level == 3 %}level3 {% elif follower.level == 4 %}level4 {% elif follower.level == 5 %} level5{% endif %}" src="{% static 'img/profile_no_img.png' %}" alt="유저대체이미지">
+                            {% if follower.level == 5 %}
+                              <img class="level5--img" src="{% static 'img/crown.png' %}" alt="level5">
                             {% endif %}
                           {% endif %}
                         </div>
@@ -303,11 +332,11 @@
           </div>
         </div>
 
-        {% comment %} 팔로윙 목록 {% endcomment %}
+        {% comment %} 팔로잉 목록 {% endcomment %}
         <div class="profile__content5" style="display: none;">
           <div class="profile__content5--following">
             <div class="profile__content5--followingtext">
-              <p>팔로윙</p>
+              <p>팔로잉</p>
             </div>
             <div class="profile__content5--followingcontent">
               {% if person.followings.all %}
@@ -316,15 +345,15 @@
                     <div class="profile__follow--item">
                       <a class="d-flex flex-row" href="{% url 'accounts:profile' following.pk %}">
                         <div class="profile__follow--imgbox">
-                          {% if following.profile %}
-                            <img class="profile__follow--img {% if level == 2 %}level2 {% elif level == 3 %}level3 {% elif level == 4 %}level4 {% elif level == 5 %} level5{% endif %}" src="{{ following.profile }}" alt="팔로윙유저이미지">
-                            {% if level == 5 %}
-                              <img class="level5--img" src="{% static 'img/level5.png' %}" alt="level5">
+                          {% if following.profile_img %}
+                            <img class="profile__follow--img {% if following.level == 2 %}level2 {% elif following.level == 3 %}level3 {% elif following.level == 4 %}level4 {% elif following.level == 5 %} level5{% endif %}" src="{{ following.profile_img.url }}" alt="팔로잉유저이미지">
+                            {% if following.level == 5 %}
+                              <img class="level5--img" src="{% static 'img/crown.png' %}" alt="level5">
                             {% endif %}
                           {% else %}
-                            <img class="profile__follow--img {% if level == 2 %}level2 {% elif level == 3 %}level3 {% elif level == 4 %}level4 {% elif level == 5 %} level5{% endif %}" src="{% static 'img/profile_no_img.png' %}" alt="">
-                            {% if level == 5 %}
-                              <img class="level5--img" src="{% static 'img/level5.png' %}" alt="level5">
+                            <img class="profile__follow--img {% if following.level == 2 %}level2 {% elif following.level == 3 %}level3 {% elif following.level == 4 %}level4 {% elif following.level == 5 %} level5{% endif %}" src="{% static 'img/profile_no_img.png' %}" alt="">
+                            {% if following.level == 5 %}
+                              <img class="level5--img" src="{% static 'img/crown.png' %}" alt="level5">
                             {% endif %}
                           {% endif %}
                         </div>
@@ -346,7 +375,7 @@
                   {% endfor %}
                 </div>
               {% else %}
-                <p class="profile__content--nonewrite">팔로윙이 없습니다.</p>
+                <p class="profile__content--nonewrite">팔로잉이 없습니다.</p>
               {% endif %}
             </div>
           </div>

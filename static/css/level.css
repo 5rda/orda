@@ -1,0 +1,79 @@
+.levelname {
+  font-size: 12px;
+  color: #777777;
+  margin-bottom: 5px;
+}
+
+.level5name {
+  font-size: 12px;
+  background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 5px;
+}
+
+/* level border */
+
+.level2-lg {
+  border: 3px solid yellow !important;
+  z-index: 2;
+}
+
+.level3-lg {
+  border: 3px solid green !important;
+  z-index: 2;
+}
+
+.level4-lg {
+  border: 3px solid red !important;
+  z-index: 2;
+}
+
+.level5-lg {
+  background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+  border: 3px solid transparent;
+  z-index: 2;
+}
+
+.level2 {
+  border: 2px solid yellow !important;
+  z-index: 2;
+}
+
+.level3 {
+  border: 2px solid green !important;
+  z-index: 2;
+}
+
+.level4 {
+  border: 2px solid red !important;
+  z-index: 2;
+}
+
+.level5 {
+  background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+  border: 2px solid transparent;
+  z-index: 2;
+}
+
+.levelname--img {
+  width: 15px;
+  height: 15px;
+  margin-right: 5px;
+}
+
+.level5--img-lg {
+  position: absolute;
+  right: 0;
+  top: 0;
+  transform: translate(0%, -50%) rotate(28deg);
+}
+
+.level5--img {
+  position: absolute;
+  width: 21.5px;
+  height: 21.5px;
+  right: 0;
+  top: 0;
+  transform: translate(0%, -50%) rotate(28deg);
+}
