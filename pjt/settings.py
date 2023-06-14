@@ -27,7 +27,7 @@ if os.name == 'nt':
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-2u9iww_4r51rnnut+yteic_yc#%mnh!pc3utd*0vy+_kc&3hdt'
+SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -43,7 +43,7 @@ INSTALLED_APPS = [
 
     'django.contrib.gis',
 
-    'debug_toolbar',
+    # 'debug_toolbar',
 
     'allauth',
     'allauth.account',
@@ -74,7 +74,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
 
     'posts.notification_middleware.NotificationMiddleware',
     'accounts.notification_middleware.NotificationMiddleware',
@@ -190,12 +190,12 @@ CKEDITOR_UPLOAD_PATH = 'uploads/'
 CKEDITOR_IMAGE_BACKEND = 'pillow'
 
 
-# debug_toolbar 관련
-INTERNAL_IPS = [
-    # ...
-    "127.0.0.1",
-    # ...
-]
+# # debug_toolbar 관련
+# INTERNAL_IPS = [
+#     # ...
+#     "127.0.0.1",
+#     # ...
+# ]
 
 # 이메일 관련
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
