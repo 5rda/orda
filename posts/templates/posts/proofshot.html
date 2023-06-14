@@ -5,6 +5,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
 {% endblock style %}
 {% block content %}
+<div style="padding: 20px 60px;">
   <div class="container my-12 mx-auto px-4 md:px-12">
     <div class="flex flex-wrap -mx-1 lg:-mx-4">
       {% for post in image_posts %}
@@ -38,6 +39,7 @@
         {% endfor %}
       </div>
   </div>
+</div>
 {% endblock content %}
 {% block javascript %}
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>

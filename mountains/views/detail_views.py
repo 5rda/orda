@@ -164,6 +164,7 @@ class MountainDetailView(LoginRequiredMixin, DetailView):
                 items = json.loads(response_body)["items"]
                 for item in items:
                     item['title'] = item['title'].replace('&apos;', "'")
+                    item['title'] = item['title'].replace('&quot;', "\"")
                     item['title'] = item['title'].replace('<b>', "")
                     item['title'] = item['title'].replace('</b>', "")
                 result.extend(items)
