@@ -20,7 +20,7 @@ from .models import Notification
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.core.files.temp import NamedTemporaryFile
-import urllib.request
+from django.core.files.base import ContentFile
 
 
 def login(request):
@@ -292,8 +292,13 @@ def naver_callback(request):
                     user.email = user_info['response']['email']
 
                 if 'profile_image' in user_info['response']:
-                    user.profile_img = user_info['response']['profile_image']
-
+                    profile_image_url = user_info['response']['profile_image']
+                    # 앞부분을 잘라냄
+                    filename = profile_image_url.replace('https://phinf.pstatic.net/contact/', '')
+                    response = requests.get(profile_image_url)
+                    if response.status_code == 200:
+                        file_content = ContentFile(response.content)
+                        user.profile_img.save(filename, file_content, save=True)
                 user.save()
                 auth_login(request, user)
                 return redirect('accounts:update')
