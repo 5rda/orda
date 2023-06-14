@@ -50,7 +50,7 @@ def login(request):
 @login_required
 def logout(request):
     auth_logout(request)
-    return render(request, 'pjt/index.html')
+    return render(request, 'pjt/mainindex.html')
 
 
 def signup(request):
@@ -163,7 +163,7 @@ def delete(request):
     if request.method == 'POST':
         request.user.delete()
         auth_logout(request)
-        return render(request, 'pjt/index.html')
+        return render(request, 'pjt/mainindex.html')
     return render(request, 'accounts/delete.html')
 
 
