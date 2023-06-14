@@ -1,6 +1,7 @@
 {% load static %}
 {% load custom_filters %}
 <link rel="stylesheet" href="{% static 'css/base.css' %}">
+<link rel="stylesheet" href="{% static 'css/level.css' %}">
 <style>
   a {
     text-decoration: none;
@@ -69,11 +70,19 @@
               </div>
               <div class="dropdown">
                 <button class="btn-outline-light " style="width: 50px;" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  {% if request.user.profile_img  %}
-                    <img class="header__profile" src="{{ request.user.profile_img.url }}" alt="{{ post.user }}프로필">
-                  {% else %}
-                    <img class="header__profile" src="{% static 'img/profile_no_img.png' %}" alt="no">
-                  {% endif %}
+                  <div class="header__profilebox">
+                    {% if request.user.profile_img  %}
+                      <img class="header__profile {% if request.user.level == 2 %}level2 {% elif request.user.level == 3 %}level3 {% elif request.user.level == 4 %}level4 {% elif request.user.level == 5 %}level5 {% endif %}" src="{{ request.user.profile_img.url }}" alt="{{ post.user }}프로필">
+                      {% if request.user.level == 5 %}
+                        <img class="level5--img" src="{% static 'img/crown.png' %}" alt="level5">
+                      {% endif %}
+                    {% else %}
+                      <img class="header__profile {% if request.user.level == 2 %}level2 {% elif request.user.level == 3 %}level3 {% elif request.user.level == 4 %}level4 {% elif request.user.level == 5 %}level5 {% endif %}" src="{% static 'img/profile_no_img.png' %}" alt="no">
+                      {% if request.user.level == 5 %}
+                        <img class="level5--img" src="{% static 'img/crown.png' %}" alt="level5">
+                      {% endif %}
+                    {% endif %}
+                  </div>
                 </button>
                 <ul class="dropdown-menu">
                   <li><a class="dropdown-item {% if active_button_id == '마이페이지' %}active-button{% endif %}" href="{% url 'accounts:profile' user.pk %}" >마이페이지</a></li>

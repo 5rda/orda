@@ -1,6 +1,5 @@
 // 버튼 요소들을 선택합니다.
 const reviewButton = document.querySelector('.profile__user--review');
-console.log(reviewButton)
 const bookmarkButton = document.querySelector('.profile__user--bookmark');
 const likeButton = document.querySelector('.profile__user--like');
 const followerButton = document.querySelector('.profile__user--followercount');
@@ -137,7 +136,7 @@ if (followBtn) {
   followBtn.addEventListener('click', () => {
     const personId = followBtn.getAttribute('data-person');
     axios.defaults.headers.common['X-CSRFToken'] = csrftoken;  // CSRF 토큰 설정
-    axios.post(`/accounts/profile/${personId}/follow`)
+    axios.post(`/accounts/profile/${personId}/follow/`)
       .then((response) => {
         const isFollowed = response.data.is_followed
         // 서버로부터의 응답을 처리
@@ -175,7 +174,7 @@ if (followBtn2) {
   followBtn2.addEventListener('click', () => {
     const personId = followBtn2.getAttribute('data-person');
     axios.defaults.headers.common['X-CSRFToken'] = csrftoken;  // CSRF 토큰 설정
-    axios.post(`/accounts/profile/${personId}/follow`)
+    axios.post(`/accounts/profile/${personId}/follow/`)
       .then((response) => {
         const isFollowed = response.data.is_followed
         // 서버로부터의 응답을 처리
@@ -204,7 +203,7 @@ if (followBtn3) {
   followBtn3.addEventListener('click', () => {
     const personId = followBtn3.getAttribute('data-person');
     axios.defaults.headers.common['X-CSRFToken'] = csrftoken;  // CSRF 토큰 설정
-    axios.post(`/accounts/profile/${personId}/follow`)
+    axios.post(`/accounts/profile/${personId}/follow/`)
       .then((response) => {
         const isFollowed = response.data.is_followed
         // 서버로부터의 응답을 처리

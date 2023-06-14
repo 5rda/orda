@@ -10,6 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
 <link rel="stylesheet" href="{% static 'css/mountains_detail.css' %}">
+<link rel="stylesheet" href="{% static 'css/level.css' %}">
 <style>
   {% comment %} /* 모달 스타일 */
   .modal {
@@ -344,9 +345,15 @@
               <a href="{% url 'accounts:profile' review.user.pk %}">
                 <div class="mountain__detail--reviewimgbox">
                   {% if review.user.profile_img %}
-                    <img class="mountain__detail--reviewimg" src="{{ review.user.profile_img.url }}" alt="리뷰유저이미지">
+                    <img class="mountain__detail--reviewimg {% if review.user.level == 2 %}level2 {% elif review.user.level == 3 %}level3 {% elif review.user.level == 4 %}level4 {% elif review.user.level == 5 %}level5 {% endif %}" src="{{ review.user.profile_img.url }}" alt="리뷰유저이미지">
+                    {% if review.user.level == 5 %}
+                      <img class="level5--img" src="{% static 'img/crown.png' %}" alt="level5">
+                    {% endif %}
                   {% else %}
-                    <img class="mountain__detail--reviewimg" src="{% static 'img/profile_no_img.png' %}" alt="대체이미지">
+                    <img class="mountain__detail--reviewimg {% if review.user.level == 2 %}level2 {% elif review.user.level == 3 %}level3 {% elif review.user.level == 4 %}level4 {% elif review.user.level == 5 %}level5 {% endif %}" src="{% static 'img/profile_no_img.png' %}" alt="대체이미지">
+                    {% if review.user.level == 5 %}
+                      <img class="level5--img" src="{% static 'img/crown.png' %}" alt="level5">
+                    {% endif %}
                   {% endif %}
                 </div>
               </a>
@@ -426,7 +433,7 @@
                     {% if first_image_url %}
                       <img class="mountain__detail--atpostsimg" src="{{ first_image_url }}" alt="썸네일">
                     {% else %}
-                      <img class="mountain__detail--atpostsimg" src="{% static 'img/nav_logo.png' %}" alt="대체이미지">
+                      <img class="mountain__detail--atpostsimg" src="{% static 'img/Noimage.png' %}" alt="대체이미지">
                     {% endif %}
                   {% endwith %}
                 </div>
@@ -435,9 +442,15 @@
                   <div class="mountain__detail--atpostsuser mb-2">
                     <div class="mountain__detail--atpostsuserimgbox">
                       {% if post.user.profile_img %}
-                        <img class="mountain__detail--atpostsuserimg" src="{{ post.user.profile_img.url }}" alt="유저프로필">
+                        <img class="mountain__detail--atpostsuserimg {% if post.user.level == 2 %}level2 {% elif post.user.level == 3 %}level3 {% elif post.user.level == 4 %}level4 {% elif post.user.level == 5 %}level5 {% endif %}" src="{{ post.user.profile_img.url }}" alt="유저프로필">
+                        {% if post.user.level == 5 %}
+                          <img class="level5--img" src="{% static 'img/crown.png' %}" alt="level5">
+                        {% endif %}
                       {% else %}
-                        <img class="mountain__detail--atpostsuserimg" src="{% static 'img/profile_no_img.png' %}" alt="대체프로필">
+                        <img class="mountain__detail--atpostsuserimg {% if post.user.level == 2 %}level2 {% elif post.user.level == 3 %}level3 {% elif post.user.level == 4 %}level4 {% elif post.user.level == 5 %}level5 {% endif %}" src="{% static 'img/profile_no_img.png' %}" alt="대체프로필">
+                        {% if post.user.level == 5 %}
+                          <img class="level5--img" src="{% static 'img/crown.png' %}" alt="level5">
+                        {% endif %}
                       {% endif %}
                     </div>
                     <p class="mountain__detail--atpostsusername mb-1 font-normal text-sm text-gray-700 dark:text-gray-400">{{ post.user.nickname }}</p>

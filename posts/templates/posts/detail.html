@@ -8,6 +8,7 @@
   <script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/translations/ko.js"></script> {% endcomment %}
 <link rel="stylesheet" href="{% static 'css/posts_detail.css' %}">
 <link rel="stylesheet" href="{% static 'css/posts_index.css' %}">
+<link rel="stylesheet" href="{% static 'css/level.css' %}">
 {% comment %} <link rel="stylesheet" href="{% static 'css/posts_create.css' %}"> {% endcomment %}
 {% endblock style %}
 {% block content %}
@@ -24,11 +25,19 @@
     <div class="post__userdata--box">
       <div class="me-3">
         <a href="{% url 'accounts:profile' post.user.pk %}">
-          {% if post.user.profile_img %}
-            <img class="user__img" src="{{ post.user.profile_img.url }}" alt="{{ post.user }}프로필">
-          {% else %}
-            <img class="user__img" src="{% static 'img/profile_no_img.png' %}" alt="no">
-          {% endif %}
+          <div class="user__imgbox">
+            {% if post.user.profile_img %}
+              <img class="user__img {% if post.user.level == 2 %}level2 {% elif post.user.level == 3 %}level3 {% elif post.user.level == 4 %}level4 {% elif post.user.level == 5 %}level5 {% endif %}" src="{{ post.user.profile_img.url }}" alt="{{ post.user }}프로필">
+              {% if post.user.level == 5 %}
+                <img class="level5--img" src="{% static 'img/crown.png' %}" alt="level5">
+              {% endif %}
+            {% else %}
+              <img class="user__img {% if post.user.level == 2 %}level2 {% elif post.user.level == 3 %}level3 {% elif post.user.level == 4 %}level4 {% elif post.user.level == 5 %}level5 {% endif %}" src="{% static 'img/profile_no_img.png' %}" alt="no">
+              {% if post.user.level == 5 %}
+                <img class="level5--img" src="{% static 'img/crown.png' %}" alt="level5">
+              {% endif %}
+            {% endif %}
+          </div>
       </div>
       <div class="post__user--box">
         <p style="font-weight: bold;">{{ post.user.nickname  }}</p>
@@ -78,7 +87,9 @@
       {% csrf_token %} 
       <div class="flex--d-row flex--align-c container">
         <div class="col-1">
-          <img src="{% static 'img/profile_no_img.png' %}" class="user__img" alt="no">
+          <div class="user__imgbox">
+            <img src="{% static 'img/profile_no_img.png' %}" class="user__img" alt="no">
+          </div>
         </div>
         <div class="comment__inputbox rounded col-11">
           <div id="comment-content-id" style="width: 90%;">{{ postcomment_form.content }}</div>
@@ -96,10 +107,18 @@
               {% comment %} 프로필 이미지 {% endcomment %}
               <a href="{% url 'accounts:profile' postcomment.user.pk %}">
                 {% if postcomment.user.profile_img %}
-                <img class="user__img" src="{{ postcomment.user.profile_img.url }}" alt="{{ post.user  }}프로필">
+                <div class="user__imgbox">
+                  <img class="user__img {% if postcomment.user.level == 2 %}level2 {% elif postcomment.user.level == 3 %}level3 {% elif postcomment.user.level == 4 %}level4 {% elif postcomment.user.level == 5 %}level5 {% endif %}" src="{{ postcomment.user.profile_img.url }}" alt="{{ post.user  }}프로필">
+                  {% if postcomment.user.level == 5 %}
+                    <img class="level5--img" src="{% static 'img/crown.png' %}" alt="level5">
+                  {% endif %}
                 {% else %}
-                <img class="user__img" src="{% static 'img/profile_no_img.png' %}" alt="no">
+                  <img class="user__img {% if postcomment.user.level == 2 %}level2 {% elif postcomment.user.level == 3 %}level3 {% elif postcomment.user.level == 4 %}level4 {% elif postcomment.user.level == 5 %}level5 {% endif %}" src="{% static 'img/profile_no_img.png' %}" alt="no">
+                  {% if postcomment.user.level == 5 %}
+                    <img class="level5--img" src="{% static 'img/crown.png' %}" alt="level5">
+                  {% endif %}
                 {% endif %}
+                </div>
               </a>
             </div>
             <div class="flex--d-col col-11">
@@ -203,10 +222,16 @@
                   <p class="postindex__post--title">{{ post.title }}</p>
                   <div class="postindex__post--user">
                     <div class="postindex__post--userimgbox">
-                      {% if post.user.profile %}
-                        <img class="postindex__post--userimg" src="{{ post.user.profile }}" alt="유저프로필">
+                      {% if post.user.profile_img %}
+                        <img class="postindex__post--userimg {% if post.user.level == 2 %}level2 {% elif post.user.level == 3 %}level3 {% elif post.user.level == 4 %}level4 {% elif post.user.level == 5 %}level5 {% endif %}" src="{{ post.user.profile_img.url }}" alt="유저프로필">
+                        {% if post.user.level == 5 %}
+                          <img class="level5--img" src="{% static 'img/crown.png' %}" alt="level5">
+                        {% endif %}
                       {% else %}
-                        <img class="postindex__post--userimg" src="{% static 'img/profile_no_img.png' %}" alt="대체프로필">
+                        <img class="postindex__post--userimg {% if post.user.level == 2 %}level2 {% elif post.user.level == 3 %}level3 {% elif post.user.level == 4 %}level4 {% elif post.user.level == 5 %}level5 {% endif %}" src="{% static 'img/profile_no_img.png' %}" alt="대체프로필">
+                        {% if post.user.level == 5 %}
+                          <img class="level5--img" src="{% static 'img/crown.png' %}" alt="level5">
+                        {% endif %}
                       {% endif %}
                     </div>
                     <p class="postindex__post--username">{{ post.user.username }}</p>
