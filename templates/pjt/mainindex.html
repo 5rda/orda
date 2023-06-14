@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+    <script src="https://unpkg.com/scroll-out/dist/scroll-out.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'css/mainindex.css' %}">
+  <style>
+  </style>
+</head>
+<body>
+  <nav class='nav__box' id='main-nav'>
+    <header style="position: sticky; top: 0; z-index: 1000;">
+      <div style="height: 100%; background-color: #FFFFFF; border-bottom:#0B6623 solid 10px;">
+        <div class="mx-auto w-100 p-4 py-3 py-2-lg" style="max-width: 1400px;">
+          <div class="d-flex justify-content-between">
+            <div class="d-flex">
+              <div style="height:75px;">
+                <a href="{% url 'mountains:mountain_list' %}"><img class='header__logo--img small--hidden' src="{% static 'img/logo_long.png' %}" alt="ordalogo"></a>
+              </div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center align-items-xl-end flex-column flex-xl-row">
+              <div class="d-flex align-items-end fs-5 hearder__btn--box" >
+                <a href="{% url 'mountains:search' %}" class="{% if '/search/' in request.path %} active-button {% endif %} btn--hover mb-1 header__btn--margin">탐색</a>
+                <a href="{% url 'mountains:mountain_list' %}" class="{% if request.resolver_match.url_name == 'mountain_list' %} active-button {% endif %} btn--hover mb-1 header__btn--margin">100대 명산</a>
+                <a href="{% url 'mountains:course_all_list' %}" class="{% if '/courses/' in request.path %} active-button {% endif %} btn--hover mb-1 header__btn--margin">등산로</a>
+                <a href="{% url 'posts:index' %}" class="{% if request.resolver_match.view_name == 'posts:index' %} active-button {% endif %} btn--hover mb-1 header__btn--margin">마이코스</a>
+                <a href="{% url 'posts:proofshot' %}" class="{% if '/proofshot/' in request.path %} active-button {% endif %} btn--hover mb-1 header__btn--margin">인증샷</a>
+              </div>
+              <div class="d-flex align-items-end hearder__search--box">
+                <div class="rounded-pill d-flex mb-1" style="border:var(--main-color) 3px solid; background-color:white">
+                  <i class="bi bi-search align-self-center ps-3"></i>  
+                  <form action="{% url 'mountains:mountain_list' %}" method="POST">
+                    {% csrf_token %}
+                    <input class="rounded-pill header__search--text py-2 ps-4 pe-5"  type="text" name="search_query" placeholder="무엇을 찾으시나요?" style="width: 400px">
+                    <button type="submit" hidden></button>
+                  </form>
+                </div>
+              </div>
+            </div>
+              <div class="d-flex align-items-end mb-2">
+                <div class="d-flex">
+                  {% if user.is_authenticated %}
+                  <form action="{% url 'accounts:logout' %}" method="POST">
+                    {% csrf_token %}
+                    <button id="로그아웃" type="submit" class="fs-5">로그아웃</button>
+                  </form>
+                  {% else %}
+                    <a id="로그인" class="{% if active_button_id == '로그인' %}active-button{% endif %} fs-5 me-3 black__text" href="{% url 'accounts:login' %}">로그인</a>
+                    <a id="회원가입" class="{% if active_button_id == '회원가입' %}active-button{% endif %} fs-5 black__text" href="{% url 'accounts:signup' %}">회원가입</a>
+                  {% endif %}                  
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    </header>
+  </nav>
+
+  
+  
+  <section class="content-section" data-scroll>
+    <figure class="figure"><img src="{% static 'img/5.png' %}" /></figure>
+    
+    <div class="content">
+      <header class="header">
+        <h2 class="heading"><br> 누구나 <br> 등산을 즐길 수 있도록<br/>당신에게 맞는 길을 찾아주는 <br><br> 당신의 산 친구</h2>
+        
+      </header>
+      <p class="paragraph">
+        <a href="#">"오르다"</a>        
+      </p>
+    </div>
+  </section>
+  
+  <section class="content-section" data-scroll>
+    <figure class="figure"><img src="{% static 'img/2.png' %}" /></figure>
+    <div class="content">
+      <header class="header">
+        <div class="subheading2"> <br> 산을 향한 설레는 <br> <strong class="strong">첫 발걸음,</strong> <br>가볍게 내디딜 수 있도록 저희가 여러분의 짐을 덜어드릴게요.</div>
+        <h2 class="heading"> 지역과 원하는 테마를 선택하세요. <br> 당신에게 딱 맞는 산을 <br> 선별해드립니다. </h2>
+    </header>
+    <p class="paragraph">
+      <a href="#">탐색하기</a>
+    </p>
+  </div>
+</section>
+
+<section class="content-section" data-scroll>
+  <figure class="figure"><img src="{% static 'img/3.png' %}" /></figure>
+  <div class="content">
+    <header class="header">
+      <div class="subheading2"><br> <br> <br> "롤 챔피언 오른이 아닙니다." </div>
+      <h2 class="heading">하나 하나 깃발을 꽂을 때마다 <br> 당신의 오른 기억을 되새기세요. </h2>
+    </header>
+    <p class="paragraph">
+      <a href="#">오른기억</a>
+    </p>
+  </div>
+</section>
+
+<section class="content-section" data-scroll>
+  <figure class="figure"><img src="{% static 'img/1.png' %}" /></figure>
+  <div class="content">
+    <header class="header">
+      <div class="subheading2"><br> 등산은 길이 끝나는 데서부터 시작한다
+        <br> - Alain de Chatellus</div>
+        <h2 class="heading">정상에 도착하셨나요? <br/>당신의 기쁨을 모두와 공유하세요. <br> 거기서부터 <br> 또다른 길의 시작입니다. </h2>
+      </header>
+      <p class="paragraph">
+        <a href="#">마이코스</a>
+      </p>
+    </div>
+</section>
+
+<section class="content-section" data-scroll>
+  <figure class="figure"><img src="{% static 'img/4.png' %}" /></figure>
+  <div class="content">
+    <header class="header">
+      <div class="subheading2"> <br> 정상을 오른 <br>  등산인들의 행복한 미소를 함께 보아요. </div>
+      <h2 class="heading">여러분의 등산 동료는  <br> 전국 어디에나 있답니다.</h2>
+    </header>
+    <p class="paragraph">
+      <!-- 전국 어디에나 있답니다. -->
+      <br>
+      <a href="#">인증샷</a>
+      
+    </p>
+  </div>
+</section>
+{% include 'footer.html' %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+<script src="{% static 'js/mainindex.js' %}"></script>
+</body>
+</html>
