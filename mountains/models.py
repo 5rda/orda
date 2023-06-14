@@ -113,23 +113,3 @@ class Review(models.Model):
         db_table = 'mountains_review'
     def __str__(self):
         return self.content
-
-
-# class CourseDetail(models.Model):
-#     id = models.AutoField(primary_key=True)
-#     crs_name = models.CharField(max_length=100)
-#     crs_name_detail = models.ForeignKey(Course, on_delete=models.CASCADE, to_field="crs_name_detail", db_column="crs_name_detail")
-#     is_waypoint = models.BooleanField(default=False)
-#     waypoint_name = models.CharField(max_length=50)
-#     waypoint_category = models.CharField(max_length=256, db_column='category')
-#     track = models.FloatField( db_column="track_se_1")
-#     geom = models.GeometryField()
-
-#     class Meta:
-#         managed = False
-#         db_table = 'mountains_coursedetail'
-#         ordering = ['crs_name_detail', 'track']
-
-#     def __str__(self):
-#         return str(self.crs_name_detail)
-

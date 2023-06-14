@@ -42,7 +42,7 @@ class MountainDetailView(LoginRequiredMixin, DetailView):
 
         # 기타
         now_weather_data = self.get_weather_forecast()
-        print(now_weather_data)
+
         tem = now_weather_data['기온']
         hum = now_weather_data['습도']
         sky = now_weather_data['하늘상태']
@@ -139,10 +139,7 @@ class MountainDetailView(LoginRequiredMixin, DetailView):
             'fine_dust': fine_dust,
             'ozone': ozone,
         }
-        # json_data = json.dumps(data, indent=4, sort_keys=True, ensure_ascii=False)
-        # file_path = os.path.join(settings.STATICFILES_DIRS[0], 'course.json')
-        # with open(file_path, 'w', encoding='utf-8') as file:
-        #     file.write(json_data)
+        
         return context
     
     def news(self):
