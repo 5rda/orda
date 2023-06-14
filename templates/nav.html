@@ -208,7 +208,7 @@
       success: function(response) {
         console.log('알림을 삭제했습니다.');
         removeNotificationFromList(notificationId);
-        updateNotificationCount(-1); 
+        updateNotificationCount(-1);
       },
       error: function(xhr) {
         console.log(xhr.responseText);
@@ -239,9 +239,9 @@
     var notificationCount = parseInt(notificationCountElement.text());
     notificationCount += change;
     if (notificationCount > 0) {
-      notificationCountElement.html('<span id="fill"><i class="bi bi-bell-fill" style="color:var(--green-btn); font-size: 38px; margin-right: -15px;"></i><i class="bi bi-dot" style="vertical-align: top; font-size: 30px; color: #CC0000;"></i></span>');
+      notificationCountElement.html('<span id="fill"><i class="bi bi-bell-fill" style="color:var(--green-btn); font-size: 38px; margin-right: -15px;"></i><i class="bi bi-dot" style="vertical-align: top; font-size: 30px; color: #CC0000;"></i><div style="display: none;">' + notificationCount + '</div></span>');
     } else {
-      notificationCountElement.html('<span id="empty"><i class="bi bi-bell" style="color:var(--green-btn); font-size: 38px;"></i></span>');
+      notificationCountElement.html('<span id="empty"><i class="bi bi-bell" style="color:var(--green-btn); font-size: 38px;"></i><div style="display: none;">' + notificationCount + '</div></span>');
     }
   }
 </script>
