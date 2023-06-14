@@ -1,4 +1,4 @@
-import json, urllib.request, requests, datetime, math
+import json, urllib.request, requests, datetime, math, os
 from mountains.models import *
 from mountains.forms import ReviewCreationForm
 from datetime import date, datetime, timedelta
@@ -146,8 +146,8 @@ class MountainDetailView(LoginRequiredMixin, DetailView):
         return context
     
     def news(self):
-        client_id = 'ZsAfwEkHHvAjK1vzwLv1'
-        client_secret = '6rMFVcImpz'
+        client_id = os.environ['NAVER_NEWS_CLIENT_ID']
+        client_secret = os.environ['NAVER_NEWS_SECRET']
         query = self.get_object().name
         encText = urllib.parse.quote(query.encode('utf-8'))
         print(encText)
@@ -183,7 +183,7 @@ class MountainDetailView(LoginRequiredMixin, DetailView):
         # API 요청을 위한 URL과 파라미터 설정
         url = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst"
 
-        serviceKey = "pY3s%2Fd1LhFkVDzZcyCuSavULc%2FJZVnzLRpdbmNUk6lD6Akcsw40HeR%2Bjop2DicS0L3UilYgnHE%2F8MKqMDTs2NQ%3D%3D"
+        serviceKey = os.environ['WEATHER_KEY']
         serviceKeyDecoded = unquote(serviceKey, 'UTF-8')
 
         now = datetime.now()
@@ -326,7 +326,7 @@ class MountainDetailView(LoginRequiredMixin, DetailView):
         # API 요청을 위한 URL과 파라미터 설정
         url = "http://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getMinuDustFrcstDspth"
 
-        serviceKey = "pY3s%2Fd1LhFkVDzZcyCuSavULc%2FJZVnzLRpdbmNUk6lD6Akcsw40HeR%2Bjop2DicS0L3UilYgnHE%2F8MKqMDTs2NQ%3D%3D"
+        serviceKey = os.environ['AIR_KEY']
         serviceKeyDecoded = unquote(serviceKey, 'UTF-8')
 
         queryParams = '?' + urlencode({ 

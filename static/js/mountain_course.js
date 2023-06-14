@@ -1,12 +1,15 @@
+
+
 function loadKakaoMapScript(callback) {
   if (window.kakao) {
       // 이미 카카오맵 API가 로드되어 있는 경우
       callback();
   } else {
       // 카카오맵 API 로드
+      const API_KEY = config.apikey;
       var script = document.createElement("script");
       script.type = "text/javascript";
-      script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=d39fcd60ffdc96ae99454337f5e45a16&libraries=services&autoload=false";
+      script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${API_KEY}&libraries=services&autoload=false`;
       document.head.appendChild(script);
       
       script.onload = function () {
@@ -16,6 +19,7 @@ function loadKakaoMapScript(callback) {
       };
   }
 }
+
 
 function toggleWaypoints(courseId) {
   var checkbox = document.getElementById('waypoint-checkbox-' + courseId);
