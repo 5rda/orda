@@ -13,14 +13,16 @@
 {% block content %}
 <div class="post__wrap">
   {% comment %} 제목 {% endcomment %}
+  <a href="{% url 'mountains:mountain_detail' pk=post.mountain.pk %}" class="ms-2 mtn__title">{{ post.mountain.name }}</a>
   <div class="title__wrap">
     {{ post.title }}
   </div>
 
+
   {% comment %} 유저 정보 + 팔로우 {% endcomment %}
   <div class="post__userdata__wrap">
     <div class="post__userdata--box">
-      <div>
+      <div class="me-3">
         <a href="{% url 'accounts:profile' post.user.pk %}">
           {% if post.user.profile_img %}
             <img class="user__img" src="{{ post.user.profile_img.url }}" alt="{{ post.user }}프로필">
@@ -29,22 +31,19 @@
           {% endif %}
       </div>
       <div class="post__user--box">
-        <p style="font-weight: bold;">{{ post.user }}</p>
+        <p style="font-weight: bold;">{{ post.user.nickname  }}</p>
         </a>
-      <div class="post__data--box">
-        <p> {{ post.updated_at|date:'Y. m. d. h. i'}} &nbsp;</p>         
-        {% if request.user == post.user %}
-        <a href="{% url 'posts:update' post.pk %}">수정 |&nbsp;</a>
-        <form action="{% url 'posts:delete' post.pk %}" method="POST" id="delete-form">
-          {% csrf_token %}
-          <input type="submit" value="삭제">
-        </form>
-        {% endif %}
-        
+        <div class="post__data--box">
+          <p> {{ post.updated_at|date:'Y. m. d. h. i'}} &nbsp;</p>         
+          {% if request.user == post.user %}
+          <a href="{% url 'posts:update' post.pk %}">수정 |&nbsp;</a>
+          <form action="{% url 'posts:delete' post.pk %}" method="POST" id="delete-form">
+            {% csrf_token %}
+            <input type="submit" value="삭제">
+          </form>
+          {% endif %}    
+        </div>
       </div>
-      <p><a href="{% url 'mountains:mountain_detail' pk=post.mountain.pk %}">[{{ post.mountain.name }}]</a></p>
-      </div>
-      
     </div>
     
     <div>
@@ -97,7 +96,7 @@
               {% comment %} 프로필 이미지 {% endcomment %}
               <a href="{% url 'accounts:profile' postcomment.user.pk %}">
                 {% if postcomment.user.profile_img %}
-                <img class="user__img" src="{{ postcomment.user.profile_img.url }}" alt="{{ post.user }}프로필">
+                <img class="user__img" src="{{ postcomment.user.profile_img.url }}" alt="{{ post.user  }}프로필">
                 {% else %}
                 <img class="user__img" src="{% static 'img/profile_no_img.png' %}" alt="no">
                 {% endif %}
@@ -105,7 +104,7 @@
             </div>
             <div class="flex--d-col col-11">
               <div class="flex--d-row flex--between">
-                <p style="font-weight:bold;">{{ postcomment.user.username }}</p>
+                <p style="font-weight:bold;">{{ postcomment.user.nickname  }}</p>
                 {% if request.user.is_authenticated and request.user == postcomment.user %}
                   <div class="flex--d-row text--subcolor">
                     <button class="edit-comment-button" data-comment-id="{{ postcomment.pk }}">수정  &nbsp;</button> 

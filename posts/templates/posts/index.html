@@ -3,11 +3,12 @@
 {% load custom_filters %}
 {% block style %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
+<link rel="stylesheet" href="owl/assets/owl.theme.default.min.css">
 <link rel="stylesheet" href="{% static 'css/posts_index.css' %}">
 
 {% endblock style %}
 {% block content %}
-<div style="padding: 20px 60px;">
+<div class="index__wrap">
   <div class="flex flex-row-reverse">
     <a href="{% url 'posts:create' %}" class="bg-[#A2E04E] hover:bg-[#47A945] text-white font-bold py-2 px-4 rounded">
       <i class="bi bi-pencil-square"></i>
@@ -17,7 +18,7 @@
   {% comment %} 조회순 {% endcomment %}
   <section style="margin-bottom: 120px;">
     <h1 class="postindex__Content--title">조회수가 높은 마이코스</h1>
-    <div class="owl-carousel" style="margin-bottom: 120px; padding: 0 100px;">
+    <div class="owl-carousel owl-theme" style="margin-bottom: 120px;">
       {% for post in view_posts|slice:":8" %}
         <div class="item">
           <div class="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
@@ -41,7 +42,7 @@
                 </form>
               </div>
               <div class="p-4 flex--col flex__align--between" style="height: 180px;">
-                <h5 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{ post.title }}</h5>
+                <h5 class="text-2xl font-bold title--wrap">{{ post.title }}</h5>
                 <div class="postindex__post--user mb-2">
                   <div class="postindex__post--userimgbox">
                     {% if post.user.profile_img %}
@@ -52,10 +53,7 @@
                   </div>
                   <p class="postindex__post--username mb-1 font-normal text-sm text-gray-700 dark:text-gray-400">{{ post.user.nickname }}</p>
                 </div>
-                <div class="flex--row flex__align--between">
-                  <div>
-                    <p style="color: #777777;">{{ post.created_at|date:"y. m. d" }}</p>
-                  </div>
+                <div class="likes__box">
                   <div class="flex--row">
                     <div class="flex--row pe-3">
                       <i class="bi bi-heart-fill pe-1" style="color:var(--red-color)"></i>
@@ -70,6 +68,9 @@
                       <p>{{post.view_count}}</p>
                     </div>
                   </div>
+                  <div>
+                    <p style="color: #777777;">{{ post.created_at|date:"y. m. d" }}</p>
+                  </div>
                 </div>
               </div>
             </a>
@@ -82,7 +83,7 @@
   {% comment %} 좋아요 많은 순 {% endcomment %}
   <section style="margin-bottom: 120px;">
     <h1 class="postindex__Content--title">좋아요가 많은 마이코스</h1>
-    <div class="owl-carousel" style="margin-bottom: 120px; padding: 0 100px;">
+    <div class="owl-carousel owl-theme" style="margin-bottom: 120px; ">
       {% for post in like_posts|slice:":8" %}
         <div class="item">
           <div class="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
@@ -106,7 +107,7 @@
                 </form>
               </div>
               <div class="p-4 flex--col flex__align--between" style="height: 180px;">
-                <h5 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{ post.title }}</h5>
+                <h5 class="text-2xl font-bold title--wrap">{{ post.title }}</h5>
                 <div class="postindex__post--user mb-2">
                   <div class="postindex__post--userimgbox">
                     {% if post.user.profile_img %}
@@ -117,10 +118,7 @@
                   </div>
                   <p class="postindex__post--username mb-1 font-normal text-sm text-gray-700 dark:text-gray-400">{{ post.user.nickname }}</p>
                 </div>
-                <div class="flex--row flex__align--between">
-                  <div>
-                    <p style="color: #777777;">{{ post.created_at|date:"y. m. d" }}</p>
-                  </div>
+                <div class="likes__box">
                   <div class="flex--row">
                     <div class="flex--row pe-3">
                       <i class="bi bi-heart-fill pe-1" style="color:var(--red-color)"></i>
@@ -135,6 +133,9 @@
                       <p>{{post.view_count}}</p>
                     </div>
                   </div>
+                  <div>
+                    <p style="color: #777777;">{{ post.created_at|date:"y. m. d" }}</p>
+                  </div>
                 </div>
               </div>
             </a>
@@ -145,18 +146,18 @@
   </section>
 
   <section style="margin-bottom: 120px;">
-    <h1 class="postindex__Content--title">전체 글<span style="color: var(--main-color); margin-left: 10px;">{{ posts|length }}</span></h1>  
+    <h1 class="postindex__Content--title2">전체 글<span style="color: var(--main-color); margin-left: 10px;">{{ posts|length }}</span></h1>  
     <div class="post-grid" id="postGrid">
       {% for post in posts %}
-        <div class="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 post-item" style="display: none;">
+        <div class="max-w-md bg-white border border-gray-200 rounded-lg shadow" style="display: block; min-width: 250px;">
           <!-- 글 내용을 표시하는 부분 -->
           <a href="{% url 'posts:detail' post.pk %}"  class="position--relative">
             <div class="postindex__post--imgbox">
               {% with first_image_url=post.content|get_first_image_from_content %}
                 {% if first_image_url %}
-                  <img class="postindex__post--img" src="{{ first_image_url }}" alt="썸네일">
+                  <img class="postindex__post--img"  src="{{ first_image_url }}" alt="썸네일">
                 {% else %}
-                  <img class="postindex__post--img" src="{% static 'img/Noimage.png' %}" alt="대체이미지">
+                  <img class="postindex__post--img"  src="{% static 'img/Noimage.png' %}" alt="대체이미지">
                 {% endif %}
               {% endwith %}
             </div>
@@ -169,12 +170,14 @@
                 {% endif %}
               </form>
             </div>
-            <div class="p-4 flex--col flex__align--between" style="height: 180px;">
-              <h5 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{ post.title }}</h5>
+            <div class="p-4 flex--col flex__align--between" style="height: 180px; width: 100%;">
+              <div style="width: 100%;">
+                <h5 class="text-2xl font-bold title--wrap" >{{ post.title }}</h5>
+              </div>
               <div class="postindex__post--user mb-2">
                 <div class="postindex__post--userimgbox">
                   {% if post.user.profile_img %}
-                    <img class="postindex__post--userimg" src="{{ post.user.profile_img.url }}" alt="유저프로필">
+                    <img class="postindex__post--userimg"  src="{{ post.user.profile_img.url }}" alt="유저프로필">
                   {% else %}
                     <img class="postindex__post--userimg" src="{% static 'img/profile_no_img.png' %}" alt="대체프로필">
                   {% endif %}
@@ -232,4 +235,25 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
 <script src="{% static 'js/posts_index.js' %}"></script>
+
+<script>
+  window.addEventListener('resize', adjustCardLayout);
+
+function adjustCardLayout() {
+  var cards = document.querySelectorAll('.max-w-sm');
+  cards.forEach(function(card) {
+    if (card.offsetWidth > 250) {
+      card.querySelector('.likes__box').style.flexDirection = 'row-reverse';
+      card.querySelector('.likes__box').style.justifyContent = 'space-between';
+      card.querySelector('.likes__box').style.textAlign = 'start';
+    } else {
+      card.querySelector('.likes__box').style.flexDirection = 'column';
+      card.querySelector('.likes__box').style.textAlign = 'center';
+    }
+  });
+}
+//adjustCardLayout();
+
+
+</script>
 {% endblock javascript %}

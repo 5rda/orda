@@ -22,7 +22,7 @@
   margin: 0px 200px;
   padding: 20px 0px;
   background-color: var(--background-color);
-  min-width: 450px; 
+  min-width: 360px; 
 }
 
 .title {
@@ -37,7 +37,7 @@
   /* background-color: var(--background-color); */
   padding: 30px 70px 30px 70px;
   margin: 0px 200px 100px;
-  min-width: 450px;    
+  min-width: 360px;    
 }
 
 .form__submitbtn {
@@ -85,6 +85,8 @@
 @media (max-width:660px) {
   .form__box{
     margin: 0px 0px 50px;
+    padding: 30px 40px;
+
   }
   .select__box--wrap {
     margin: 50px 0px 0px;
