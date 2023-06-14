@@ -108,6 +108,10 @@ th {
   width: 47%;
 }
 
+.mountains__detail--weatherlink:hover {
+  background-color: #DBDBDB;
+}
+
 .weather--wrap {
   display: flex;
   flex-direction: column;

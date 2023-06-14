@@ -135,53 +135,55 @@
   <section style="margin-bottom: 50px;">
     <div class="d-flex flex-row">
       <div class="mountains__detail--weather">
-        <div class="d-flex flex-row justify-content-between">
-          <div class="weather--wrap">
-            <div class="d-flex flex-row justify-content-center" style="height: 60%; margin-bottom: 14px;">
-              <div class="weather--sky">
-                {% if now_time in sun %}
-                  {% if sky == '1' %}
-                    <img class="weather--skyimg" src="{% static 'img/weather/sunny.png' %}" alt="아침맑음" title="맑음">
-                  {% elif sky == '3' %}
-                    <img class="weather--skyimg" src="{% static 'img/weather/suncloudy.png' %}" alt="아침구름많음" title="구름많음">
-                  {% elif sky == '4' %}
-                    <img class="weather--skyimg" src="{% static 'img/weather/overcast.png' %}" alt="흐림" title="흐림">
+        <a class="mountains__detail--weatherlink" href="{% url 'mountains:weather_forecast' mountain.pk %}">
+          <div class="d-flex flex-row justify-content-between">
+            <div class="weather--wrap">
+              <div class="d-flex flex-row justify-content-center" style="height: 60%; margin-bottom: 14px;">
+                <div class="weather--sky">
+                  {% if now_time in sun %}
+                    {% if sky == '1' %}
+                      <img class="weather--skyimg" src="{% static 'img/weather/sunny.png' %}" alt="아침맑음" title="맑음">
+                    {% elif sky == '3' %}
+                      <img class="weather--skyimg" src="{% static 'img/weather/suncloudy.png' %}" alt="아침구름많음" title="구름많음">
+                    {% elif sky == '4' %}
+                      <img class="weather--skyimg" src="{% static 'img/weather/overcast.png' %}" alt="흐림" title="흐림">
+                    {% endif %}
+                  {% else %}
+                    {% if sky == '1' %}
+                      <img class="weather--skyimg" src="{% static 'img/weather/moon.png' %}" alt="저녁맑음" title="맑음">
+                    {% elif sky == '3' %}
+                      <img class="weather--skyimg" src="{% static 'img/weather/mooncloudy.png' %}" alt="저녁구름많음" title="구름많음">
+                    {% elif sky == '4' %}
+                      <img class="weather--skyimg" src="{% static 'img/weather/overcast.png' %}" alt="흐림" title="흐림">
+                    {% endif %}
                   {% endif %}
-                {% else %}
-                  {% if sky == '1' %}
-                    <img class="weather--skyimg" src="{% static 'img/weather/moon.png' %}" alt="저녁맑음" title="맑음">
-                  {% elif sky == '3' %}
-                    <img class="weather--skyimg" src="{% static 'img/weather/mooncloudy.png' %}" alt="저녁구름많음" title="구름많음">
-                  {% elif sky == '4' %}
-                    <img class="weather--skyimg" src="{% static 'img/weather/overcast.png' %}" alt="흐림" title="흐림">
+                </div>
+                <div class="d-flex flex-row">
+                  <p class="weather--tem">{{ tem }}</p>
+                  <p style="font-size: 2rem; line-height: 140px;">℃</p>
+                </div>
+              </div>
+              <div class="d-flex flex-row justify-content-between">
+                <div class="weather--hvwr">
+                  <p>습도</p>
+                  <p>{{ hum }} %</p>
+                </div>
+                <div style="border-right: 1px solid #DBDBDB;"></div>
+                <div class="weather--hvwr">
+                  <p>바람</p>
+                  <p>{{ vec }} {{ wsd }} m/s</p>
+                </div>
+                <div style="border-right: 1px solid #DBDBDB;"></div>
+                <div class="weather--hvwr">
+                  <p>1시간강수량</p>
+                  {% if rain == '0' %}
+                    <p>- mm</p>
+                  {% else %}
+                    <p>{{ rain }}</p>
                   {% endif %}
-                {% endif %}
+                </div>
               </div>
-              <div class="d-flex flex-row">
-                <p class="weather--tem">{{ tem }}</p>
-                <p style="font-size: 2rem; line-height: 140px;">℃</p>
-              </div>
-            </div>
-            <div class="d-flex flex-row justify-content-between">
-              <div class="weather--hvwr">
-                <p>습도</p>
-                <p>{{ hum }} %</p>
-              </div>
-              <div style="border-right: 1px solid #DBDBDB;"></div>
-              <div class="weather--hvwr">
-                <p>바람</p>
-                <p>{{ vec }} {{ wsd }} m/s</p>
-              </div>
-              <div style="border-right: 1px solid #DBDBDB;"></div>
-              <div class="weather--hvwr">
-                <p>1시간강수량</p>
-                {% if rain == '0' %}
-                  <p>- mm</p>
-                {% else %}
-                  <p>{{ rain }}</p>
-                {% endif %}
-              </div>
-            </div>
+            </a>
           </div>
           <div></div>
           <div class="air--warp">
