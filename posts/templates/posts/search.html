@@ -5,6 +5,7 @@
 {% block style %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
 <link rel="stylesheet" href="{% static 'css/posts_index.css' %}">
+<link rel="stylesheet" href="{% static 'css/level.css' %}">
 {% endblock style %}
 {% block content %}
 <div style="padding: 30px 60px;">
@@ -42,9 +43,15 @@
               <div class="postindex__post--user mb-2">
                 <div class="postindex__post--userimgbox">
                   {% if post.user.profile_img %}
-                    <img class="postindex__post--userimg" src="{{ post.user.profile_img.url }}" alt="유저프로필">
+                    <img class="postindex__post--userimg {% if post.user.level == 2 %}level2 {% elif post.user.level == 3 %}level3 {% elif post.user.level == 4 %}level4 {% elif post.user.level == 5 %}level5 {% endif %}" src="{{ post.user.profile_img.url }}" alt="유저프로필">
+                    {% if post.user.level == 5 %}
+                      <img class="level5--img" src="{% static 'img/crown.png' %}" alt="level5">
+                    {% endif %}
                   {% else %}
-                    <img class="postindex__post--userimg" src="{% static 'img/profile_no_img.png' %}" alt="대체프로필">
+                    <img class="postindex__post--userimg {% if post.user.level == 2 %}level2 {% elif post.user.level == 3 %}level3 {% elif post.user.level == 4 %}level4 {% elif post.user.level == 5 %}level5 {% endif %}" src="{% static 'img/profile_no_img.png' %}" alt="대체프로필">
+                    {% if post.user.level == 5 %}
+                      <img class="level5--img" src="{% static 'img/crown.png' %}" alt="level5">
+                    {% endif %}
                   {% endif %}
                 </div>
                 {% if search_option == 'author' %}
