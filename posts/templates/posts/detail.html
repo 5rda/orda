@@ -53,9 +53,9 @@
         <form id="follow-form" data-user-id="{{ post.user.pk }}">
           {% csrf_token %}
           {% if request.user in post.user.followers.all %}
-            <input type="submit" class="follw__btn rounded btn__hover" value="팔로잉">
+            <input type="submit" class="follw__btn rounded btn__hover" value="팔로우">
           {% else %}
-            <input type="submit" class="follw__btn rounded btn__hover" value="팔로워">
+            <input type="submit" class="follw__btn rounded btn__hover" value="팔로우 취소">
           {% endif %}
         </form>
       {% endif %}
