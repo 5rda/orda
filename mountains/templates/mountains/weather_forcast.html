@@ -85,3 +85,410 @@
 </ul>
 </body>
 </html>
+
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/mountains_weather.css' %}">
+{% endblock style %}
+
+{% block content %}
+<div class="mountain__weather--wrap">
+  <h2 class="mountain__weather--title">{{ mountain.name }} 5일 예보(3시간 간격)</h2>
+  <section>
+    <div class="mountain__daybox--wrap">
+        <ul class="d-flex flex-row">
+            {% for date, data in daily_data.items %}
+                <li class="weather__day--selectbtn">
+                    <button>{{ date }}</button>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <div class="weather__content--wrap">
+            {% for date, forecasts in daily_data.items %}
+                {% if forloop.counter == 1 %}
+                {% comment %} 오늘 {% endcomment %}
+                    <div id="day1weather" class="weather__content">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    {% for forecast in forecasts %}
+                                        <th>{{ forecast.dt_txt }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>날씨</td>
+                                    {% for forecast in forecasts %}
+                                        <td>
+                                            <img id="weather-icon" src="http://openweathermap.org/img/wn/{{ forecast.weather.0.icon }}.png"
+                                                alt="{{ forecast.weather.0.description }}" />
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td>기온</td>
+                                    {% for forecast in forecasts %}
+                                        <td>{{ forecast.main.temp|floatformat:0 }}°C</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td>습도</td>
+                                    {% for forecast in forecasts %}
+                                    <td>{{ forecast.main.humidity }}%</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td>강수확률</td>
+                                    {% for forecast in forecasts %}
+                                        <td>{{ forecast.pop }}%</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td>강수량</td>
+                                    {% for forecast in forecasts %}
+                                        <td>
+                                            {% if forecast.rain %}
+                                                {{ forecast.rain.3h }}mm
+                                            {% else %}
+                                                - mm
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td>바람</td>
+                                    {% for forecast in forecasts %}
+                                        <td>{{ forecast.wind.deg }} {{ forecast.wind.speed }}m/s</td>
+                                    {% endfor %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+                {% if forloop.counter == 2 %}
+                {% comment %} 1일 뒤 {% endcomment %}
+                    <div id="day2weather" class="weather__content">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    {% for forecast in forecasts %}
+                                        <th>{{ forecast.dt_txt }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>날씨</td>
+                                    {% for forecast in forecasts %}
+                                        <td>
+                                            <img id="weather-icon" src="http://openweathermap.org/img/wn/{{ forecast.weather.0.icon }}.png"
+                                                alt="{{ forecast.weather.0.description }}" />
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td>기온</td>
+                                    {% for forecast in forecasts %}
+                                        <td>{{ forecast.main.temp|floatformat:0 }}°C</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td>습도</td>
+                                    {% for forecast in forecasts %}
+                                    <td>{{ forecast.main.humidity }}%</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td>강수확률</td>
+                                    {% for forecast in forecasts %}
+                                        <td>{{ forecast.pop }}%</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td>강수량</td>
+                                    {% for forecast in forecasts %}
+                                        <td>
+                                            {% if forecast.rain %}
+                                                {{ forecast.rain.3h }}mm
+                                            {% else %}
+                                                - mm
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td>바람</td>
+                                    {% for forecast in forecasts %}
+                                        <td>{{ forecast.wind.deg }} {{ forecast.wind.speed }}m/s</td>
+                                    {% endfor %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+                {% if forloop.counter == 3 %}
+                {% comment %} 2일 뒤 {% endcomment %}
+                    <div id="day3weather" class="weather__content">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    {% for forecast in forecasts %}
+                                        <th>{{ forecast.dt_txt }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>날씨</td>
+                                    {% for forecast in forecasts %}
+                                        <td>
+                                            <img id="weather-icon" src="http://openweathermap.org/img/wn/{{ forecast.weather.0.icon }}.png"
+                                                alt="{{ forecast.weather.0.description }}" />
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td>기온</td>
+                                    {% for forecast in forecasts %}
+                                        <td>{{ forecast.main.temp|floatformat:0 }}°C</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td>습도</td>
+                                    {% for forecast in forecasts %}
+                                    <td>{{ forecast.main.humidity }}%</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td>강수확률</td>
+                                    {% for forecast in forecasts %}
+                                        <td>{{ forecast.pop }}%</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td>강수량</td>
+                                    {% for forecast in forecasts %}
+                                        <td>
+                                            {% if forecast.rain %}
+                                                {{ forecast.rain.3h }}mm
+                                            {% else %}
+                                                - mm
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td>바람</td>
+                                    {% for forecast in forecasts %}
+                                        <td>{{ forecast.wind.deg }} {{ forecast.wind.speed }}m/s</td>
+                                    {% endfor %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+                {% if forloop.counter == 4 %}
+                {% comment %} 3일뒤 {% endcomment %}
+                    <div id="day4weather" class="weather__content">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    {% for forecast in forecasts %}
+                                        <th>{{ forecast.dt_txt }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>날씨</td>
+                                    {% for forecast in forecasts %}
+                                        <td>
+                                            <img id="weather-icon" src="http://openweathermap.org/img/wn/{{ forecast.weather.0.icon }}.png"
+                                                alt="{{ forecast.weather.0.description }}" />
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td>기온</td>
+                                    {% for forecast in forecasts %}
+                                        <td>{{ forecast.main.temp|floatformat:0 }}°C</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td>습도</td>
+                                    {% for forecast in forecasts %}
+                                    <td>{{ forecast.main.humidity }}%</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td>강수확률</td>
+                                    {% for forecast in forecasts %}
+                                        <td>{{ forecast.pop }}%</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td>강수량</td>
+                                    {% for forecast in forecasts %}
+                                        <td>
+                                            {% if forecast.rain %}
+                                                {{ forecast.rain.3h }}mm
+                                            {% else %}
+                                                - mm
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td>바람</td>
+                                    {% for forecast in forecasts %}
+                                        <td>{{ forecast.wind.deg }} {{ forecast.wind.speed }}m/s</td>
+                                    {% endfor %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+                {% if forloop.counter == 5 %}
+                {% comment %} 4일뒤 {% endcomment %}
+                    <div id="day5weather" class="weather__content">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    {% for forecast in forecasts %}
+                                        <th>{{ forecast.dt_txt }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>날씨</td>
+                                    {% for forecast in forecasts %}
+                                        <td>
+                                            <img id="weather-icon" src="http://openweathermap.org/img/wn/{{ forecast.weather.0.icon }}.png"
+                                                alt="{{ forecast.weather.0.description }}" />
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td>기온</td>
+                                    {% for forecast in forecasts %}
+                                        <td>{{ forecast.main.temp|floatformat:0 }}°C</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td>습도</td>
+                                    {% for forecast in forecasts %}
+                                    <td>{{ forecast.main.humidity }}%</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td>강수확률</td>
+                                    {% for forecast in forecasts %}
+                                        <td>{{ forecast.pop }}%</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td>강수량</td>
+                                    {% for forecast in forecasts %}
+                                        <td>
+                                            {% if forecast.rain %}
+                                                {{ forecast.rain.3h }}mm
+                                            {% else %}
+                                                - mm
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td>바람</td>
+                                    {% for forecast in forecasts %}
+                                        <td>{{ forecast.wind.deg }} {{ forecast.wind.speed }}m/s</td>
+                                    {% endfor %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+                {% if forloop.counter == 6 %}
+                {% comment %} 5일뒤 {% endcomment %}
+                    <div id="day6weather" class="weather__content">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    {% for forecast in forecasts %}
+                                        <th>{{ forecast.dt_txt }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>날씨</td>
+                                    {% for forecast in forecasts %}
+                                        <td>
+                                            <img id="weather-icon" src="http://openweathermap.org/img/wn/{{ forecast.weather.0.icon }}.png"
+                                                alt="{{ forecast.weather.0.description }}" />
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td>기온</td>
+                                    {% for forecast in forecasts %}
+                                        <td>{{ forecast.main.temp|floatformat:0 }}°C</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td>습도</td>
+                                    {% for forecast in forecasts %}
+                                    <td>{{ forecast.main.humidity }}%</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td>강수확률</td>
+                                    {% for forecast in forecasts %}
+                                        <td>{{ forecast.pop }}%</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td>강수량</td>
+                                    {% for forecast in forecasts %}
+                                        <td>
+                                            {% if forecast.rain %}
+                                                {{ forecast.rain.3h }}mm
+                                            {% else %}
+                                                - mm
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td>바람</td>
+                                    {% for forecast in forecasts %}
+                                        <td>{{ forecast.wind.deg }} {{ forecast.wind.speed }}m/s</td>
+                                    {% endfor %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+  </section>
+</div>
+{% endblock content %}
+
+{% block javascript %}
+<script src="{% static 'js/mountains_weather.js' %}"></script>
+{% endblock javascript %}

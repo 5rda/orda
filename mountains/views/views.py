@@ -325,11 +325,30 @@ def weather_forecast(request, pk):
 
     daily_data = {}  # 날짜별 데이터를 담을 딕셔너리
 
+    def get_direction(deg):
+        if 22.5 <= deg < 67.5:
+            return '북동'
+        elif 67.5 <= deg < 112.5:
+            return '동'
+        elif 112.5 <= deg < 157.5:
+            return '남동'
+        elif 157.5 <= deg < 202.5:
+            return '남'
+        elif 202.5 <= deg < 247.5:
+            return '남서'
+        elif 247.5 <= deg < 292.5:
+            return '서'
+        elif 292.5 <= deg < 337.5:
+            return '북서'
+        else:
+            return '북'
+
     for forecast in weather_data['list']:
         dt_txt = datetime.datetime.strptime(forecast['dt_txt'], '%Y-%m-%d %H:%M:%S') + datetime.timedelta(hours=9)
         date_key = dt_txt.strftime('%d일')  # 날짜를 key로 사용
-        forecast['dt_txt'] = dt_txt.strftime('%m월 %d일 %H시')
+        forecast['dt_txt'] = dt_txt.strftime('%H시')
         forecast['pop'] = int(forecast['pop'] * 100)
+        forecast['wind']['deg'] = get_direction(forecast['wind']['deg'])
 
         if date_key not in daily_data:
             daily_data[date_key] = []  # 새로운 날짜의 데이터를 빈 리스트로 초기화
