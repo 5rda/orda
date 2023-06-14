@@ -146,11 +146,11 @@
   </section>
 
   <section style="margin-bottom: 120px;">
-    <h1 class="postindex__Content--title2">전체 글<span style="color: var(--main-color); margin-left: 10px;">{{ posts|length }}</span></h1>  
+    <h1 class="postindex__Content--title2">전체 글<span style="color: var(--main-color); margin-left: 10px;">{{ posts|length }}</span></h1>
     <div class="post-grid" id="postGrid">
       {% for post in posts %}
-        <div class="max-w-md bg-white border border-gray-200 rounded-lg shadow" style="display: block; min-width: 250px;">
-          <!-- 글 내용을 표시하는 부분 -->
+        <div class="max-w-md bg-white border border-gray-200 rounded-lg shadow post-item" style="display: block; min-width: 250px;">
+        <!-- 글 내용을 표시하는 부분 -->
           <a href="{% url 'posts:detail' post.pk %}"  class="position--relative">
             <div class="postindex__post--imgbox">
               {% with first_image_url=post.content|get_first_image_from_content %}
@@ -208,7 +208,7 @@
         </div>
       {% endfor %}
     </div>
-    <button id="loadMoreBtn" style="display: none;">더 보기</button>
+    <button id="loadMoreBtn" {% if posts|length <= 12 %}style="display: none;"{% endif %}>더 보기</button>
   </section>
 </div>
 
@@ -235,7 +235,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
 <script src="{% static 'js/posts_index.js' %}"></script>
-
 <script>
   window.addEventListener('resize', adjustCardLayout);
 
@@ -253,7 +252,5 @@ function adjustCardLayout() {
   });
 }
 //adjustCardLayout();
-
-
 </script>
 {% endblock javascript %}

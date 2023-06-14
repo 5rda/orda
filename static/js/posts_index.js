@@ -1,35 +1,38 @@
-var page = 1; // 초기 페이지 번호
-var perPage = 12; // 한 페이지에 보여줄 글 수
-var postItems = Array.from(document.getElementsByClassName("post-item"));
-var loadMoreBtn = document.getElementById("loadMoreBtn");
+document.addEventListener("DOMContentLoaded", function () {
+  var loadMoreBtn = document.getElementById("loadMoreBtn");
+  var postGrid = document.getElementById("postGrid");
+  var posts = document.querySelectorAll(".post-item");
 
-function showPosts(startIndex, endIndex) {
-  for (var i = startIndex; i < endIndex; i++) {
-    postItems[i].style.display = "block";
-  }
-}
+  var visiblePosts = 12; // 초기에 보여줄 게시물 수
+  var increment = 12; // 더 보기 버튼을 누를 때 추가로 보여줄 게시물 수
 
-function loadMorePosts() {
-  var startIndex = (page - 1) * perPage;
-  var endIndex = startIndex + perPage;
-
-  if (endIndex >= postItems.length) {
-    loadMoreBtn.style.display = "none";
-    endIndex = postItems.length;
+  // 초기에 보여줄 게시물 수 이상일 경우 더 보기 버튼을 표시
+  if (posts.length > visiblePosts) {
+    loadMoreBtn.style.display = "block";
   }
 
-  showPosts(startIndex, endIndex);
-  page++;
-}
+  // 초기에 보여줄 게시물 수 이후의 게시물은 숨김
+  for (var i = visiblePosts; i < posts.length; i++) {
+    posts[i].style.display = "none";
+  }
 
-if (postItems.length > perPage) {
-  loadMoreBtn.style.display = "block";
-  showPosts(0, perPage);
-  page++;
-}
+  // 더 보기 버튼 클릭 시 게시물 추가 보여주기
+  loadMoreBtn.addEventListener("click", function () {
+    var nextVisiblePosts = visiblePosts + increment;
 
-loadMoreBtn.addEventListener("click", loadMorePosts);
+    // 추가로 보여줄 게시물이 남아있을 경우 보여주기
+    for (var i = visiblePosts; i < posts.length && i < nextVisiblePosts; i++) {
+      posts[i].style.display = "block";
+    }
 
+    visiblePosts = nextVisiblePosts;
+
+    // 모든 게시물을 보여준 경우 더 보기 버튼 숨김
+    if (visiblePosts >= posts.length) {
+      loadMoreBtn.style.display = "none";
+    }
+  });
+});
 
 // 좋아요 비동기
 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
