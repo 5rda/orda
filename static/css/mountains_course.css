@@ -1,7 +1,7 @@
 .course__wrap{
-  margin: 30px 8%;
+  margin: 30px 5%;
   padding: 0px 16px;
-  min-width: 430px;
+  min-width: 375px;
 }
 
 .title__box {
@@ -77,8 +77,8 @@
 .arrow--rotate {
   border: 3px solid ;
   border-radius: 50%;
-  width: 30px;
-  height: 30px;
+  width: 35px;
+  height: 35px;
   color: var(--sub-color);
   margin-bottom: 10px;
   

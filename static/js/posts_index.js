@@ -79,22 +79,25 @@ $(document).ready(function() {
     // OwlCarousel 옵션 설정
     items: 4, // 한 번에 표시할 아이템 수
     loop: false, // 무한 루프 여부
-    margin: 20, // 아이템 간의 간격
-    nav: true, // 네비게이션 버튼 표시 여부
-    navText: ["<", ">"],
+    margin: 10, // 아이템 간의 간격
     dots: true, // 도트 표시 여부
+    animateIn: 'fadeIn',
+    autoplay: true,
+    rewind: true,
+    autoplayTimeout: 3000,
+    smartSpeed: 500,
     responsive: {
       // 반응형 옵션 설정
       0: {
         items: 1 // 0px 이상일 때, 1개의 아이템 표시
       },
-      992: {
+      720: {
         items: 2
       },
-      1200: {
+      1080: {
         items: 3
       },
-      1400: {
+      1280: {
         items: 4
       },
     }

@@ -549,18 +549,30 @@ function initMap(courseId, course) {
 
   // 출발 좌표에 마커 표시
   var startMarkerPosition = linePath[0];
+  var startMarkerImage = new kakao.maps.MarkerImage(
+    '/static/img/icons/start.png',
+    new kakao.maps.Size(100, 100),
+    { offset: new kakao.maps.Point(50, 80) }
+    );
   var startMarker = new kakao.maps.Marker({
     position: startMarkerPosition,
     map: map,
-    title: "출발지"
+    title: "출발지",
+    image: startMarkerImage,
   });
 
   // 도착 좌표에 마커 표시
   var endMarkerPosition = linePath[linePath.length - 1];
+  var endMarkerImage = new kakao.maps.MarkerImage(
+    '/static/img/icons/end.png',
+    new kakao.maps.Size(100, 100),
+    { offset: new kakao.maps.Point(50, 80) }
+    );
   var endMarker = new kakao.maps.Marker({
     position: endMarkerPosition,
     map: map,
-    title: "도착지"
+    title: "도착지",
+    image: endMarkerImage,
   });
       
   // 중간 인덱스 계산

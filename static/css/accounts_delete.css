@@ -22,7 +22,7 @@
   margin: 0px 200px;
   padding: 20px 0px;
   background-color: var(--background-color);
-  min-width: 450px; 
+  min-width: 360px; 
 }
 
 .title {
@@ -37,7 +37,7 @@
   /* background-color: var(--background-color); */
   padding: 50px 70px 50px 70px;
   margin: 0px 200px 100px;
-  min-width: 450px;    
+  min-width: 360px;    
 }
 
 .form__text {

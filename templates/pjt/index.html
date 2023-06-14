@@ -46,27 +46,28 @@
           <div class="d-flex justify-content-between">
             <div class="d-flex">
               <div style="height:75px;">
-                <a href="{% url 'mountains:mountain_list' %}"><img class='header__logo--img' src="{% static 'img/logo_long.png' %}" alt="ordalogo"></a>
-              </div>
-              <div class="d-flex align-items-end fs-5 ms-3 hearder__btn--box" >
-                <a href="{% url 'mountains:search' %}" class="{% if '/search/' in request.path %} active-button {% endif %} btn--hover mb-1  mx-3">탐색</a>
-                <a href="{% url 'mountains:mountain_list' %}" class="{% if request.resolver_match.url_name == 'mountain_list' %} active-button {% endif %} btn--hover mb-1 mx-3">100대 명산</a>
-                <a href="{% url 'mountains:course_all_list' %}" class="{% if '/courses/' in request.path %} active-button {% endif %} btn--hover mb-1 mx-3">등산로</a>
-                <a href="{% url 'posts:index' %}" class="{% if request.resolver_match.view_name == 'posts:index' %} active-button {% endif %} btn--hover mb-1 mx-3">마이코스</a>
-                <a href="{% url 'posts:proofshot' %}" class="{% if '/proofshot/' in request.path %} active-button {% endif %} btn--hover mb-1 mx-3">인증샷</a>
+                <a href="{% url 'mountains:mountain_list' %}"><img class='header__logo--img small--hidden' src="{% static 'img/logo_long.png' %}" alt="ordalogo"></a>
               </div>
             </div>
-            <div class="d-flex">
-              <div class="d-flex align-items-end me-3 hearder__search--box">
+            <div class="d-flex justify-content-between align-items-center align-items-xl-end flex-column flex-xl-row">
+              <div class="d-flex align-items-end fs-5 hearder__btn--box" >
+                <a href="{% url 'mountains:search' %}" class="{% if '/search/' in request.path %} active-button {% endif %} btn--hover mb-1 header__btn--margin">탐색</a>
+                <a href="{% url 'mountains:mountain_list' %}" class="{% if request.resolver_match.url_name == 'mountain_list' %} active-button {% endif %} btn--hover mb-1 header__btn--margin">100대 명산</a>
+                <a href="{% url 'mountains:course_all_list' %}" class="{% if '/courses/' in request.path %} active-button {% endif %} btn--hover mb-1 header__btn--margin">등산로</a>
+                <a href="{% url 'posts:index' %}" class="{% if request.resolver_match.view_name == 'posts:index' %} active-button {% endif %} btn--hover mb-1 header__btn--margin">마이코스</a>
+                <a href="{% url 'posts:proofshot' %}" class="{% if '/proofshot/' in request.path %} active-button {% endif %} btn--hover mb-1 header__btn--margin">인증샷</a>
+              </div>
+              <div class="d-flex align-items-end hearder__search--box">
                 <div class="rounded-pill d-flex mb-1" style="border:var(--main-color) 3px solid; background-color:white">
                   <i class="bi bi-search align-self-center ps-3"></i>  
                   <form action="{% url 'mountains:mountain_list' %}" method="POST">
                     {% csrf_token %}
-                    <input class="rounded-pill header__search--text py-2 ps-4 pe-5"  type="text" name="search_query" placeholder="무엇을 찾으시나요?">
+                    <input class="rounded-pill header__search--text py-2 ps-4 pe-5"  type="text" name="search_query" placeholder="무엇을 찾으시나요?" style="width: 400px">
                     <button type="submit" hidden></button>
                   </form>
                 </div>
               </div>
+            </div>
               <div class="d-flex align-items-end mb-2">
                 <div class="d-flex">
                   {% if user.is_authenticated %}
@@ -77,10 +78,7 @@
                   {% else %}
                     <a id="로그인" class="{% if active_button_id == '로그인' %}active-button{% endif %} fs-5 me-3" href="{% url 'accounts:login' %}">로그인</a>
                     <a id="회원가입" class="{% if active_button_id == '회원가입' %}active-button{% endif %} fs-5" href="{% url 'accounts:signup' %}">회원가입</a>
-                  {% endif %}
-                  
-                  
-                </div>
+                  {% endif %}                  
                 </div>
               </div>
             </div>

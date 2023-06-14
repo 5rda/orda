@@ -18,7 +18,7 @@
     <form action="{% url 'mountains:reset' %}" method="GET" id="reset-form">
       {% if 'filtered_courses' in request.session or 'filtered_mountains' in request.session %}
         <input type="hidden" name="reset" value="true">
-        <button type="submit" class="bi bi-arrow-clockwise align-self-end ms-2 fs-5 arrow--rotate mt-1"></button>
+        <button type="submit" class="bi bi-arrow-clockwise align-self-end ms-2 fs-5 arrow--rotate "></button>
       {% endif %}
     </form>
   </div>
@@ -107,7 +107,7 @@
 {% block javascript %}
 <script>
   $('document').ready(function() {
-    var area0 = ["시/도 선택","서울특별시","인천광역시","대전광역시","광주광역시","대구광역시","울산광역시","부산광역시","경기도","강원도","충청북도","충청남도","전라북도","전라남도","경상북도","경상남도","제주도"];
+    var area0 = ["전국","서울특별시","인천광역시","대전광역시","광주광역시","대구광역시","울산광역시","부산광역시","경기도","강원도","충청북도","충청남도","전라북도","전라남도","경상북도","경상남도","제주도"];
     var area1 = ["전체"];
     var area2 = ["전체"];
     var area3 = ["전체"];

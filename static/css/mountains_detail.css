@@ -7,7 +7,7 @@ th {
 .mountains__detail--warp {
   margin: 30px 16%;
   padding: 0px 16px;
-  min-width: 430px;
+  min-width: 370px;
   position: relative;
 }
 
@@ -645,8 +645,9 @@ th {
 @media (max-width:1080px) {
   .mountains__detail--warp {
     margin: 30px 0;
-    min-width: 430px;
+    min-width: 370px;
     position: relative;
+    padding: 0;
   }
 
   .mountain__btn__wrap{

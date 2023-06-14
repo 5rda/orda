@@ -1,13 +1,18 @@
 .post__wrap {
   margin: 30px 8%;
   padding: 0px 16px;
-  min-width: 430px;
+  min-width: 370px;
   position: relative;
+}
+
+.mtn__title {
+  color: #509762;
+  font-weight: 600;
 }
 
 .title__wrap {
   font-size: 35px;
-  padding: 3px 5px;
+  padding: 0px 5px;
   word-wrap: break-word;
   font-weight: bold;
 }
