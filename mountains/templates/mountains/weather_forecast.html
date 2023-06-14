@@ -1,20 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/mountains_weather.css' %}">
+{% endblock style %}
+
+{% block content %}
   <h2>{{ mountain.name }} 5일 예보(3시간 간격)</h2>
   <ul>
     <table>
         <thead>
             <tr>
                 <th></th>
-                {% for forecast in weather_data.list %}
-                <th>{{ forecast.dt_txt }}</th>
+                {% for date, data in daily_data.items %}
+                        {{ date }}
+                    {% comment %} <th>{{ forecast.dt_txt }}</th> {% endcomment %}
                 {% endfor %}
             </tr>
         </thead>
@@ -83,5 +84,8 @@
         </tbody>
     </table>
 </ul>
-</body>
-</html>
+{% endblock content %}
+
+{% block javascript %}
+<script src="{% static 'js/mountains_weather.js' %}"></script>
+{% endblock javascript %}

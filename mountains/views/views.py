@@ -323,14 +323,23 @@ def weather_forecast(request, pk):
 
     weather_data = get_weather(lat, lon, api_key)
 
+    daily_data = {}  # 날짜별 데이터를 담을 딕셔너리
+
     for forecast in weather_data['list']:
         dt_txt = datetime.datetime.strptime(forecast['dt_txt'], '%Y-%m-%d %H:%M:%S') + datetime.timedelta(hours=9)
+        date_key = dt_txt.strftime('%d일')  # 날짜를 key로 사용
         forecast['dt_txt'] = dt_txt.strftime('%m월 %d일 %H시')
         forecast['pop'] = int(forecast['pop'] * 100)
 
+        if date_key not in daily_data:
+            daily_data[date_key] = []  # 새로운 날짜의 데이터를 빈 리스트로 초기화
+
+        daily_data[date_key].append(forecast)  # 해당 날짜에 데이터 추가
+
     context = {
         'mountain': mountain,
-        'weather_data': weather_data
+        'weather_data': weather_data,
+        'daily_data': daily_data,
     }
 
     return render(request, 'mountains/weather_forecast.html', context)
