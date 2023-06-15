@@ -155,7 +155,7 @@ USE_TZ = False
 
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_URL = '/static/'
-STATIC_ROOT = '/var/www/orda_static'
+STATIC_ROOT = '/home/ubuntu/orda_static'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
