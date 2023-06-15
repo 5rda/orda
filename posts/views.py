@@ -53,7 +53,7 @@ def detail(request, post_pk):
 
     prev_posts = Post.objects.filter(pk__lt=post_pk).order_by('-pk')[:2]
     next_posts = Post.objects.filter(pk__gt=post_pk).order_by('pk')[:2]
-    posts = list(prev_posts) + [post] + list(next_posts)
+    posts = list(prev_posts)  + list(next_posts)
     session_key = f'post_viewed_{post_pk}'
 
     if not request.session.get(session_key):

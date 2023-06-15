@@ -251,7 +251,7 @@ form.addEventListener("submit", function (event) {
     const followBtn = document.querySelector('#follow-form > input[type=submit]')
 
     if(isFollowed){
-      followBtn.value='팔로잉'
+      followBtn.value='팔로우 취소'
     } else{
       followBtn.value='팔로우'
     }
