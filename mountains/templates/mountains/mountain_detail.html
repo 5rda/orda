@@ -954,6 +954,11 @@ function initMap(courseId, course) {
   function scrollToComment() {
     const bestReviewId = "{{ most_liked_review.pk }}"; // 해당 리뷰의 고유 식별자 가져오기
     const bestReviewElement = document.getElementById(`best-${bestReviewId}`);
+
+    if (bestReviewElement.style.display === "none") {
+      bestReviewElement.style.display = "block";
+    }
+    
     bestReviewElement.scrollIntoView({ behavior: 'smooth' }); // 해당 리뷰로 스크롤 이동
   }
 </script>
