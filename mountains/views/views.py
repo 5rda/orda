@@ -319,7 +319,7 @@ def weather_forecast(request, pk):
     mountain = Mountain.objects.get(pk=pk)
     lat = mountain.geom.y
     lon = mountain.geom.x
-    api_key = "f0b89520154cdfcc100e02c4acfd8849"
+    api_key = os.environ['OPEN_WEATHER_KEY']
 
     weather_data = get_weather(lat, lon, api_key)
 
