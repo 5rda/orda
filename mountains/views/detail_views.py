@@ -272,7 +272,9 @@ class MountainDetailView(LoginRequiredMixin, DetailView):
 
         # API 요청 보내기
         response = requests.get(url + queryParams, verify=False)
+        print(f'response:{response}')
         items = response.json().get('response').get('body').get('items') #데이터들 아이템에 저장
+        print(f'items:{items}')
         now_weather_data = dict()
     
         for item in items['item']:
