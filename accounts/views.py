@@ -220,7 +220,7 @@ NAVER_CLIENT_SECRET = os.environ.get('NAVER_CLIENT_SECRET')
 
 def kakao_login(request):
     client_id = KAKAO_CLIENT_ID
-    redirect_uri = 'http://localhost:8000/accounts/kakao/callback/'
+    redirect_uri = 'http://orda.duckdns.org/accounts/kakao/callback/'
     url = f'https://kauth.kakao.com/oauth/authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code'
     return redirect(url)
 
@@ -233,7 +233,7 @@ def kakao_callback(request):
         data = {
             'grant_type': 'authorization_code',
             'client_id': KAKAO_CLIENT_ID,
-            'redirect_uri': 'http://localhost:8000/accounts/kakao/callback/',
+            'redirect_uri': 'http://orda.duckdns.org/accounts/kakao/callback/',
             'code': code,
         }
         response = requests.post(url, data=data)
@@ -268,7 +268,7 @@ def kakao_callback(request):
 
 def naver_login(request):
     client_id = NAVER_CLIENT_ID
-    redirect_uri = 'http://localhost:8000/accounts/naver/callback/'
+    redirect_uri = 'http://orda.duckdns.org/accounts/naver/callback/'
     url = f'https://nid.naver.com/oauth2.0/authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code&state=STATE_STRING'
     return redirect(url)
 
@@ -282,7 +282,7 @@ def naver_callback(request):
             'grant_type': 'authorization_code',
             'client_id': NAVER_CLIENT_ID,
             'client_secret': NAVER_CLIENT_SECRET,
-            'redirect_uri': 'http://localhost:8000/accounts/naver/callback/',
+            'redirect_uri': 'http://orda.duckdns.org/accounts/naver/callback/',
             'code': code,
         }
         response = requests.post(url, data=data)
