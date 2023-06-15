@@ -28,7 +28,7 @@
   
   <div id="results" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 mb-4">
     {% for mountain in page_obj %}
-    <div class="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+    <div  class="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
       <a href="{% url 'mountains:mountain_detail' mountain.pk %}"  class="position--relative ">
         <div>
           <img class="rounded-t-lg img--size"src="{% get_static_prefix %}img/mountains/{{ mountain.name }}.png" alt="{{ mountain.name }}">
@@ -73,7 +73,13 @@
     </div>
     {% endfor %}
   </div>
-  <hr>
+  {% comment %} "검색한 산이 없습니다" 문구 표시 {% endcomment %}
+    {% if page_obj|length == 0 %}
+      <div class="text-center my-5 p-5">
+        <p id="noResultsElement">검색한 산이 없습니다.</p>
+      </div>
+    {% endif %}
+    <hr>
   {% comment %} pagenator {% endcomment %}
   <div class="pagination mt-4">
     <div class="mx-auto">
@@ -101,4 +107,9 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="{% static 'js/mountains_likes.js' %}"></script>
 <script src="{% static 'js/list_order.js' %}"></script>
+
+<script>
+  
+
+</script>
 {% endblock javascript %}
