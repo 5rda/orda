@@ -313,7 +313,7 @@
                       {% if request.user != follower %}
                       
                         <div class="profile__follow--followbtnbox">
-                          <button id="followBtn2" class="{% if request.user in follower.followers.all %}profile__follow--unfollowbtn {% else %}profile__follow--followbtn{% endif %}" type="submit" data-person="{{ follower.pk }}">
+                          <button class="followBtn2 {% if request.user in follower.followers.all %}profile__follow--unfollowbtn {% else %}profile__follow--followbtn{% endif %}" type="submit" data-person="{{ follower.pk }}">
                             {% if request.user in follower.followers.all %}
                               <p>팔로잉</p>
                             {% else %}
@@ -326,7 +326,7 @@
                   {% endfor %}
                 </div>
               {% else %}
-                <p class="profile__content--nonewrite">팔로워가 없습니다.</p>
+                <p class="profile__content--nonewrite" style="line-height: 180px;">팔로워가 없습니다.</p>
               {% endif %}  
             </div>
           </div>
@@ -366,7 +366,7 @@
                       </a>
                       {% if request.user != following %}
                         <div class="profile__follow--followbtnbox">
-                          <button id="followBtn3" class="profile__follow--unfollowbtn" type="submit" data-person="{{ following.pk }}">
+                          <button class="followBtn3 profile__follow--unfollowbtn" type="submit" data-person="{{ following.pk }}">
                             <p>팔로잉</p>
                           </button>
                         </div>
@@ -375,7 +375,7 @@
                   {% endfor %}
                 </div>
               {% else %}
-                <p class="profile__content--nonewrite">팔로잉이 없습니다.</p>
+                <p class="profile__content--nonewrite" style="line-height: 180px;">팔로잉이 없습니다.</p>
               {% endif %}
             </div>
           </div>

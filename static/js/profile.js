@@ -169,60 +169,64 @@ if (followBtn) {
   });
 }
 
-const followBtn2 = document.getElementById('followBtn2');
-if (followBtn2) {
-  followBtn2.addEventListener('click', () => {
-    const personId = followBtn2.getAttribute('data-person');
-    axios.defaults.headers.common['X-CSRFToken'] = csrftoken;  // CSRF 토큰 설정
-    axios.post(`/accounts/profile/${personId}/follow/`)
-      .then((response) => {
-        const isFollowed = response.data.is_followed
-        // 서버로부터의 응답을 처리
-        if (isFollowed == true) {
-          // 팔로우 성공 시 동작
-          followBtn2.innerHTML = '<p>팔로잉</p>';
-          followBtn2.classList.remove('profile__follow--followbtn')
-          followBtn2.classList.add('profile__follow--unfollowbtn')
-        } else {
-          // 언팔로우 성공 시 동작
-          followBtn2.innerHTML = '<p>팔로우</p>';
-          followBtn2.classList.remove('profile__follow--unfollowbtn')
-          followBtn2.classList.add('profile__follow--followbtn')
-        }
-      })
+const followBtns2 = document.querySelectorAll('.followBtn2');
+followBtns2.forEach(followBtn => {
+  if (followBtn) {
+    followBtn.addEventListener('click', () => {
+      const personId = followBtn.getAttribute('data-person');
+      axios.defaults.headers.common['X-CSRFToken'] = csrftoken;  // CSRF 토큰 설정
+      axios.post(`/accounts/profile/${personId}/follow/`)
+        .then((response) => {
+          const isFollowed = response.data.is_followed
+          // 서버로부터의 응답을 처리
+          if (isFollowed == true) {
+            // 팔로우 성공 시 동작
+            followBtn.innerHTML = '<p>팔로잉</p>';
+            followBtn.classList.remove('profile__follow--followbtn')
+            followBtn.classList.add('profile__follow--unfollowbtn')
+          } else {
+            // 언팔로우 성공 시 동작
+            followBtn.innerHTML = '<p>팔로우</p>';
+            followBtn.classList.remove('profile__follow--unfollowbtn')
+            followBtn.classList.add('profile__follow--followbtn')
+          }
+        })
 
-      .catch(error => {
-        // 에러 처리
-        console.error(error);
-      });
-  });
-}
+        .catch(error => {
+          // 에러 처리
+          console.error(error);
+        });
+    });
+  }
+})
 
-const followBtn3 = document.getElementById('followBtn3');
-if (followBtn3) {
-  followBtn3.addEventListener('click', () => {
-    const personId = followBtn3.getAttribute('data-person');
-    axios.defaults.headers.common['X-CSRFToken'] = csrftoken;  // CSRF 토큰 설정
-    axios.post(`/accounts/profile/${personId}/follow/`)
-      .then((response) => {
-        const isFollowed = response.data.is_followed
-        // 서버로부터의 응답을 처리
-        if (isFollowed == true) {
-          // 팔로우 성공 시 동작
-          followBtn3.innerHTML = '<p>팔로잉</p>';
-          followBtn3.classList.remove('profile__follow--followbtn')
-          followBtn3.classList.add('profile__follow--unfollowbtn')
-        } else {
-          // 언팔로우 성공 시 동작
-          followBtn3.innerHTML = '<p>팔로우</p>';
-          followBtn3.classList.remove('profile__follow--unfollowbtn')
-          followBtn3.classList.add('profile__follow--followbtn')
-        }
-      })
+const followBtns3 = document.querySelectorAll('.followBtn3');
+followBtns3.forEach(followBtn => {
+  if (followBtn) {
+    followBtn.addEventListener('click', () => {
+      const personId = followBtn.getAttribute('data-person');
+      axios.defaults.headers.common['X-CSRFToken'] = csrftoken;  // CSRF 토큰 설정
+      axios.post(`/accounts/profile/${personId}/follow/`)
+        .then((response) => {
+          const isFollowed = response.data.is_followed
+          // 서버로부터의 응답을 처리
+          if (isFollowed == true) {
+            // 팔로우 성공 시 동작
+            followBtn.innerHTML = '<p>팔로잉</p>';
+            followBtn.classList.remove('profile__follow--followbtn')
+            followBtn.classList.add('profile__follow--unfollowbtn')
+          } else {
+            // 언팔로우 성공 시 동작
+            followBtn.innerHTML = '<p>팔로우</p>';
+            followBtn.classList.remove('profile__follow--unfollowbtn')
+            followBtn.classList.add('profile__follow--followbtn')
+          }
+        })
 
-      .catch(error => {
-        // 에러 처리
-        console.error(error);
-      });
-  });
-}
+        .catch(error => {
+          // 에러 처리
+          console.error(error);
+        });
+    });
+  }
+});

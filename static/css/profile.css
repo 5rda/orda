@@ -395,10 +395,13 @@
 }
 
 .profile__content4--followercontent {
-  height: 200px;
   border: solid 1px #DBDBDB;
   border-radius: 5px;
   padding: 10px;
+  min-height: 200px;
+  max-height: 450px;
+  overflow-y: auto;
+  white-space: nowrap;
 }
 
 .profile__content5--following {
@@ -414,10 +417,13 @@
 }
 
 .profile__content5--followingcontent {
-  height: 200px;
   border: solid 1px #DBDBDB;
   border-radius: 5px;
   padding: 10px;
+  min-height: 200px;
+  max-height: 450px;
+  overflow-y: auto;
+  white-space: nowrap;
 }
 
 
