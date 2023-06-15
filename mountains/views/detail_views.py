@@ -21,7 +21,7 @@ class MountainDetailView(LoginRequiredMixin, DetailView):
             request.session['mountain_viewed_{}'.format(self.object.pk)] = True
 
         context = self.get_context_data(object=self.object)
-        context.update(self.news())
+        # context.update(self.news())
         return self.render_to_response(context)
     
     def get_context_data(self, **kwargs):
@@ -142,39 +142,39 @@ class MountainDetailView(LoginRequiredMixin, DetailView):
         
         return context
     
-    def news(self):
-        client_id = os.environ['NAVER_NEWS_CLIENT_ID']
-        client_secret = os.environ['NAVER_NEWS_SECRET']
-        query = self.get_object().name
-        encText = urllib.parse.quote(query.encode('utf-8'))
-        print(encText)
+    # def news(self):
+    #     client_id = os.environ['NAVER_NEWS_CLIENT_ID']
+    #     client_secret = os.environ['NAVER_NEWS_SECRET']
+    #     query = self.get_object().name
+    #     encText = urllib.parse.quote(query.encode('utf-8'))
+    #     print(encText)
 
-        result = []
-        for start in range(1, 6, 1):
-            url = f'https://openapi.naver.com/v1/search/news.json?query={encText}&display={start}&sort=sim'
+    #     result = []
+    #     for start in range(1, 6, 1):
+    #         url = f'https://openapi.naver.com/v1/search/news.json?query={encText}&display={start}&sort=sim'
 
-            request = urllib.request.Request(url)
-            request.add_header("X-Naver-Client-Id", client_id)
-            request.add_header("X-Naver-Client-Secret", client_secret)
-            response = urllib.request.urlopen(request)
-            rescode = response.getcode()
+    #         request = urllib.request.Request(url)
+    #         request.add_header("X-Naver-Client-Id", client_id)
+    #         request.add_header("X-Naver-Client-Secret", client_secret)
+    #         response = urllib.request.urlopen(request)
+    #         rescode = response.getcode()
 
-            if rescode == 200:
-                response_body = response.read().decode("utf-8")
-                items = json.loads(response_body)["items"]
-                for item in items:
-                    item['title'] = item['title'].replace('&apos;', "'")
-                    item['title'] = item['title'].replace('&quot;', "\"")
-                    item['title'] = item['title'].replace('<b>', "")
-                    item['title'] = item['title'].replace('</b>', "")
-                result.extend(items)
-                # result_set.update(json.loads(response_body)["items"])
+    #         if rescode == 200:
+    #             response_body = response.read().decode("utf-8")
+    #             items = json.loads(response_body)["items"]
+    #             for item in items:
+    #                 item['title'] = item['title'].replace('&apos;', "'")
+    #                 item['title'] = item['title'].replace('&quot;', "\"")
+    #                 item['title'] = item['title'].replace('<b>', "")
+    #                 item['title'] = item['title'].replace('</b>', "")
+    #             result.extend(items)
+    #             # result_set.update(json.loads(response_body)["items"])
         
-        result = [dict(t) for t in {tuple(d.items()) for d in result}]
+    #     result = [dict(t) for t in {tuple(d.items()) for d in result}]
 
-        return {
-            'result': result,
-        }
+    #     return {
+    #         'result': result,
+    #     }
     
     # def get_weather_forecast(self):
     #     mountain = self.get_object()
