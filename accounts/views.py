@@ -255,8 +255,13 @@ def kakao_callback(request):
                     user.email = user_info['kakao_account']['email']
 
                 if 'properties' in user_info and 'profile_image' in user_info['properties']:
-                    user.profile_img = user_info['properties']['profile_image']
-
+                    profile_image_url = user_info['properties']['profile_image']
+                    # 앞부분을 잘라냄
+                    filename = profile_image_url.replace('http://k.kakaocdn.net/dn/', '')
+                    response = requests.get(profile_image_url)
+                    if response.status_code == 200:
+                        file_content = ContentFile(response.content)
+                        user.profile_img.save(filename, file_content, save=True)
                 user.save()
                 auth_login(request, user)
                 return redirect('accounts:update')
