@@ -30,7 +30,7 @@ if os.name == 'nt':
 SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -155,6 +155,7 @@ USE_TZ = False
 
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_URL = '/static/'
+STATIC_ROOT = '/var/www/orda_static'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
