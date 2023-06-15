@@ -28,6 +28,7 @@
     <form id="sort-form">
       <label for="sort-select" class="sr-only">정렬</label>
       <select name="sort" id="sort-select" class="select__box focus:outline-none focus:border-gray-200 peer">
+        <option value="">정렬</option>
         <option value="bookmarks">북마크순</option>
         <option value="diff">난이도순</option>
         <option value="distance">거리순</option>
@@ -51,7 +52,7 @@
       class="flex flex-col bg-white border border-gray-200 rounded-lg shadow md:flex-row li__box">
         <img class="object-cover w-full rounded-t-lg h-96 md:h-auto md:w-48 md:rounded-none md:rounded-l-lg" src="{% get_static_prefix %}img/mountains/{{ course.mntn_name }}.png" alt="{{ course.mntn_name }}">
         <div class="flex--col mt-3 ms-4 md:ms-2">
-          <h3 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{ course.crs_name }}</h3>
+          <h3 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{ course.crs_name_detail }}</h3>
           <h5 class="mb-2 text-xl font-bold tracking-tight text--colormain">{{ course.mntn_name }}</h5>
           <div class="flex--row">
             <div class="me-3 box--minwidth">
